@@ -39,3 +39,45 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "auth_profile"
+
+
+class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="addresses"
+    )
+    title = models.CharField(
+        max_length=100,
+        help_text="مثلاً خانه، محل کار، ..."
+    )
+    address_line = models.CharField(
+        max_length=255,
+        help_text=_("نشانی کامل (خیابان، پلاک، ...)")
+    )
+    postal_code = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text=_("عرض جغرافیایی")
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text=_("طول جغرافیایی")
+    )
+    is_default = models.BooleanField(
+        default=False,
+        help_text=_("آیا آدرس پیش‌فرض کاربر است؟")
+    )
+
+    class Meta:
+        db_table = "auth_user_address"
