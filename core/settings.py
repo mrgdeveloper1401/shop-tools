@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "blog_app.apps.BlogAppConfig",
     "core_app.apps.CoreAppConfig",
     "order_app.apps.OrderAppConfig",
+    "discount_app.apps.DiscountAppConfig",
 ]
 
 MIDDLEWARE = [
