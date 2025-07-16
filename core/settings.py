@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from core_app.utils.ck_editor import CKEDITOR_5_CONFIGS, customColorPalette
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework",
     "django_filters",
+    "django_ckeditor_5",
+
+    "account_app.apps.AccountAppConfig",
+    "product_app.apps.ProductAppConfig",
+    "blog_app.apps.BlogAppConfig",
+    "core_app.apps.CoreAppConfig",
 ]
 
 MIDDLEWARE = [
@@ -99,3 +106,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'account_app.User'
+
+
+# Define a constant in settings.py to specify file upload permissions
+CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff"  # Possible values: "staff", "authenticated", "any"
