@@ -78,3 +78,12 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         ordering = ("-id",)
+
+
+class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "public_notification"

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Profile, UserAddress
+from .models import User, Profile, UserAddress, PrivateNotification
 
 
 @admin.register(User)
@@ -15,4 +15,9 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(UserAddress)
 class UserAddressAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(PrivateNotification)
+class PrivateNotificationAdmin(admin.ModelAdmin):
     pass

@@ -81,3 +81,17 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "auth_user_address"
+
+
+class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="private_notifications"
+    )
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "auth_private_notification"
