@@ -26,6 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
     objects = UserManager()
 
     class Meta:
+        ordering = ("-id",)
         db_table = "auth_user"
 
 
@@ -42,6 +43,7 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
 
     class Meta:
+        ordering = ("-id",)
         db_table = "auth_profile"
 
     @cached_property
@@ -65,8 +67,7 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     postal_code = models.CharField(
         max_length=20,
-        blank=True,
-        null=True
+        db_index=True
     )
     latitude = models.DecimalField(
         max_digits=9,
@@ -88,6 +89,7 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
 
     class Meta:
+        ordering = ("-id",)
         db_table = "auth_user_address"
 
 
@@ -102,6 +104,7 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        ordering = ("-id",)
         db_table = "auth_private_notification"
 
 

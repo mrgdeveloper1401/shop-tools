@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 
-from account_app.models import User, Profile, PrivateNotification
+from account_app.models import User, Profile, PrivateNotification, UserAddress
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
 from core_app.models import Image
@@ -118,3 +118,25 @@ class UserPrivateNotification(serializers.ModelSerializer):
             "body",
             "created_at"
         )
+
+
+class UserAddressSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.only("mobile_phone")
+    )
+
+    class Meta:
+        model = UserAddress
+        exclude = (
+            "is_deleted",
+            "deleted_at"
+        )
+
+    def get_fields(self):
+        request = self.context.get("request")
+        fields = super().get_fields()
+
+        if request and not request.user.is_staff:
+            fields.pop("user", None)
+
+        return fields

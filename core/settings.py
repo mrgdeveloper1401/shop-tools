@@ -31,11 +31,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     "rest_framework",
-    "django_filters",
     "django_ckeditor_5",
     "drf_spectacular",
     "rest_framework_simplejwt",
     "corsheaders", # TODO, move into file production
+    "django_filters",
 
     "account_app.apps.AccountAppConfig",
     "product_app.apps.ProductAppConfig",
@@ -129,7 +129,10 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
 
 

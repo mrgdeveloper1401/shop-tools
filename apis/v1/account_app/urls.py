@@ -12,6 +12,7 @@ router.register("create_user", views.UserCreateViewSet, basename="create_user")
 router.register("user_information", views.UserInformationViewSet, basename="user_information")
 router.register("profile", views.UserProfileViewSet, basename="profile")
 router.register("private_notification", views.UserPrivateNotificationViewSet, basename="private_notification")
+router.register("user_address", views.UserAddressViewSet, basename="user_address")
 
 urlpatterns = [
     path("request-otp/", views.RequestOtpView.as_view(), name="request-otp"),

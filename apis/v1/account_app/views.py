@@ -1,13 +1,12 @@
-# import asyncio
-
 from django.core.cache import cache
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions
 
-from account_app.models import User, OtpService, Profile, PrivateNotification
+from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
+from core.utils.pagination import  AdminTwentyPageNumberPagination
+from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter
 from core.utils.permissions import NotAuthenticated
-from core.utils.sms import send_otp_sms
 from . import serializers
 
 
@@ -37,7 +36,6 @@ class RequestOtpView(views.APIView):
 
         # send otp code by celery
         send_otp_code_by_celery.delay(phone, otp)
-        # asyncio.run(send_otp_sms(phone, otp))
 
         # create redis key
         redis_key = f'{ip_addr}-{phone}-{otp}'
@@ -82,69 +80,125 @@ class RequestPhoneVerifyOtpView(views.APIView):
         # create token
         user = User.objects.filter(
             mobile_phone=phone,
-        ).only('id', "is_active")
+        ).only('id', "is_active", "is_staff")
 
         # check user
         if not user.exists():
             raise exceptions.NotFound()
 
-        token = get_tokens_for_user(user.first())
+        # get user
+        get_user = user.first()
+
+        # generate token
+        token = get_tokens_for_user(get_user)
 
         # return token
-        return response.Response(token)
+        return response.Response(
+            data={
+                "token": token,
+                "is_staff": get_user.is_staff
+            }
+        )
 
 
-class UserInformationViewSet(
-    viewsets.GenericViewSet,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-):
+class UserInformationViewSet(viewsets.ModelViewSet):
+    """
+    permission (create and delete) --> user must be admin \n
+    pagination --> only user admin have pagination --> 20 item \n
+    for filter query must admin user (is_active, mobile_phone)
+    """
     serializer_class = serializers.UserInformationSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = AdminTwentyPageNumberPagination
+    filterset_class = AdminUserInformationFilter
+
+    def get_permissions(self):
+        if self.action in ("create", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
 
     def get_queryset(self):
-        return User.objects.filter(id=self.request.user.id).only(
+        query = User.objects.only(
             "mobile_phone",
             'username',
             "email",
             "is_active",
         )
 
+        if not self.request.user.is_staff:
+            query = query.filter(id=self.request.user.id)
 
-class UserProfileViewSet(
-    viewsets.GenericViewSet,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-):
+        return query
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """
+    permission (create and delete) --> user must be admin \n
+    pagination --> 20 item , only user admin have pagination
+    """
     serializer_class = serializers.UserProfileSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = AdminTwentyPageNumberPagination
+
+    def get_permissions(self):
+        if self.action in ("create", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
 
     def get_queryset(self):
-        return Profile.objects.filter(user_id=self.request.user.id).select_related(
-            "profile_image"
-        ).only(
+        query = Profile.objects.select_related("profile_image").only(
             "first_name",
             "last_name",
             "profile_image__image",
         )
+        if not self.request.user.is_staff:
+            query = query.filter(user_id=self.request.user.id)
+        return query
 
 
-class UserPrivateNotificationViewSet(
-    viewsets.GenericViewSet,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-):
+class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
+    """
+    permission (create and delete and update) --> user must be admin \n
+    pagination --> 20 item , only user admin have pagination
+    """
     serializer_class = serializers.UserPrivateNotification
-    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = AdminTwentyPageNumberPagination
+
+    def get_permissions(self):
+        if self.action in ("create", "destroy", "update", "partial_update"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
 
     def get_queryset(self):
-        return PrivateNotification.objects.filter(
-            user_id=self.request.user.id,
-        ).only(
+        query = PrivateNotification.objects.only(
             "title",
             "body",
             "created_at"
         )
+        if not self.request.user.is_staff:
+            query = query.filter(user_id=self.request.user.id)
+        return query
+
+
+class UserAddressViewSet(viewsets.ModelViewSet):
+    """
+    pagination --> 20 item , only user admin have pagination \n
+    filter query --> postal cdde, only admin user can use filter query
+    """
+    serializer_class = serializers.UserAddressSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = AdminTwentyPageNumberPagination
+    filterset_class = AdminUserAddressFilter
+
+    def get_queryset(self):
+        query = UserAddress.objects.defer(
+            "is_deleted",
+            "deleted_at"
+        )
+        if not self.request.user.is_staff:
+            query = query.filter(user_id=self.request.user.id)
+        return query
