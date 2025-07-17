@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "django_ckeditor_5",
     "drf_spectacular",
     "rest_framework_simplejwt",
+    "corsheaders" # TODO, move into file production
 
     "account_app.apps.AccountAppConfig",
     "product_app.apps.ProductAppConfig",
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware", # TODO, move into file production
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

@@ -39,3 +39,5 @@ MEDIA_URL = '/media/'
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
+
+CORS_ALLOW_ALL_ORIGINS = True
