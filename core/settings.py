@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     "django_ckeditor_5",
     "drf_spectacular",
     "rest_framework_simplejwt",
-    "corsheaders" # TODO, move into file production
+    "corsheaders", # TODO, move into file production
 
     "account_app.apps.AccountAppConfig",
     "product_app.apps.ProductAppConfig",
