@@ -1,11 +1,11 @@
 from django.core.cache import cache
-from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions
+from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
 
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.pagination import  AdminTwentyPageNumberPagination
-from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter
+from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter
 from core.utils.permissions import NotAuthenticated
 from . import serializers
 
@@ -202,3 +202,21 @@ class UserAddressViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_staff:
             query = query.filter(user_id=self.request.user.id)
         return query
+
+
+class AdminUserListview(generics.ListAPIView):
+    """
+    you can show list user \n
+    permission --> admin user \n
+    filter query --> mobile_phone
+    """
+    serializer_class = serializers.AdminUserListSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    filterset_class = UserMobilePhoneFilter
+
+    def get_queryset(self):
+        return User.objects.only(
+            "mobile_phone"
+        ).filter(
+            is_active=True
+        )

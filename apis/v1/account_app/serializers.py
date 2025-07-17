@@ -140,3 +140,12 @@ class UserAddressSerializer(serializers.ModelSerializer):
             fields.pop("user", None)
 
         return fields
+
+
+class AdminUserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "mobile_phone"
+        )
