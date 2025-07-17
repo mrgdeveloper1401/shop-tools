@@ -67,11 +67,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             }
         }
 
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     print(data)
-    #     return data
-
     @extend_schema_field(serializers.DictField())
     def get_access_token(self, obj):
         return get_tokens_for_user(obj)

@@ -23,6 +23,7 @@ class Coupon(CreateMixin, UpdateMixin, SoftDeleteMixin):
     coupon_type = models.CharField(
         choices=CouponEnums.choices,
         default=CouponEnums.percent,
+        max_length=7,
     )
     amount = models.CharField(
         max_length=15
@@ -44,6 +45,7 @@ class Discount(CreateMixin, UpdateMixin, SoftDeleteMixin):
     discount_type = models.CharField(
         choices=CouponEnums.choices,
         default=CouponEnums.percent,
+        max_length=7
     )
     amount = models.CharField(max_length=15)
     start_date = models.DateTimeField()
@@ -59,6 +61,7 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
     discount_type = models.CharField(
         choices=CouponEnums.choices,
         default=CouponEnums.percent,
+        max_length=7
     )
     amount = models.CharField(max_length=15)
     start_date = models.DateTimeField()
