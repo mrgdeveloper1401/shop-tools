@@ -9,6 +9,8 @@ app_name = "v1_auth"
 router = routers.SimpleRouter()
 
 router.register("create_user", views.UserCreateViewSet, basename="create_user")
+router.register("user_information", views.UserInformationViewSet, basename="user_information")
+router.register("profile", views.UserProfileViewSet, basename="profile")
 
 urlpatterns = [
     path("request-otp/", views.RequestOtpView.as_view(), name="request-otp"),

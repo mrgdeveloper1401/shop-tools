@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.core.cache import cache
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
@@ -42,6 +43,10 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "auth_profile"
+
+    @cached_property
+    def profile_image_url(self):
+        return self.profile_image.image.url if self.profile_image else None
 
 
 class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):

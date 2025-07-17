@@ -1,9 +1,9 @@
 # import asyncio
 
 from django.core.cache import cache
-from rest_framework import viewsets, mixins, views, response, status, exceptions
+from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions
 
-from account_app.models import User, OtpService
+from account_app.models import User, OtpService, Profile
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.permissions import NotAuthenticated
@@ -92,3 +92,40 @@ class RequestPhoneVerifyOtpView(views.APIView):
 
         # return token
         return response.Response(token)
+
+
+class UserInformationViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+):
+    serializer_class = serializers.UserInformationSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id).only(
+            "mobile_phone",
+            'username',
+            "email",
+            "is_active",
+        )
+
+
+class UserProfileViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+):
+    serializer_class = serializers.UserProfileSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return Profile.objects.filter(user_id=self.request.user.id).select_related(
+            "profile_image"
+        ).only(
+            "first_name",
+            "last_name",
+            "profile_image__image",
+        )

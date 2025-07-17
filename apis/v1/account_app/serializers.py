@@ -4,6 +4,7 @@ from rest_framework import serializers, exceptions
 from account_app.models import User, Profile, OtpService
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
+from core_app.models import Image
 
 
 class RequestPhoneSerializer(serializers.Serializer):
@@ -43,13 +44,30 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False)
+
     class Meta:
         model = Profile
         fields = (
+            "id",
             "first_name",
             "last_name",
-            "profile_image"
+            "profile_image",
+            "image",
+            "profile_image_url"
         )
+        read_only_fields = ("profile_image",)
+
+    def update(self, instance, validated_data):
+        image = validated_data.pop("image", None)
+
+        if image:
+            img = Image.objects.create(
+                image=image
+            )
+            instance.profile_image = img
+
+        return super().update(instance, validated_data)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -73,3 +91,19 @@ class UserCreateSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.DictField())
     def get_access_token(self, obj):
         return get_tokens_for_user(obj)
+
+
+class UserInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "mobile_phone",
+            'username',
+            "email",
+            "is_active",
+        )
+        read_only_fields = (
+            "is_active",
+            "mobile_phone"
+        )
