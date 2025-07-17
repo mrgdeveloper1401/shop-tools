@@ -1,4 +1,5 @@
-from rest_framework import serializers, exceptions
+from drf_spectacular.utils import extend_schema_field
+from rest_framework import serializers
 
 from account_app.models import User, Profile
 from account_app.validators import MobileRegexValidator
@@ -71,5 +72,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
     #     print(data)
     #     return data
 
+    @extend_schema_field(serializers.DictField())
     def get_access_token(self, obj):
         return get_tokens_for_user(obj)
