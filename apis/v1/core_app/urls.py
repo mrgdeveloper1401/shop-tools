@@ -1,11 +1,12 @@
 from rest_framework import routers
 
-from apis.v1.core_app.views import PublicNotificationViewSet
+from . import views
 
 app_name = 'v1_core'
 
 router = routers.SimpleRouter()
 
-router.register(r'public_notifications', PublicNotificationViewSet, basename='public_notifications')
+router.register('public_notifications', views.PublicNotificationViewSet, basename='public_notifications')
+router.register("admin_images", views.AdminImageViewSet, basename='admin_images')
 
-urlpatterns = [] + router.urls
+urlpatterns = router.urls

@@ -20,6 +20,7 @@ class TagBlog(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        ordering = ('-id',)
         db_table = "blog_tag"
 
 
@@ -41,6 +42,7 @@ class PostBlog(CreateMixin, UpdateMixin, SoftDeleteMixin):
     description_slug = models.TextField(blank=True, null=True)
 
     class Meta:
+        ordering = ("-id",)
         db_table = "blog_post"
 
 

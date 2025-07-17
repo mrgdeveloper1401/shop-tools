@@ -78,6 +78,7 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         ordering = ("-id",)
+        db_table = 'core_app_image'
 
 
 class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):

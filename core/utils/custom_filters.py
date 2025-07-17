@@ -1,6 +1,10 @@
+from django_filters import DateTimeFromToRangeFilter
 from django_filters.rest_framework import FilterSet
+from django_filters.widgets import RangeWidget
 
 from account_app.models import User, UserAddress
+from blog_app.models import CategoryBlog, TagBlog
+from core_app.models import Image
 
 
 class AdminUserInformationFilter(FilterSet):
@@ -36,3 +40,38 @@ class UserMobilePhoneFilter(FilterSet):
         fields = (
             "mobile_phone",
         )
+
+
+class AdminCategoryBlogFilter(FilterSet):
+    class Meta:
+        model = CategoryBlog
+        fields = {
+            "category_name": ['contains'],
+            "is_active": ['exact'],
+        }
+
+    def filter_queryset(self, queryset):
+        if self.request.user.is_staff:
+            return super().filter_queryset(queryset)
+        return queryset
+
+
+class AdminImageFilter(FilterSet):
+    created_at = DateTimeFromToRangeFilter(
+        field_name="created_at",
+        widget=RangeWidget(attrs={'type': 'datetime-local'}),
+    )
+
+    class Meta:
+        model = Image
+        fields = (
+            "created_at",
+        )
+
+
+class BlogTagFilter(FilterSet):
+    class Meta:
+        model = TagBlog
+        fields = {
+            "tag_name": ['contains'],
+        }

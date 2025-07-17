@@ -1,7 +1,9 @@
 from rest_framework import viewsets, permissions
 
+from core.utils.custom_filters import AdminImageFilter
+from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
-from core_app.models import PublicNotification
+from core_app.models import PublicNotification, Image
 
 
 class PublicNotificationViewSet(viewsets.ModelViewSet):
@@ -18,3 +20,17 @@ class PublicNotificationViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+
+class AdminImageViewSet(viewsets.ModelViewSet):
+    """
+    pagination --> 20 item
+    """
+    serializer_class = serializers.AdminImageSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = TwentyPageNumberPagination
+    filterset_class = AdminImageFilter
+    queryset = Image.objects.defer(
+        "is_deleted",
+        "deleted_at",
+    )
