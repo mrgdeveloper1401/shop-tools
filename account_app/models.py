@@ -1,5 +1,8 @@
+import random
+
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -95,3 +98,29 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "auth_private_notification"
+
+
+class OtpService:
+    @staticmethod
+    def generate_otp(length=6, expiry_time=120):
+        """Generate a numeric OTP and store it in Redis"""
+        otp = ''.join([str(random.randint(0, 9)) for _ in range(length)])
+        return otp
+
+    @staticmethod
+    def store_otp(key, otp, expiry_time=300):
+        """Store OTP in Redis with expiry time (default: 5 minutes)"""
+        cache.set(key, otp, timeout=expiry_time)
+
+    @staticmethod
+    def verify_otp(key, submitted_otp):
+        """Verify the submitted OTP against stored OTP"""
+        stored_otp = cache.get(key)
+        if stored_otp is None:
+            return False
+        return stored_otp == submitted_otp
+
+    @staticmethod
+    def delete_otp(key):
+        """Delete OTP from Redis"""
+        cache.delete(key)

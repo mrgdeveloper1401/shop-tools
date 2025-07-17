@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 
-from account_app.models import User, Profile
+from account_app.models import User, Profile, OtpService
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
 
@@ -11,18 +11,21 @@ class RequestPhoneSerializer(serializers.Serializer):
         validators=(MobileRegexValidator,)
     )
 
-    # def validate(self, attrs):
-    #     if not User.objects.only("id").filter(mobile_phone=attrs["mobile_phone"], is_active=True).exists():
-    #         raise exceptions.ValidationError({"message": "user dont exists"})
-    #     else:
-    #         otp = Otp.objects.filter(mobile_phone=attrs["mobile_phone"], expired_date__gt=timezone.now()).last()
-    #         if otp:
-    #             raise exceptions.ValidationError({"message": "otp already exists, please wait 2 minute"})
-    #     return attrs
+    def validate(self, attrs):
+        user = User.objects.filter(
+            mobile_phone=attrs["mobile_phone"]
+        ).only("id")
+
+        if not user.exists():
+            raise exceptions.NotFound()
+        return attrs
 
 
 class RequestPhoneVerifySerializer(serializers.Serializer):
     code = serializers.CharField()
+    phone = serializers.CharField(
+        validators=(MobileRegexValidator,)
+    )
 
 
 class UserSerializer(serializers.ModelSerializer):

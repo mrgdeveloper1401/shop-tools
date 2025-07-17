@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+
+from decouple import config, Csv
+
 from core.utils.ck_editor import CKEDITOR_5_CONFIGS, customColorPalette
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -168,3 +171,22 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6380/1", # TODO, read location by .env file
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+CELERY_BROKER_URL=config("CELERY_BROKER_URL", cast=str)
+CELERY_RESULT_BACKEND=config("CELERY_RESULT_BACKEND", cast=str)
+CELERY_ACCEPT_CONTENT = config("CELERY_ACCEPT_CONTENT", default="json", cast=Csv())
+CELERY_TASK_SERIALIZER=config("CELERY_TASK_SERIALIZER", cast=str)
+CELERY_RESULT_SERIALIZER=config("CELERY_RESULT_SERIALIZER", cast=str)
+CELERY_TIMEZONE=config("CELERY_TIMEZONE", cast=str)
+CELERY_ENABLE_UTC=config("CELERY_ENABLE_UTC", cast=bool)
+CELERY_WORKER_CONCURRENCY = config("CELERY_WORKER_CONCURRENCY", cast=int, default=1)
