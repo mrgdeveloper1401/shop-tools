@@ -3,7 +3,7 @@
 from django.core.cache import cache
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions
 
-from account_app.models import User, OtpService, Profile
+from account_app.models import User, OtpService, Profile, PrivateNotification
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.permissions import NotAuthenticated
@@ -128,4 +128,23 @@ class UserProfileViewSet(
             "first_name",
             "last_name",
             "profile_image__image",
+        )
+
+
+class UserPrivateNotificationViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+):
+    serializer_class = serializers.UserPrivateNotification
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return PrivateNotification.objects.filter(
+            user_id=self.request.user.id,
+        ).only(
+            "title",
+            "body",
+            "created_at"
         )

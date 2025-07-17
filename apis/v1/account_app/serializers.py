@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 
-from account_app.models import User, Profile, OtpService
+from account_app.models import User, Profile, PrivateNotification
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
 from core_app.models import Image
@@ -106,4 +106,15 @@ class UserInformationSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "is_active",
             "mobile_phone"
+        )
+
+
+class UserPrivateNotification(serializers.ModelSerializer):
+    class Meta:
+        model = PrivateNotification
+        fields = (
+            "id",
+            "title",
+            "body",
+            "created_at"
         )
