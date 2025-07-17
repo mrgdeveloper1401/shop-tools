@@ -12,7 +12,7 @@ class CategoryBlog(MP_Node, CreateMixin, UpdateMixin):
     description_slug = models.TextField(blank=True, null=True)
 
     class Meta:
-        db_table = "blog_comments"
+        db_table = "blog_category"
 
 
 class TagBlog(CreateMixin, UpdateMixin, SoftDeleteMixin):
