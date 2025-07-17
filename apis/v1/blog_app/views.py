@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions
 
 from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
-from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
+from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
 from blog_app.models import CategoryBlog, PostBlog, TagBlog
 
