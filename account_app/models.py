@@ -10,8 +10,8 @@ from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
 
 class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, CreateMixin):
     mobile_phone = models.CharField(_("mobile phone"), max_length=15, unique=True)
-    username = models.CharField(_("username"), max_length=150, unique=True, blank=True, null=True)
-    email = models.EmailField(_("email address"), unique=True, blank=True, null=True)
+    username = models.CharField(_("username"), max_length=150, blank=True, null=True)
+    email = models.EmailField(_("email address"), blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

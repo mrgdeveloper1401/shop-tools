@@ -2,6 +2,7 @@ from rest_framework import serializers, exceptions
 
 from account_app.models import User, Profile
 from account_app.validators import MobileRegexValidator
+from core.utils.jwt import get_tokens_for_user
 
 
 class RequestPhoneSerializer(serializers.Serializer):
@@ -48,6 +49,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    access_token = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = (
@@ -55,4 +58,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
             "password",
             "email",
             "username",
+            "access_token"
         )
+        extra_kwargs = {
+            "password": {
+                "write_only": True,
+            }
+        }
+
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     print(data)
+    #     return data
+
+    def get_access_token(self, obj):
+        return get_tokens_for_user(obj)

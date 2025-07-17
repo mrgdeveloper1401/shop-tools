@@ -8,6 +8,21 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+INSTALLED_APPS += [
+    "debug_toolbar"
+]
+
+MIDDLEWARE += [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+]
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
+
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -22,3 +37,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY

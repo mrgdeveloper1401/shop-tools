@@ -19,3 +19,4 @@ httpx
 uvicorn
 pillow
 django-ckeditor-5
+django-debug-toolbar
