@@ -5,6 +5,7 @@ from django_filters.widgets import RangeWidget
 from account_app.models import User, UserAddress
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
+from product_app.models import Category
 
 
 class AdminUserInformationFilter(FilterSet):
@@ -75,3 +76,17 @@ class BlogTagFilter(FilterSet):
         fields = {
             "tag_name": ['contains'],
         }
+
+
+class AdminProductCategoryFilter(FilterSet):
+    class Meta:
+        model = Category
+        fields = {
+            "category_name": ['contains'],
+            "is_active": ['exact'],
+        }
+
+    def filter_queryset(self, queryset):
+        if self.request.user.is_staff:
+            return super().filter_queryset(queryset)
+        return queryset
