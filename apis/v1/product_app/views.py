@@ -64,7 +64,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_slug",
                 "description",
                 "social_links",
-                "base_price",
                 "product_name"
             ).prefetch_related(
                 Prefetch(
