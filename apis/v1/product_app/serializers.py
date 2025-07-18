@@ -154,6 +154,18 @@ class UserProductBrandSerializer(serializers.ModelSerializer):
         fields = ("brand_name", "id")
 
 
+class AdminSimpleProductNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ("product_name",)
+
+
+class AdminSimpleProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ('get_image_url',)
+
+
 class AdminProductImageSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.filter(is_active=True).only("id")
@@ -166,5 +178,13 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
         model = ProductImages
         exclude = (
             "is_deleted",
-            "deleted_at"
+            "deleted_at",
+            "created_at",
+            "updated_at",
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['product'] = AdminSimpleProductNameSerializer(instance.product).data
+        data['image'] = AdminSimpleProductImageSerializer(instance.image).data
+        return data

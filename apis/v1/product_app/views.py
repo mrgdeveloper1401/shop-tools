@@ -138,5 +138,14 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
 class ProductImageViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AdminProductImageSerializer
     permission_classes = (permissions.IsAdminUser,)
-    queryset = ProductImages.objects.defer("is_deleted", "deleted_at")
+    queryset = ProductImages.objects.select_related(
+        "product",
+        "image"
+    ).only(
+        "product__product_name",
+        "image_id",
+        "order",
+        "is_active",
+        "image__image"
+    )
     filterset_class = AdminProductImageFilter

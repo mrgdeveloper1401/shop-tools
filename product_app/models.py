@@ -52,13 +52,6 @@ class ProductImages(CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="product_product_image"
     )
-    variant = models.ForeignKey(
-        "ProductVariant",
-        on_delete=models.SET_NULL,
-        related_name="variant_images",
-        null=True,
-        blank=True
-    )
     image = models.ForeignKey(
         "core_app.Image",
         on_delete=models.PROTECT,
