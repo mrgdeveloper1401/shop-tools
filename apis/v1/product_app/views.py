@@ -19,7 +19,10 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_staff:
             return Category.objects.filter(is_active=True).only("category_name",)
         else:
-            return Category.objects.all()
+            return Category.objects.defer(
+                "updated_at",
+                "created_at"
+            )
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):

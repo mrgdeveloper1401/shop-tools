@@ -10,7 +10,10 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = "__all__"
+        exclude = (
+            "created_at",
+            "updated_at",
+        )
         read_only_fields = (
             "path",
             "depth",
