@@ -95,7 +95,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     tags = models.ManyToManyField(
         Tag,
         blank=True,
-        related_name="tags"
+        related_name="product_tags"
     )
     product_name = models.CharField(
         max_length=400,

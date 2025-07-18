@@ -57,12 +57,12 @@ class ProductViewSet(viewsets.ModelViewSet):
         base_query = Product.objects.filter(category_id=self.kwargs["category_pk"])
 
         if self.request.user.is_staff:
-            return Product.objects.only(
-                "tags",
-                "product_brand_id",
+            return Product.objects.select_related(
+                "product_brand"
+            ).only(
+                "tags__tag_name",
+                "product_brand__brand_name",
                 "category_id",
-                "created_at",
-                "updated_at",
                 "is_active",
                 "product_slug",
                 "description",
@@ -70,7 +70,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_name"
             ).prefetch_related(
                 Prefetch(
-                    "tags", queryset=Tag.objects.only("id")
+                    "tags", queryset=Tag.objects.only("tag_name")
                 )
             )
 

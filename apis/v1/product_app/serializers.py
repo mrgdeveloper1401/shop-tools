@@ -39,6 +39,18 @@ class UserProductCategorySerializer(serializers.ModelSerializer):
         )
 
 
+class SimpleProductBrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductBrand
+        fields = ("brand_name",)
+
+
+class SimpleProductTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("tag_name",)
+
+
 class ProductSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.only("id"),
@@ -55,8 +67,16 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         exclude = (
             "is_deleted",
-            "deleted_at"
+            "deleted_at",
+            "created_at",
+            "updated_at",
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['product_brand'] = SimpleProductBrandSerializer(instance.product_brand).data
+        data['tags'] = SimpleProductTagSerializer(instance.tags.all(), many=True).data
+        return data
 
 
 class NestedImageSerializer(serializers.ModelSerializer):
