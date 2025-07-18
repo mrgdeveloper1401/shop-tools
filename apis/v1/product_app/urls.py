@@ -1,10 +1,17 @@
-from rest_framework import routers
+from rest_framework_nested import routers
+from django.urls import path, include
 
-from apis.v1.product_app.views import ProductCategoryViewSet
+from . import views
 
 app_name = "v1_product_app"
 
 router = routers.SimpleRouter()
-router.register("product_category", ProductCategoryViewSet, basename="product_category")
+router.register("product_category", views.ProductCategoryViewSet, basename="product_category")
+router.register("product_brand", views.ProductBrandViewSet, basename="product_brand")
 
-urlpatterns = router.urls
+category_router = routers.NestedSimpleRouter(router, "product_category", lookup="category")
+category_router.register("products", views.ProductViewSet, basename="products")
+
+urlpatterns = [
+    path("", include(category_router.urls)),
+] + router.urls

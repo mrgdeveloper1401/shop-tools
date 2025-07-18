@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
-from product_app.models import Category
+from product_app.models import Category, Product, ProductBrand
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -33,3 +33,30 @@ class UserProductCategorySerializer(serializers.ModelSerializer):
             "id",
             "category_name",
         )
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        exclude = (
+            "is_deleted",
+            "deleted_at"
+        )
+        read_only_fields = (
+            "category",
+        )
+
+
+class AdminProductBrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductBrand
+        exclude = (
+            "is_deleted",
+            "deleted_at"
+        )
+
+
+class UserProductBrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductBrand
+        fields = ("brand_name", "id")

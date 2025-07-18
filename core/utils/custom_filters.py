@@ -5,7 +5,7 @@ from django_filters.widgets import RangeWidget
 from account_app.models import User, UserAddress
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
-from product_app.models import Category
+from product_app.models import Category, ProductBrand
 
 
 class AdminUserInformationFilter(FilterSet):
@@ -41,6 +41,15 @@ class UserMobilePhoneFilter(FilterSet):
         fields = (
             "mobile_phone",
         )
+
+
+class ProductBrandFilter(FilterSet):
+    class Meta:
+        model = ProductBrand
+        fields = {
+            "brand_name": ['contains'],
+            "is_active": ["exact"],
+        }
 
 
 class AdminCategoryBlogFilter(FilterSet):
