@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from core_app.managers import PublishManager
@@ -75,6 +76,10 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
         related_name='images',
         help_text=_('User who uploaded this image (if any).')
     )
+
+    @cached_property
+    def get_image_url(self):
+        return self.image.url
 
     class Meta:
         ordering = ("-id",)

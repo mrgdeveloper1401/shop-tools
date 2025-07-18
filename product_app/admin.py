@@ -9,7 +9,9 @@ from .models import (
     ProductImages,
     ProductBrand,
     Tag,
-    ProductComment
+    ProductComment,
+    ProductVariant,
+    VariantAttribute
 )
 
 
@@ -55,4 +57,14 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(ProductComment)
 class ProductCommentAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(VariantAttribute)
+class VariantAttributeAdmin(admin.ModelAdmin):
     pass

@@ -102,6 +102,7 @@ class UserInformationSerializer(serializers.ModelSerializer):
             'username',
             "email",
             "is_active",
+            "is_staff"
         )
         read_only_fields = (
             "is_active",

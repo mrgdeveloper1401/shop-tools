@@ -1,9 +1,10 @@
+from django.db.models import Prefetch
 from rest_framework import viewsets, permissions
 
-from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter
+from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
-from product_app.models import Category, Product, ProductBrand
+from product_app.models import Category, Product, ProductBrand, ProductImages, Tag
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
@@ -15,14 +16,10 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     pagination_class = AdminTwentyPageNumberPagination
 
     def get_queryset(self):
-        query = Category.objects.all()
-
         if not self.request.user.is_staff:
-            query = query.filter(is_active=True).only(
-                "category_name",
-            )
-
-        return query
+            return Category.objects.filter(is_active=True).only("category_name",)
+        else:
+            return Category.objects.all()
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -37,7 +34,16 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.ProductSerializer
+    pagination_class = TwentyPageNumberPagination
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.ProductSerializer
+        else:
+            if self.action == "list":
+                return serializers.UserListProductSerializer
+            else:
+                return serializers.UserRetrieveProductSerializer
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -45,18 +51,60 @@ class ProductViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        query = Product.objects.filter(category_id=self.kwargs["category_pk"])
+        base_query = Product.objects.filter(category_id=self.kwargs["category_pk"])
 
-        if not self.request.user.is_staff:
-            query = query.filter(is_active=True).defer(
-                "is_deleted",
-                "deleted_at",
-                "is_active",
+        if self.request.user.is_staff:
+            return Product.objects.only(
+                "tags",
+                "product_brand_id",
+                "category_id",
                 "created_at",
                 "updated_at",
+                "is_active",
+                "product_slug",
+                "description",
+                "social_links",
+                "base_price",
+                "product_name"
+            ).prefetch_related(
+                Prefetch(
+                    "tags", queryset=Tag.objects.only("id")
+                )
             )
 
-        return query
+        else:
+            query = base_query.filter(is_active=True).prefetch_related(
+                    Prefetch(
+                        "product_product_image", queryset=ProductImages.objects.filter(
+                            is_active=True
+                        ).select_related("image").only(
+                            "order",
+                            "image__image",
+                            "product_id"
+                        )
+                    ),
+                    Prefetch(
+                        "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
+                    )
+                )
+
+            if self.action == "list":
+                return query.only(
+                    "product_name",
+                    "price",
+                    "product_images"
+                )
+            else:
+                return query.only(
+                    "product_name",
+                    "description",
+                    "price",
+                    "social_links",
+                    "product_brand_id",
+                    "attributes_id",
+                    "tags",
+                    "product_images"
+                )
 
 
 class ProductBrandViewSet(viewsets.ModelViewSet):
@@ -83,3 +131,10 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
             return ProductBrand.objects.defer("is_deleted", "deleted_at")
         else:
             return ProductBrand.objects.filter(is_active=True).only("brand_name",)
+
+
+class ProductImageViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.AdminProductImageSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    queryset = ProductImages.objects.defer("is_deleted", "deleted_at")
+    filterset_class = AdminProductImageFilter

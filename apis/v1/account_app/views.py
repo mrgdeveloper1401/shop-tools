@@ -124,6 +124,7 @@ class UserInformationViewSet(viewsets.ModelViewSet):
             'username',
             "email",
             "is_active",
+            "is_staff"
         )
 
         if not self.request.user.is_staff:

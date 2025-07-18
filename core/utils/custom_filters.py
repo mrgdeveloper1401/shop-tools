@@ -5,7 +5,7 @@ from django_filters.widgets import RangeWidget
 from account_app.models import User, UserAddress
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
-from product_app.models import Category, ProductBrand
+from product_app.models import Category, ProductBrand, ProductImages
 
 
 class AdminUserInformationFilter(FilterSet):
@@ -99,3 +99,9 @@ class AdminProductCategoryFilter(FilterSet):
         if self.request.user.is_staff:
             return super().filter_queryset(queryset)
         return queryset
+
+
+class AdminProductImageFilter(FilterSet):
+    class Meta:
+        model = ProductImages
+        fields = ("is_active",)
