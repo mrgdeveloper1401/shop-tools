@@ -2,6 +2,8 @@ from core.settings import *
 
 ALLOWED_HOSTS = config("PRODUCTION_ALLOWED_HOSTS", cast=Csv())
 
+SECRET_KEY = config("PRODUCTION_SECRET_KEY", cast=str)
+
 INSTALLED_APPS += [
     "corsheaders",
 ]
