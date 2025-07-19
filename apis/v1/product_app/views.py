@@ -107,12 +107,9 @@ class ProductViewSet(viewsets.ModelViewSet):
                 return query.only(
                     "product_name",
                     "description",
-                    "price",
                     "social_links",
                     "product_brand_id",
-                    "attributes_id",
                     "tags",
-                    "product_images"
                 )
 
 

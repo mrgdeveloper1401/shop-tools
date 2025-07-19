@@ -1,5 +1,6 @@
 from django.db import models
 from treebeard.mp_tree import MP_Node
+from django.utils.translation import gettext_lazy as _
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
@@ -100,6 +101,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     social_links = models.JSONField(
         blank=True,
         null=True,
+        help_text=_("you can defined social link by json")
     )
     # base_price = models.DecimalField(
     #     max_digits=12,
