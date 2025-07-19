@@ -2,6 +2,8 @@ from core.settings import *
 
 SECRET_KEY = 'django-insecure-bpg-62bxjk+m1fotiez1b#oi295y!r!)k!*&er0lj3b1h_cw_e'
 
+DEBUG = True
+
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS += [

@@ -379,3 +379,4 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm,python
 
 ./base_image/gs_tools:1.0.0.tar.gz
+general_log_django
