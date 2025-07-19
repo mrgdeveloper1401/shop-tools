@@ -47,6 +47,9 @@ services:
     build:
       context: .
     env_file: ".env"
+    environment:
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
 
 volumes:
