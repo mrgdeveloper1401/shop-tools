@@ -78,22 +78,26 @@ class ProductViewSet(viewsets.ModelViewSet):
             ).prefetch_related(
                 Prefetch(
                     "tags", queryset=Tag.objects.only("tag_name")
+                ),
+                Prefetch(
+                    "product_product_image", queryset=ProductImages.objects.select_related("image").only(
+                        "image__image",
+                        "order",
+                        "product_id"
+                    )
                 )
             )
 
         else:
             query = base_query.filter(is_active=True).prefetch_related(
-                    # Prefetch(
-                    #     "product_product_image", queryset=ProductImages.objects.filter(
-                    #         is_active=True
-                    #     ).select_related("image").only(
-                    #         "order",
-                    #         "image__image",
-                    #         "product_id"
-                    #     )
-                    # ),
                     Prefetch(
-                        "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
+                        "product_product_image", queryset=ProductImages.objects.select_related("image").only(
+                            "image__image",
+                            "order",
+                            "product_id"
+                        ).filter(
+                            is_active=True
+                        )
                     )
                 )
 
@@ -104,11 +108,17 @@ class ProductViewSet(viewsets.ModelViewSet):
                     # "product_images"
                 )
             else:
-                return query.only(
+                return query.prefetch_related(
+                    Prefetch(
+                        "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
+                    ),
+                ).select_related(
+                    "product_brand"
+                ).only(
                     "product_name",
                     "description",
                     "social_links",
-                    "product_brand_id",
+                    "product_brand__brand_name",
                     "tags",
                 )
 
@@ -134,25 +144,30 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return ProductBrand.objects.defer("is_deleted", "deleted_at")
+            return ProductBrand.objects.defer("is_deleted", "deleted_at", "created_at", "updated_at")
         else:
             return ProductBrand.objects.filter(is_active=True).only("brand_name",)
 
 
 class ProductImageViewSet(viewsets.ModelViewSet):
+    """
+    this view can only user admin access \n
+    filter query --> field(is_active)
+    """
     serializer_class = serializers.AdminProductImageSerializer
     permission_classes = (permissions.IsAdminUser,)
-    queryset = ProductImages.objects.select_related(
-        "product",
-        "image"
-    ).only(
-        "product__product_name",
-        "image_id",
-        "order",
-        "is_active",
-        "image__image"
-    )
     filterset_class = AdminProductImageFilter
+
+    def get_queryset(self):
+        return ProductImages.objects.filter(
+            product_id=self.kwargs['product_pk']
+        ).select_related(
+            "image"
+        ).only(
+            "order",
+            "is_active",
+            "image__image"
+        )
 
 
 class ProductVariantViewSet(viewsets.ModelViewSet):
@@ -170,10 +185,11 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
             Prefetch(
                 "attributes", queryset=VariantAttribute.objects.select_related(
                     "attribute",
-                    "value"
+                    "value",
                 ).only(
                     "attribute__attribute_name",
-                    "value__attribute_value"
+                    "value__attribute_value",
+                    "variant_id"
                 )
             )
         )

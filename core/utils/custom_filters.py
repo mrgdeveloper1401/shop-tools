@@ -106,6 +106,11 @@ class AdminProductImageFilter(FilterSet):
         model = ProductImages
         fields = ("is_active",)
 
+    def filter_queryset(self, queryset):
+        if self.request.user.is_staff:
+            return super().filter_queryset(queryset)
+        return queryset
+
 
 class ProductAttributeFilter(FilterSet):
     class Meta:

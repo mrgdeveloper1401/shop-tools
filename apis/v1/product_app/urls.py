@@ -9,7 +9,6 @@ app_name = "v1_product_app"
 router = routers.SimpleRouter()
 router.register("product_category", views.ProductCategoryViewSet, basename="product_category")
 router.register("product_brand", views.ProductBrandViewSet, basename="product_brand")
-router.register("product_images", views.ProductImageViewSet, basename="product_images")
 router.register("product_attribute", views.ProductAttributeViewSet, basename="product_attribute")
 router.register("product_attribute_value", views.ProductAttributeValueViewSet, basename="product_attribute_value")
 
@@ -18,6 +17,7 @@ category_router.register("products", views.ProductViewSet, basename="products")
 
 product_router = routers.NestedSimpleRouter(category_router, "products", lookup="product")
 product_router.register("product_variant", views.ProductVariantViewSet, basename="product_variant")
+product_router.register("product_images", views.ProductImageViewSet, basename="product_images")
 
 product_variant_router = NestedSimpleRouter(product_router, "product_variant", lookup="variant")
 product_variant_router.register(

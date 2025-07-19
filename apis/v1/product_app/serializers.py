@@ -52,6 +52,23 @@ class SimpleProductTagSerializer(serializers.ModelSerializer):
         fields = ("tag_name",)
 
 
+class AdminSimpleProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ('get_image_url',)
+
+
+class NestedProductImageSerializer(serializers.ModelSerializer):
+    image = AdminSimpleProductImageSerializer(read_only=True)
+
+    class Meta:
+        model = ProductImages
+        fields = (
+            "image",
+            "order"
+        )
+
+
 class ProductSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.only("id"),
@@ -63,6 +80,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.only("id"),
     )
+    product_product_image = NestedProductImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -86,24 +104,16 @@ class NestedImageSerializer(serializers.ModelSerializer):
         fields = ("get_image_url",)
 
 
-class NestedProductImageSerializer(serializers.ModelSerializer):
-    image = NestedImageSerializer()
-
-    class Meta:
-        model = ProductImages
-        fields = (
-            "image",
-            "order"
-        )
-
 
 class UserListProductSerializer(serializers.ModelSerializer):
+    product_product_image = NestedProductImageSerializer(many=True)
 
     class Meta:
         model = Product
         fields = (
             "id",
             "product_name",
+            "product_product_image"
         )
 
 
@@ -115,6 +125,8 @@ class NestedProductTagsSerializer(serializers.ModelSerializer):
 
 class UserRetrieveProductSerializer(serializers.ModelSerializer):
     tags = NestedProductTagsSerializer(many=True)
+    product_brand = SimpleProductBrandSerializer()
+    product_product_image = NestedProductImageSerializer(many=True)
 
     class Meta:
         model = Product
@@ -122,8 +134,9 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "product_name",
             "description",
             "social_links",
-            "product_brand_id",
+            "product_brand",
             "tags",
+            "product_product_image"
         )
 
 
@@ -132,7 +145,9 @@ class AdminProductBrandSerializer(serializers.ModelSerializer):
         model = ProductBrand
         exclude = (
             "is_deleted",
-            "deleted_at"
+            "deleted_at",
+            "created_at",
+            "updated_at"
         )
 
 
@@ -148,32 +163,25 @@ class AdminSimpleProductNameSerializer(serializers.ModelSerializer):
         fields = ("product_name",)
 
 
-class AdminSimpleProductImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = ('get_image_url',)
-
-
 class AdminProductImageSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.filter(is_active=True).only("id")
-    )
+    # product = serializers.PrimaryKeyRelatedField(
+    #     queryset=Product.objects.filter(is_active=True).only("id")
+    # )
     image = serializers.PrimaryKeyRelatedField(
         queryset=Image.objects.only("id")
     )
 
     class Meta:
         model = ProductImages
-        exclude = (
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at",
+        fields = (
+            "id",
+            "image",
+            "order",
+            "is_active"
         )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['product'] = AdminSimpleProductNameSerializer(instance.product).data
         data['image'] = AdminSimpleProductImageSerializer(instance.image).data
         return data
 
