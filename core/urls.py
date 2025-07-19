@@ -45,10 +45,10 @@ urlpatterns = [
     path('ckeditor5/', include('django_ckeditor_5.urls')),
 ] + v1_api_urls + swagger + jwt
 
-if settings.DEBUG:
-    from debug_toolbar.toolbar import debug_toolbar_urls
-    from django.conf.urls.static import static
-
-
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += debug_toolbar_urls()
+# if settings.DEBUG:
+#     from debug_toolbar.toolbar import debug_toolbar_urls
+#     from django.conf.urls.static import static
+#
+#
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#     urlpatterns += debug_toolbar_urls()
