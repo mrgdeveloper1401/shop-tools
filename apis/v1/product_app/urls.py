@@ -13,6 +13,10 @@ router.register("product_images", views.ProductImageViewSet, basename="product_i
 category_router = routers.NestedSimpleRouter(router, "product_category", lookup="category")
 category_router.register("products", views.ProductViewSet, basename="products")
 
+product_router = routers.NestedSimpleRouter(category_router, "products", lookup="product")
+product_router.register("product_variant", views.ProductVariantViewSet, basename="product_varient")
+
 urlpatterns = [
     path("", include(category_router.urls)),
+    path("", include(product_router.urls)),
 ] + router.urls

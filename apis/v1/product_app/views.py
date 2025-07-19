@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions
 from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
-from product_app.models import Category, Product, ProductBrand, ProductImages, Tag
+from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
@@ -149,3 +149,22 @@ class ProductImageViewSet(viewsets.ModelViewSet):
         "image__image"
     )
     filterset_class = AdminProductImageFilter
+
+
+class ProductVariantViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminProductVariantSerializer
+
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
+
+    def get_queryset(self):
+        base_query = ProductVariant.objects.filter(product_id=self.kwargs['product_pk'])
+
+        # filter admin user
+        if self.request.user.is_staff:
+            return base_query.defer("is_deleted", "deleted_at", "created_at", "updated_at")
+        pass

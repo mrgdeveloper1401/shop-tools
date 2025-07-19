@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from core_app.models import Image
-from product_app.models import Category, Product, ProductBrand, ProductImages, Tag
+from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -188,3 +188,18 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
         data['product'] = AdminSimpleProductNameSerializer(instance.product).data
         data['image'] = AdminSimpleProductImageSerializer(instance.image).data
         return data
+
+
+class AdminProductVariantSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.only("id")
+    )
+
+    class Meta:
+        model = ProductVariant
+        exclude = (
+            "is_deleted",
+            "deleted_at",
+            "created_at",
+            "updated_at",
+        )
