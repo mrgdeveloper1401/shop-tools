@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     "django_ckeditor_5",
     "drf_spectacular",
     "rest_framework_simplejwt",
-    "corsheaders", # TODO, move into file production
     "django_filters",
 
     "account_app.apps.AccountAppConfig",
@@ -46,7 +45,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware", # TODO, move into file production
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -178,15 +176,12 @@ SIMPLE_JWT = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6380/1", # TODO, read location by .env file
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
 
-CELERY_BROKER_URL=config("CELERY_BROKER_URL", cast=str)
-CELERY_RESULT_BACKEND=config("CELERY_RESULT_BACKEND", cast=str)
 CELERY_ACCEPT_CONTENT = config("CELERY_ACCEPT_CONTENT", default="json", cast=Csv())
 CELERY_TASK_SERIALIZER=config("CELERY_TASK_SERIALIZER", cast=str)
 CELERY_RESULT_SERIALIZER=config("CELERY_RESULT_SERIALIZER", cast=str)
