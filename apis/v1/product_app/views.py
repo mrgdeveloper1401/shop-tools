@@ -2,7 +2,7 @@ from django.db.models import Prefetch
 from rest_framework import viewsets, permissions
 
 from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter, \
-    ProductAttributeFilter
+    ProductAttributeFilter, ProductFilter
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
@@ -39,7 +39,12 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
+    """
+    search_filter --> product_name \n
+    pagination --> 20 item
+    """
     pagination_class = TwentyPageNumberPagination
+    filterset_class = ProductFilter
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
@@ -78,15 +83,15 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         else:
             query = base_query.filter(is_active=True).prefetch_related(
-                    Prefetch(
-                        "product_product_image", queryset=ProductImages.objects.filter(
-                            is_active=True
-                        ).select_related("image").only(
-                            "order",
-                            "image__image",
-                            "product_id"
-                        )
-                    ),
+                    # Prefetch(
+                    #     "product_product_image", queryset=ProductImages.objects.filter(
+                    #         is_active=True
+                    #     ).select_related("image").only(
+                    #         "order",
+                    #         "image__image",
+                    #         "product_id"
+                    #     )
+                    # ),
                     Prefetch(
                         "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
                     )
@@ -95,8 +100,8 @@ class ProductViewSet(viewsets.ModelViewSet):
             if self.action == "list":
                 return query.only(
                     "product_name",
-                    "price",
-                    "product_images"
+                    # "price",
+                    # "product_images"
                 )
             else:
                 return query.only(

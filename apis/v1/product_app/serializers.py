@@ -98,18 +98,12 @@ class NestedProductImageSerializer(serializers.ModelSerializer):
 
 
 class UserListProductSerializer(serializers.ModelSerializer):
-    product_images = NestedProductImageSerializer(
-        many=True,
-        source="product_product_image",
-    )
 
     class Meta:
         model = Product
         fields = (
             "id",
             "product_name",
-            "price",
-            "product_images"
         )
 
 
@@ -120,10 +114,6 @@ class NestedProductTagsSerializer(serializers.ModelSerializer):
 
 
 class UserRetrieveProductSerializer(serializers.ModelSerializer):
-    product_images = NestedProductImageSerializer(
-        many=True,
-        source="product_product_image",
-    )
     tags = NestedProductTagsSerializer(many=True)
 
     class Meta:
@@ -131,12 +121,9 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
         fields = (
             "product_name",
             "description",
-            "price",
             "social_links",
             "product_brand_id",
-            "attributes_id",
             "tags",
-            "product_images"
         )
 
 

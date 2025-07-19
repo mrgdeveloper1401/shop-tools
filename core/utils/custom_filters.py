@@ -5,7 +5,7 @@ from django_filters.widgets import RangeWidget
 from account_app.models import User, UserAddress
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
-from product_app.models import Category, ProductBrand, ProductImages, ProductAttribute
+from product_app.models import Category, ProductBrand, ProductImages, ProductAttribute, Product
 
 
 class AdminUserInformationFilter(FilterSet):
@@ -113,4 +113,12 @@ class ProductAttributeFilter(FilterSet):
         fields = {
             "attribute_name": ['contains'],
             "is_active": ['exact'],
+        }
+
+
+class ProductFilter(FilterSet):
+    class Meta:
+        model = Product
+        fields = {
+            "product_name": ['contains'],
         }
