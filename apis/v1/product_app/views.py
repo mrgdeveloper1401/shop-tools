@@ -1,8 +1,8 @@
 from django.db.models import Prefetch
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter, \
-    ProductAttributeFilter, ProductFilter
+    ProductAttributeFilter, ProductFilter, ProductHomePageFilter
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
@@ -275,3 +275,16 @@ class VariantAttributeViewSet(viewsets.ModelViewSet):
         )
         if self.request.user.is_staff:
             return base_query
+
+
+class ProductListHomePageView(generics.ListAPIView):
+    """
+    pagination --> 20 item \n
+    filter query --> product_name
+    """
+    queryset = Product.objects.filter(is_active=True).only(
+        "product_name"
+    )
+    serializer_class = serializers.ProductListHomePageSerializer
+    pagination_class = TwentyPageNumberPagination
+    filterset_class = ProductHomePageFilter

@@ -127,3 +127,11 @@ class ProductFilter(FilterSet):
         fields = {
             "product_name": ['contains'],
         }
+
+
+class ProductHomePageFilter(FilterSet):
+    class Meta:
+        model = Product
+        fields = {
+            "product_name": ['contains']
+        }

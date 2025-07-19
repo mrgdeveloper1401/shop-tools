@@ -275,3 +275,25 @@ class AdminVariantAttributeSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+
+class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
+    attributes = NestedVariantAttributeSerializer(many=True)
+
+    class Meta:
+        model = ProductVariant
+        fields = ("price", "attributes")
+
+
+class ProductListHomePageSerializer(serializers.ModelSerializer):
+    product_product_image = NestedProductImageSerializer(many=True)
+    variants = NestedProductVariantPriceAttributeSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            "id",
+            "product_name",
+            "product_product_image",
+            "variants"
+        )

@@ -29,5 +29,6 @@ product_variant_router.register(
 urlpatterns = [
     path("", include(category_router.urls)),
     path("", include(product_router.urls)),
-    path("", include(product_variant_router.urls))
+    path("", include(product_variant_router.urls)),
+    path("product_home_page/", views.ProductListHomePageView.as_view(), name='product_home_page')
 ] + router.urls
