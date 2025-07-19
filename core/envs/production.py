@@ -60,7 +60,6 @@ STORAGES = {
         "BACKEND": "storages.backends.s3.S3Storage",
     },
 }
-print(STORAGES)
 
 AWS_S3_REGION_NAME = 'us-east-1'
 AWS_DEFAULT_ACL = 'public-read'
