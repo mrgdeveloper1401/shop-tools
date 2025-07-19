@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 
-from account_app.models import User, Profile, PrivateNotification, UserAddress
+from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
 from core_app.models import Image
@@ -125,12 +125,20 @@ class UserAddressSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.only("mobile_phone")
     )
+    city = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.only("name")
+    )
+    state = serializers.PrimaryKeyRelatedField(
+        queryset=State.objects.only("state_name")
+    )
 
     class Meta:
         model = UserAddress
         exclude = (
             "is_deleted",
-            "deleted_at"
+            "deleted_at",
+            "created_at",
+            "updated_at",
         )
 
     def get_fields(self):
@@ -149,4 +157,22 @@ class AdminUserListSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "mobile_phone"
+        )
+
+
+class StateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        fields = (
+            "id",
+            "state_name"
+        )
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = (
+            "id",
+            "name"
         )

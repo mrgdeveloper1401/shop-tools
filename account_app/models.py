@@ -51,7 +51,36 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return self.profile_image.image.url if self.profile_image else None
 
 
+class State(models.Model):
+    state_name = models.CharField(_("state name"), max_length=150)
+
+    class Meta:
+        db_table = "state"
+
+
+class City(models.Model):
+    name = models.CharField(_("city name"), max_length=150)
+    state = models.ForeignKey(State, on_delete=models.PROTECT, related_name="cities")
+
+    class Meta:
+        db_table = "city"
+
+
 class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    state = models.ForeignKey(
+        State,
+        on_delete=models.PROTECT,
+        related_name="user_address_state",
+        blank=True, # TODO, when clear migration, remove field blank and null
+        null=True
+    )
+    city = models.ForeignKey(
+        City,
+        on_delete=models.PROTECT,
+        related_name="user_address_city",
+        blank=True, # TODO, when clear migration, remove field blank and null
+        null=True,
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,

@@ -135,7 +135,7 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
-
+ 
     def get_serializer_class(self):
         if self.request.user.is_staff:
             return serializers.AdminProductBrandSerializer

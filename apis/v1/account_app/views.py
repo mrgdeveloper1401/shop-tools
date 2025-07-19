@@ -1,7 +1,7 @@
 from django.core.cache import cache
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
 
-from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress
+from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.pagination import  AdminTwentyPageNumberPagination
@@ -198,7 +198,9 @@ class UserAddressViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         query = UserAddress.objects.defer(
             "is_deleted",
-            "deleted_at"
+            "deleted_at",
+            "created_at",
+            "updated_at"
         )
         if not self.request.user.is_staff:
             query = query.filter(user_id=self.request.user.id)
@@ -220,4 +222,33 @@ class AdminUserListview(generics.ListAPIView):
             "mobile_phone"
         ).filter(
             is_active=True
+        )
+
+
+class StateViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin
+):
+    serializer_class = serializers.StateSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return State.objects.only(
+            "state_name"
+        )
+
+
+class CityViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+):
+    serializer_class = serializers.CitySerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return City.objects.filter(
+            state_id=self.kwargs['state_pk']
+        ).only(
+            "name"
         )
