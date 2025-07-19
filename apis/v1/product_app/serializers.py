@@ -2,7 +2,8 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from core_app.models import Image
-from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant
+from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
+    ProductAttributeValue, VariantAttribute
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -190,13 +191,89 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
         return data
 
 
+class NestedProductAttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAttribute
+        fields = (
+            "attribute_name",
+        )
+
+
+class NestedProductAttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAttributeValue
+        fields = ("attribute_value",)
+
+
+class NestedVariantAttributeSerializer(serializers.ModelSerializer):
+    attribute = NestedProductAttributeSerializer()
+    value = NestedProductAttributeValueSerializer()
+
+    class Meta:
+        model = VariantAttribute
+        fields = (
+            "attribute",
+            "value"
+        )
+
+
 class AdminProductVariantSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.only("id")
     )
+    attributes = NestedVariantAttributeSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductVariant
+        exclude = (
+            "is_deleted",
+            "deleted_at",
+            "created_at",
+            "updated_at",
+        )
+
+
+class AdminProductAttributeSerializer(serializers.ModelSerializer):
+    attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProductAttribute
+        exclude = (
+            "is_deleted",
+            "deleted_at",
+            "created_at",
+            "updated_at",
+        )
+
+
+class AdminProductAttributeValueSerializer(serializers.ModelSerializer):
+    attribute = serializers.PrimaryKeyRelatedField(
+        queryset=ProductAttribute.objects.only('id'),
+    )
+
+    class Meta:
+        model = ProductAttributeValue
+        exclude = (
+            "is_deleted",
+            "deleted_at",
+            "created_at",
+            "updated_at",
+        )
+
+
+class AdminVariantAttributeSerializer(serializers.ModelSerializer):
+    variant = serializers.PrimaryKeyRelatedField(
+        queryset=ProductVariant.objects.only("id")
+    )
+    attribute = serializers.PrimaryKeyRelatedField(
+        queryset=ProductAttribute.objects.only('id')
+    )
+    value = serializers.PrimaryKeyRelatedField(
+        queryset=ProductAttributeValue.objects.only("id")
+    )
+
+    class Meta:
+        model = VariantAttribute
         exclude = (
             "is_deleted",
             "deleted_at",

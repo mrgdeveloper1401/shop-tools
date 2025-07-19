@@ -1,10 +1,12 @@
 from django.db.models import Prefetch
 from rest_framework import viewsets, permissions
 
-from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter
+from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter, \
+    ProductAttributeFilter
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
-from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant
+from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
+    ProductAttributeValue, VariantAttribute
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
@@ -162,9 +164,96 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        base_query = ProductVariant.objects.filter(product_id=self.kwargs['product_pk'])
+        base_query = ProductVariant.objects.filter(product_id=self.kwargs['product_pk']).prefetch_related(
+            Prefetch(
+                "attributes", queryset=VariantAttribute.objects.select_related(
+                    "attribute",
+                    "value"
+                ).only(
+                    "attribute__attribute_name",
+                    "value__attribute_value"
+                )
+            )
+        )
 
         # filter admin user
         if self.request.user.is_staff:
             return base_query.defer("is_deleted", "deleted_at", "created_at", "updated_at")
         pass
+
+
+class ProductAttributeViewSet(viewsets.ModelViewSet):
+    filterset_class = ProductAttributeFilter
+
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminProductAttributeSerializer
+        pass
+
+    def get_queryset(self):
+        base_query = ProductAttribute.objects.defer(
+            "is_deleted",
+            "deleted_at",
+            "created_at",
+            "updated_at"
+        ).prefetch_related(
+            Prefetch(
+                "attribute_values", queryset=ProductAttributeValue.objects.only(
+                    "attribute_value",
+                )
+            )
+        )
+
+        # filter staff user
+        if self.request.user.is_staff:
+            return base_query
+
+
+class ProductAttributeValueViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminProductAttributeValueSerializer
+
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
+
+    def get_queryset(self):
+        base_query = ProductAttributeValue.objects.defer(
+            "is_deleted",
+            "deleted_at",
+            "created_at",
+            "updated_at"
+        )
+        # filter staff user
+        if self.request.user.is_staff:
+            return base_query
+
+
+class VariantAttributeViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminVariantAttributeSerializer
+
+    def get_queryset(self):
+        base_query = VariantAttribute.objects.filter(
+            variant_id=self.kwargs['variant_pk']
+        ).defer(
+            "is_deleted",
+            "deleted_at",
+            "created_at",
+            "updated_at"
+        )
+        if self.request.user.is_staff:
+            return base_query

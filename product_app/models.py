@@ -141,7 +141,7 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = "product_variant"
 
 
-class VariantAttribute(models.Model):
+class VariantAttribute(CreateMixin, UpdateMixin, SoftDeleteMixin):
     variant = models.ForeignKey(
         ProductVariant,
         on_delete=models.PROTECT,

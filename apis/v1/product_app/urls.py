@@ -1,5 +1,6 @@
 from rest_framework_nested import routers
 from django.urls import path, include
+from rest_framework_nested.routers import NestedSimpleRouter
 
 from . import views
 
@@ -9,14 +10,24 @@ router = routers.SimpleRouter()
 router.register("product_category", views.ProductCategoryViewSet, basename="product_category")
 router.register("product_brand", views.ProductBrandViewSet, basename="product_brand")
 router.register("product_images", views.ProductImageViewSet, basename="product_images")
+router.register("product_attribute", views.ProductAttributeViewSet, basename="product_attribute")
+router.register("product_attribute_value", views.ProductAttributeValueViewSet, basename="product_attribute_value")
 
 category_router = routers.NestedSimpleRouter(router, "product_category", lookup="category")
 category_router.register("products", views.ProductViewSet, basename="products")
 
 product_router = routers.NestedSimpleRouter(category_router, "products", lookup="product")
-product_router.register("product_variant", views.ProductVariantViewSet, basename="product_varient")
+product_router.register("product_variant", views.ProductVariantViewSet, basename="product_variant")
+
+product_variant_router = NestedSimpleRouter(product_router, "product_variant", lookup="variant")
+product_variant_router.register(
+    "variant_attribute",
+    views.VariantAttributeViewSet,
+    basename="variant_attribute"
+)
 
 urlpatterns = [
     path("", include(category_router.urls)),
     path("", include(product_router.urls)),
+    path("", include(product_variant_router.urls))
 ] + router.urls
