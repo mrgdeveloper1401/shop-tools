@@ -49,12 +49,12 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
     #     null=True,
     #     help_text=_('Optional thumbnail (can be generated on save).')
     # )
-    title = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        help_text=_('Short descriptive title.')
-    )
+    # title = models.CharField(
+    #     max_length=255,
+    #     blank=True,
+    #     null=True,
+    #     help_text=_('Short descriptive title.')
+    # )
     alt_text = models.CharField(
         max_length=255,
         blank=True,

@@ -1,5 +1,6 @@
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from rest_framework.generics import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 
 from core_app.models import Image
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
@@ -177,23 +178,51 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
     # product = serializers.PrimaryKeyRelatedField(
     #     queryset=Product.objects.filter(is_active=True).only("id")
     # )
-    image = serializers.PrimaryKeyRelatedField(
-        queryset=Image.objects.only("id")
+    # image = serializers.PrimaryKeyRelatedField(
+    #     queryset=Image.objects.only("id")
+    # )
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.only("id",)
     )
+    alt_image = serializers.CharField(required=False)
+    image = serializers.ImageField(required=False)
 
     class Meta:
         model = ProductImages
         fields = (
             "id",
+            "product",
             "image",
+            "alt_image",
             "order",
             "is_active"
         )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['image'] = AdminSimpleProductImageSerializer(instance.image).data
+        data['image'] = AdminSimpleProductImageSerializer(instance.image, read_only=True).data
         return data
+
+    def create(self, validated_data):
+        image = validated_data.pop("image", None)
+        alt_image = validated_data.pop("alt_image", None)
+
+        if image or alt_image:
+            img = Image.objects.create(
+                image=image,
+                alt_text=alt_image
+            )
+            product_image = ProductImages.objects.create(
+                image_id=img.id,
+                **validated_data
+            )
+            return product_image
+        else:
+            raise exceptions.ValidationError(
+                {
+                    "message": _("you must set image and alt_text image")
+                }
+            )
 
 
 class NestedProductAttributeSerializer(serializers.ModelSerializer):
