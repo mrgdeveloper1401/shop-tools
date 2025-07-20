@@ -4,4 +4,5 @@ WORKDIR /home/app
 
 COPY . .
 
-RUN pip install --index-url https://mirror-pypi.runflare.com/simple colorlog
+RUN pip install --index-url https://mirror-pypi.runflare.com/simple colorlog && \
+    pip install --index-url https://mirror-pypi.runflare.com/simple drf-spectacular[sidecar]

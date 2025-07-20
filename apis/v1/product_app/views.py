@@ -3,6 +3,7 @@ from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter, \
     ProductAttributeFilter, ProductFilter, ProductHomePageFilter, ProductTagFilter
+from core.utils.mixin import Rud
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
@@ -38,7 +39,37 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
             return serializers.ProductCategorySerializer
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class CreateAdminProductView(generics.CreateAPIView):
+    serializer_class = serializers.ProductSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    queryset = Product.objects.select_related(
+            "product_brand"
+        ).only(
+            "tags__tag_name",
+            "product_brand__brand_name",
+            "category_id",
+            "is_active",
+            "product_slug",
+            "description",
+            "social_links",
+            "product_name",
+            "description_slug",
+            "sku"
+        ).prefetch_related(
+            Prefetch(
+                "tags", queryset=Tag.objects.only("tag_name")
+            ),
+            Prefetch(
+                "product_product_image", queryset=ProductImages.objects.select_related("image").only(
+                    "image__image",
+                    "order",
+                    "product_id"
+                )
+            )
+        )
+
+
+class ProductViewSet(Rud):
     """
     search_filter --> product_name \n
     pagination --> 20 item
@@ -56,7 +87,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 return serializers.UserRetrieveProductSerializer
 
     def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
+        if self.action in ("update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
@@ -151,7 +182,22 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
             return ProductBrand.objects.filter(is_active=True).only("brand_name",)
 
 
-class ProductImageViewSet(viewsets.ModelViewSet):
+class AdminCreateProductImage(generics.CreateAPIView):
+    serializer_class = serializers.AdminProductImageSerializer
+    permission_classes = (permissions.IsAdminUser,)
+
+    def get_queryset(self):
+        return ProductImages.objects.filter(
+            product_id=self.kwargs['product_pk']
+        ).select_related(
+            "image"
+        ).only(
+            "order",
+            "is_active",
+            "image__image"
+        )
+
+class ProductImageViewSet(Rud):
     """
     this view can only user admin access \n
     filter query --> field(is_active)
@@ -172,13 +218,13 @@ class ProductImageViewSet(viewsets.ModelViewSet):
         )
 
 
-class ProductVariantViewSet(viewsets.ModelViewSet):
+class ProductVariantViewSet(Rud):
     def get_serializer_class(self):
         if self.request.user.is_staff:
             return serializers.AdminProductVariantSerializer
 
     def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
+        if self.action in ("update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
@@ -256,9 +302,20 @@ class ProductAttributeValueViewSet(viewsets.ModelViewSet):
             return base_query
 
 
-class VariantAttributeViewSet(viewsets.ModelViewSet):
+class AdminCreateVariantAttributeView(generics.CreateAPIView):
+    serializer_class = serializers.AdminVariantAttributeSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    queryset = VariantAttribute.objects.defer(
+        "is_deleted",
+        "deleted_at",
+        "created_at",
+        "updated_at"
+    )
+
+
+class VariantAttributeViewSet(Rud):
     def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
+        if self.action in ("update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 

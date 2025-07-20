@@ -31,5 +31,12 @@ urlpatterns = [
     path("", include(category_router.urls)),
     path("", include(product_router.urls)),
     path("", include(product_variant_router.urls)),
-    path("product_home_page/", views.ProductListHomePageView.as_view(), name='product_home_page')
+    path("product_home_page/", views.ProductListHomePageView.as_view(), name='product_home_page'),
+    path("create_product/", views.CreateAdminProductView.as_view(), name='admin_create_product'),
+    path("create_product_image/", views.AdminCreateProductImage.as_view(), name='admin_create_product_image'),
+    path(
+        'create_variant_attribute/',
+        views.AdminCreateVariantAttributeView.as_view(),
+        name='admin_create_variant_attribute'
+    )
 ] + router.urls

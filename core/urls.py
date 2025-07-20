@@ -17,8 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from django.conf import settings
 from rest_framework_simplejwt.views import TokenVerifyView
+from decouple import config
 
 v1_api_urls = [
     path("v1/auth/", include("apis.v1.account_app.urls", namespace="v1_auth")),
@@ -46,10 +46,12 @@ urlpatterns = [
     path('ckeditor5/', include('django_ckeditor_5.urls')),
 ] + v1_api_urls + swagger + jwt
 
-if settings.DEBUG:
+DEBUG = config("DEBUG", cast=bool)
+
+if DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls
     from django.conf.urls.static import static
-
+    from django.conf import settings
 
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += debug_toolbar_urls()
