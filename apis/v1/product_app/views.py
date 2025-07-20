@@ -3,7 +3,7 @@ from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter, \
     ProductAttributeFilter, ProductFilter, ProductHomePageFilter, ProductTagFilter
-from core.utils.mixin import Rud
+# from core.utils.mixin import Rud
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
@@ -69,7 +69,7 @@ class CreateAdminProductView(generics.CreateAPIView):
         )
 
 
-class ProductViewSet(Rud):
+class ProductViewSet(viewsets.ModelViewSet):
     """
     search_filter --> product_name \n
     pagination --> 20 item
@@ -87,7 +87,7 @@ class ProductViewSet(Rud):
                 return serializers.UserRetrieveProductSerializer
 
     def get_permissions(self):
-        if self.action in ("update", "partial_update", "destroy"):
+        if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
@@ -197,7 +197,7 @@ class AdminCreateProductImage(generics.CreateAPIView):
             "image__image"
         )
 
-class ProductImageViewSet(Rud):
+class ProductImageViewSet(viewsets.ModelViewSet):
     """
     this view can only user admin access \n
     filter query --> field(is_active)
@@ -218,13 +218,13 @@ class ProductImageViewSet(Rud):
         )
 
 
-class ProductVariantViewSet(Rud):
+class ProductVariantViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.user.is_staff:
             return serializers.AdminProductVariantSerializer
 
     def get_permissions(self):
-        if self.action in ("update", "partial_update", "destroy"):
+        if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
@@ -313,9 +313,9 @@ class AdminCreateVariantAttributeView(generics.CreateAPIView):
     )
 
 
-class VariantAttributeViewSet(Rud):
+class VariantAttributeViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
-        if self.action in ("update", "partial_update", "destroy"):
+        if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 

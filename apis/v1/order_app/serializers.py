@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from account_app.models import User
 from order_app.models import Order, OrderItem
 
 
@@ -22,6 +23,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class AdminOrderSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.only("mobile_phone",),
+    )
+
     class Meta:
         model = Order
         exclude = (
