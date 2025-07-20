@@ -215,7 +215,8 @@ class ProductImageViewSet(viewsets.ModelViewSet):
         ).only(
             "order",
             "is_active",
-            "image__image"
+            "image__image",
+            "image__alt_text"
         )
 
 

@@ -55,7 +55,7 @@ class SimpleProductTagSerializer(serializers.ModelSerializer):
 class AdminSimpleProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('get_image_url',)
+        fields = ('get_image_url', "alt_text")
 
 
 class NestedProductImageSerializer(serializers.ModelSerializer):

@@ -43,12 +43,12 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
         upload_to='images/%Y/%m/%d/',
         help_text=_('Upload the original image file.')
     )
-    thumbnail = models.ImageField(
-        upload_to='images/thumbnails/%Y/%m/%d/',
-        blank=True,
-        null=True,
-        help_text=_('Optional thumbnail (can be generated on save).')
-    )
+    # thumbnail = models.ImageField(
+    #     upload_to='images/thumbnails/%Y/%m/%d/',
+    #     blank=True,
+    #     null=True,
+    #     help_text=_('Optional thumbnail (can be generated on save).')
+    # )
     title = models.CharField(
         max_length=255,
         blank=True,
@@ -61,10 +61,10 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
         null=True,
         help_text=_('Alt text for accessibility and SEO.')
     )
-    caption = models.TextField(
-        blank=True,
-        help_text=_('Optional longer caption or description.')
-    )
+    # caption = models.TextField(
+    #     blank=True,
+    #     help_text=_('Optional longer caption or description.')
+    # )
 
     # Optional relations
     # For example: link image to a user or a gallery
