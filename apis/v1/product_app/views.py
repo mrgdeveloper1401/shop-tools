@@ -51,7 +51,7 @@ class CreateAdminProductView(generics.CreateAPIView):
             "is_active",
             "product_slug",
             "description",
-            "social_links",
+            # "social_links",
             "product_name",
             "description_slug",
             "sku"
@@ -104,7 +104,7 @@ class ProductViewSet(Rud):
                 "is_active",
                 "product_slug",
                 "description",
-                "social_links",
+                # "social_links",
                 "product_name",
                 "description_slug",
                 "sku"
@@ -150,7 +150,7 @@ class ProductViewSet(Rud):
                 ).only(
                     "product_name",
                     "description",
-                    "social_links",
+                    # "social_links",
                     "product_brand__brand_name",
                     "tags",
                 )

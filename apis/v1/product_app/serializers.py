@@ -133,7 +133,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
         fields = (
             "product_name",
             "description",
-            "social_links",
+            # "social_links",
             "product_brand",
             "tags",
             "product_product_image"
