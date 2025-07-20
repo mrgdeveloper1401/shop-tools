@@ -203,26 +203,26 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
         data['image'] = AdminSimpleProductImageSerializer(instance.image, read_only=True).data
         return data
 
-    def create(self, validated_data):
-        image = validated_data.pop("image", None)
-        alt_image = validated_data.pop("alt_image", None)
-
-        if image or alt_image:
-            img = Image.objects.create(
-                image=image,
-                alt_text=alt_image
-            )
-            product_image = ProductImages.objects.create(
-                image_id=img.id,
-                **validated_data
-            )
-            return product_image
-        else:
-            raise exceptions.ValidationError(
-                {
-                    "message": _("you must set image and alt_text image")
-                }
-            )
+    # def create(self, validated_data):
+    #     image = validated_data.pop("image", None)
+    #     alt_image = validated_data.pop("alt_image", None)
+    #
+    #     if image or alt_image:
+    #         img = Image.objects.create(
+    #             image=image,
+    #             alt_text=alt_image
+    #         )
+    #         product_image = ProductImages.objects.create(
+    #             image_id=img.id,
+    #             **validated_data
+    #         )
+    #         return product_image
+    #     else:
+    #         raise exceptions.ValidationError(
+    #             {
+    #                 "message": _("you must set image and alt_text image")
+    #             }
+    #         )
 
 
 class NestedProductAttributeSerializer(serializers.ModelSerializer):
