@@ -176,3 +176,8 @@ class CitySerializer(serializers.ModelSerializer):
             "id",
             "name"
         )
+
+
+class LoginByPhonePasswordSerializer(serializers.Serializer):
+    phone = serializers.CharField()
+    password = serializers.CharField()

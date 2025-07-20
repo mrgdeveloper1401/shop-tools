@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.core.cache import cache
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
 
@@ -252,3 +253,31 @@ class CityViewSet(
         ).only(
             "name"
         )
+
+
+class LoginByPhonePasswordView(views.APIView):
+    serializer_class = serializers.LoginByPhonePasswordSerializer
+    permission_classes = (NotAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone = serializer.validated_data['phone']
+        password = serializer.validated_data['password']
+
+        user = authenticate(
+            mobile_phone=phone,
+            password=password
+        )
+        if user and user.is_active:
+            # generate token
+            token = get_tokens_for_user(user)
+            return response.Response(
+                data={
+                    "token": token,
+                    "is_staff": user.is_staff
+                }
+            )
+        else:
+            return exceptions.NotFound()

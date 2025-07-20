@@ -43,3 +43,9 @@ SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 CORS_ALLOW_ALL_ORIGINS = True
 
 CACHES['default']['LOCATION'] = "redis://127.0.0.1:6380/1"
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    }
+}
