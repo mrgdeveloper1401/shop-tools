@@ -104,6 +104,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         null=True,
         help_text=_("you can defined social link by json")
     )
+    sku = models.CharField(max_length=50, blank=True, null=True) # TODO, when clear migration, we remove field blank and null and set field unique
     # base_price = models.DecimalField(
     #     max_digits=12,
     #     decimal_places=3,
@@ -122,7 +123,6 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="variants"
     )
-    sku = models.CharField(max_length=50, unique=True)
     barcode = models.CharField(max_length=100, unique=True)
     price = models.DecimalField(max_digits=12, decimal_places=3)
     stock_number = models.PositiveIntegerField(default=0)

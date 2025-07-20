@@ -75,7 +75,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "description",
                 "social_links",
                 "product_name",
-                "description_slug"
+                "description_slug",
+                "sku"
             ).prefetch_related(
                 Prefetch(
                     "tags", queryset=Tag.objects.only("tag_name")
@@ -286,7 +287,9 @@ class ProductListHomePageView(generics.ListAPIView):
     queryset = Product.objects.filter(is_active=True).only(
         "product_name",
         "category_id",
-        "product_name"
+        "product_name",
+        "product_slug",
+        "description_slug"
     ).prefetch_related(
         Prefetch(
             "product_product_image", queryset=ProductImages.objects.filter(

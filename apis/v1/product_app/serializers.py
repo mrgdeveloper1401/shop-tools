@@ -297,7 +297,9 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "category_id",
             "product_name",
             "product_product_image",
-            "variants"
+            "variants",
+            "product_slug",
+            "description_slug"
         )
 
 

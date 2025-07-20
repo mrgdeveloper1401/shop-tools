@@ -5,6 +5,7 @@ from django_filters.widgets import RangeWidget
 from account_app.models import User, UserAddress
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
+from order_app.models import Order
 from product_app.models import Category, ProductBrand, ProductImages, ProductAttribute, Product, Tag
 
 
@@ -143,4 +144,12 @@ class ProductTagFilter(FilterSet):
         fields = {
             "tag_name": ['contains'],
             "is_active": ['exact'],
+        }
+
+
+class OrderFilter(FilterSet):
+    class Meta:
+        model = Order
+        fields = {
+            "is_complete": ['exact'],
         }

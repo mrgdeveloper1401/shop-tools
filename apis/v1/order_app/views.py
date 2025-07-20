@@ -1,0 +1,66 @@
+from rest_framework import viewsets, permissions
+
+from core.utils.custom_filters import OrderFilter
+from core.utils.pagination import TwentyPageNumberPagination
+from order_app.models import Order, OrderItem
+from . import serializers
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    """
+    filter query --> field is_complete \n
+    pagination --> 20 item
+    """
+    pagination_class = TwentyPageNumberPagination
+    filterset_class = OrderFilter
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Order.objects.all().defer("is_deleted", "deleted_at")
+        else:
+            return Order.objects.filter(
+                user_id=self.request.user.id
+            ).only(
+                "is_complete",
+                "created_at",
+            )
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminOrderSerializer
+        else:
+            return serializers.OrderSerializer
+
+    def get_permissions(self):
+        if self.action in ("update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
+
+
+class OrderItemViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            pass
+        else:
+            return serializers.OrderItemSerializer
+
+    def get_queryset(self):
+        base_query = OrderItem.objects.filter(
+            order_id=self.kwargs['order_pk']
+        )
+
+        if self.request.user.is_staff:
+            pass
+        else:
+            return base_query.select_related(
+                "product_variant__product__category"
+            ).only(
+                "price",
+                "created_at",
+                "quantity",
+                "product_variant_id",
+                "product_variant__product_id",
+                "product_variant__product__category_id",
+            )
