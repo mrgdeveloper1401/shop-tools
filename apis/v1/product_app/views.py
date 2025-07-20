@@ -96,11 +96,12 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         if self.request.user.is_staff:
             return Product.objects.select_related(
-                "product_brand"
+                "product_brand",
+                "category"
             ).only(
                 "tags__tag_name",
                 "product_brand__brand_name",
-                "category_id",
+                "category__category_name",
                 "is_active",
                 "product_slug",
                 "description",

@@ -43,13 +43,13 @@ class UserProductCategorySerializer(serializers.ModelSerializer):
 class SimpleProductBrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductBrand
-        fields = ("brand_name",)
+        fields = ("brand_name", "id")
 
 
 class SimpleProductTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ("tag_name",)
+        fields = ("tag_name", "id")
 
 
 class AdminSimpleProductImageSerializer(serializers.ModelSerializer):
@@ -66,6 +66,15 @@ class NestedProductImageSerializer(serializers.ModelSerializer):
         fields = (
             "image",
             "order"
+        )
+
+
+class SimpleProductCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            "id",
+            "category_name",
         )
 
 
@@ -95,6 +104,7 @@ class ProductSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data['product_brand'] = SimpleProductBrandSerializer(instance.product_brand).data
         data['tags'] = SimpleProductTagSerializer(instance.tags.all(), many=True).data
+        data['category'] = SimpleProductCategorySerializer(instance.category).data
         return data
 
 
