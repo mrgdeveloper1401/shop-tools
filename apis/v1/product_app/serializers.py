@@ -297,3 +297,23 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "product_product_image",
             "variants"
         )
+
+
+class AdminTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = (
+            "id",
+            "tag_name",
+            "is_active",
+            "created_at",
+            "updated_at",
+        )
+
+
+class UserProductTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = (
+            "tag_name",
+        )

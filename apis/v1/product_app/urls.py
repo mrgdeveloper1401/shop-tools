@@ -11,6 +11,7 @@ router.register("product_category", views.ProductCategoryViewSet, basename="prod
 router.register("product_brand", views.ProductBrandViewSet, basename="product_brand")
 router.register("product_attribute", views.ProductAttributeViewSet, basename="product_attribute")
 router.register("product_attribute_value", views.ProductAttributeValueViewSet, basename="product_attribute_value")
+router.register("product_tag", views.TagViewSet, basename="product_tag")
 
 category_router = routers.NestedSimpleRouter(router, "product_category", lookup="category")
 category_router.register("products", views.ProductViewSet, basename="products")

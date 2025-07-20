@@ -2,7 +2,7 @@ from django.db.models import Prefetch
 from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter, \
-    ProductAttributeFilter, ProductFilter, ProductHomePageFilter
+    ProductAttributeFilter, ProductFilter, ProductHomePageFilter, ProductTagFilter
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
@@ -288,3 +288,35 @@ class ProductListHomePageView(generics.ListAPIView):
     serializer_class = serializers.ProductListHomePageSerializer
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductHomePageFilter
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    """
+    filter query --> tag_name and is_active \n
+    pagination --> 20 item \n
+    permissions --> method post and put and patch and deleted only user admin
+    """
+    filterset_class = ProductTagFilter
+    pagination_class = TwentyPageNumberPagination
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminTagSerializer
+        else:
+            return serializers.UserProductTagSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Tag.objects.only(
+                "tag_name",
+                "is_active",
+                "created_at",
+                'updated_at'
+            )
+        else:
+            return Tag.objects.filter(is_active=True).only("tag_name",)
+
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
