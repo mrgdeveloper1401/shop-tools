@@ -284,7 +284,29 @@ class ProductListHomePageView(generics.ListAPIView):
     filter query --> product_name
     """
     queryset = Product.objects.filter(is_active=True).only(
+        "product_name",
+        "category_id",
         "product_name"
+    ).prefetch_related(
+        Prefetch(
+            "product_product_image", queryset=ProductImages.objects.filter(
+                is_active=True
+            ).select_related(
+                "image"
+            ).only(
+                "image__image",
+                "order",
+                "product_id"
+            )
+        ),
+        Prefetch(
+            "variants", queryset=ProductVariant.objects.filter(
+                is_active=True
+            ).only(
+                "price",
+                "product_id"
+            )
+        )
     )
     serializer_class = serializers.ProductListHomePageSerializer
     pagination_class = TwentyPageNumberPagination

@@ -44,8 +44,13 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CACHES['default']['LOCATION'] = "redis://127.0.0.1:6380/1"
 
-# STORAGES = {
-#     "staticfiles": {
-#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
-#     }
-# }
+STORAGES = {
+    'default':
+        {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage'
+        },
+    'staticfiles':
+        {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'
+        }
+}
