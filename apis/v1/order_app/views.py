@@ -40,9 +40,16 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if self.action in ("update", "partial_update", "destroy", "create"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
+
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            pass
+            return serializers.AdminOrderItemSerializer
         else:
             return serializers.OrderItemSerializer
 
@@ -52,11 +59,12 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         )
 
         if self.request.user.is_staff:
-            pass
+            return base_query.defer("is_deleted", "deleted_at")
         else:
             return base_query.select_related(
-                "product_variant__product__category"
+                "product_variant__product__category",
             ).only(
+                "order_id",
                 "price",
                 "created_at",
                 "quantity",

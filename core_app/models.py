@@ -68,14 +68,14 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     # Optional relations
     # For example: link image to a user or a gallery
-    uploaded_by = models.ForeignKey(
-        'account_app.User',
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name='images',
-        help_text=_('User who uploaded this image (if any).')
-    )
+    # uploaded_by = models.ForeignKey(
+    #     'account_app.User',
+    #     on_delete=models.PROTECT,
+    #     null=True,
+    #     blank=True,
+    #     related_name='images',
+    #     help_text=_('User who uploaded this image (if any).')
+    # )
 
     @cached_property
     def get_image_url(self):

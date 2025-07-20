@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from account_app.models import User
 from order_app.models import Order, OrderItem
+from product_app.models import ProductVariant
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -49,4 +50,20 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "quantity",
             "price",
             "created_at"
+        )
+
+
+class AdminOrderItemSerializer(serializers.ModelSerializer):
+    order = serializers.PrimaryKeyRelatedField(
+        queryset=Order.objects.only("id")
+    )
+    product_variant = serializers.PrimaryKeyRelatedField(
+        queryset=ProductVariant.objects.only("id")
+    )
+
+    class Meta:
+        model = OrderItem
+        exclude = (
+            "is_deleted",
+            "deleted_at",
         )
