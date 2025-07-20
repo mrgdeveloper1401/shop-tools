@@ -74,7 +74,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_slug",
                 "description",
                 "social_links",
-                "product_name"
+                "product_name",
+                "description_slug"
             ).prefetch_related(
                 Prefetch(
                     "tags", queryset=Tag.objects.only("tag_name")

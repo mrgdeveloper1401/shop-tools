@@ -97,6 +97,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     product_slug = models.CharField(max_length=500, blank=True)
     description = models.TextField()
+    description_slug = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     social_links = models.JSONField(
         blank=True,
