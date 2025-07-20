@@ -279,10 +279,11 @@ class AdminVariantAttributeSerializer(serializers.ModelSerializer):
 
 class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
     # attributes = NestedVariantAttributeSerializer(many=True)
+    variant_id = serializers.IntegerField(source="id")
 
     class Meta:
         model = ProductVariant
-        fields = ("price",)
+        fields = ("price", "variant_id")
 
 
 class ProductListHomePageSerializer(serializers.ModelSerializer):
