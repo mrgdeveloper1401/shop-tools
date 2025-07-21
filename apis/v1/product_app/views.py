@@ -289,13 +289,13 @@ class ProductAttributeViewSet(viewsets.ModelViewSet):
             "deleted_at",
             "created_at",
             "updated_at"
-        ).prefetch_related(
-            Prefetch(
-                "attribute_values", queryset=ProductAttributeValue.objects.only(
-                    "attribute_value",
-                )
-            )
-        )
+        )#.prefetch_related(
+        #     Prefetch(
+        #         "attribute_values", queryset=ProductAttributeValue.objects.only(
+        #             "attribute_value",
+        #         )
+        #     )
+        # )
 
         # filter staff user
         if self.request.user.is_staff:

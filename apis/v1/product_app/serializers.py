@@ -290,7 +290,7 @@ class AdminProductVariantSerializer(serializers.ModelSerializer):
 
 
 class AdminProductAttributeSerializer(serializers.ModelSerializer):
-    attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
+    # attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductAttribute
