@@ -176,7 +176,7 @@ class NestedProductAttributeValuesSerializer(serializers.ModelSerializer):
 
 class RetrieveAdminProductSerializer(ProductSerializer):
     # variants = NestedProductVariantAttributeSerializer(many=True, read_only=True)
-    attributes = NestedProductAttributeValuesSerializer(many=True)
+    attributes = NestedProductAttributeValuesSerializer(many=True, read_only=True)
 
 
 class NestedImageSerializer(serializers.ModelSerializer):
@@ -209,7 +209,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     tags = NestedProductTagsSerializer(many=True)
     product_brand = SimpleProductBrandSerializer()
     product_product_image = NestedProductImageSerializer(many=True)
-    attributes = NestedProductAttributeValuesSerializer(many=True)
+    attributes = NestedProductAttributeValuesSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
