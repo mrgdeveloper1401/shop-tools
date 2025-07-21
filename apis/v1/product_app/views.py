@@ -79,7 +79,10 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            return serializers.ProductSerializer
+            if self.action == "list":
+                return serializers.ProductSerializer
+            else:
+                return serializers.RetrieveAdminProductSerializer
         else:
             if self.action == "list":
                 return serializers.UserListProductSerializer
@@ -116,8 +119,22 @@ class ProductViewSet(viewsets.ModelViewSet):
                 Prefetch(
                     "product_product_image", queryset=ProductImages.objects.select_related("image").only(
                         "image__image",
+                        "image__alt_text",
                         "order",
                         "product_id"
+                    )
+                ),
+                Prefetch(
+                    "variants", queryset=ProductVariant.objects.only("product_id", "price").prefetch_related(
+                        Prefetch(
+                            "attributes", queryset=VariantAttribute.objects.select_related(
+                                "attribute", "value"
+                            ).only(
+                                "variant_id",
+                                "attribute__attribute_name",
+                                "value__attribute_value"
+                            )
+                        )
                     )
                 )
             )

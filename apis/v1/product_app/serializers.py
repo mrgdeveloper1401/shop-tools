@@ -109,6 +109,54 @@ class ProductSerializer(serializers.ModelSerializer):
         return data
 
 
+class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
+    # attributes = NestedVariantAttributeSerializer(many=True)
+    variant_id = serializers.IntegerField(source="id")
+
+    class Meta:
+        model = ProductVariant
+        fields = ("price", "variant_id")
+
+
+class NestedProductAttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAttribute
+        fields = (
+            "attribute_name",
+        )
+
+
+class NestedProductAttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAttributeValue
+        fields = ("attribute_value",)
+
+
+class NestedVariantAttributeSerializer(serializers.ModelSerializer):
+    attribute = NestedProductAttributeSerializer()
+    value = NestedProductAttributeValueSerializer()
+
+    class Meta:
+        model = VariantAttribute
+        fields = (
+            "attribute",
+            "value"
+        )
+
+
+class NestedProductVariantAttributeSerializer(serializers.ModelSerializer):
+    attributes = NestedVariantAttributeSerializer(many=True)
+    variant_id = serializers.IntegerField(source="id")
+
+    class Meta:
+        model = ProductVariant
+        fields = ("price", "variant_id", "attributes")
+
+
+class RetrieveAdminProductSerializer(ProductSerializer):
+    variants = NestedProductVariantAttributeSerializer(many=True, read_only=True)
+
+
 class NestedImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
@@ -222,32 +270,6 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
     #         )
 
 
-class NestedProductAttributeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductAttribute
-        fields = (
-            "attribute_name",
-        )
-
-
-class NestedProductAttributeValueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductAttributeValue
-        fields = ("attribute_value",)
-
-
-class NestedVariantAttributeSerializer(serializers.ModelSerializer):
-    attribute = NestedProductAttributeSerializer()
-    value = NestedProductAttributeValueSerializer()
-
-    class Meta:
-        model = VariantAttribute
-        fields = (
-            "attribute",
-            "value"
-        )
-
-
 class AdminProductVariantSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.only("id")
@@ -311,15 +333,6 @@ class AdminVariantAttributeSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
-
-
-class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
-    # attributes = NestedVariantAttributeSerializer(many=True)
-    variant_id = serializers.IntegerField(source="id")
-
-    class Meta:
-        model = ProductVariant
-        fields = ("price", "variant_id")
 
 
 class ProductListHomePageSerializer(serializers.ModelSerializer):
