@@ -1,6 +1,6 @@
-from rest_framework import serializers, exceptions
+from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
-from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema_field
 
 from core_app.models import Image
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
@@ -390,17 +390,26 @@ class ProductCommentSerializer(serializers.ModelSerializer):
             "numchild",
             "depth",
             "created_at",
-            "updated_at"
+            "updated_at",
+            "comment_body"
+        )
+        read_only_fields = (
+            "path",
+            "numchild",
+            "depth"
         )
 
     def create(self, validated_data):
         parent = validated_data.pop("parent", None)
+        user_id = self.context['request'].user.id
+        product_pk = self.context['product_pk']
 
         if parent is None:
-            return ProductComment.add_root(**validated_data)
+            return ProductComment.add_root(**validated_data, user_id=user_id, product_id=product_pk)
         else:
             comment = get_object_or_404(ProductComment, pk=parent)
-            return comment.add_child(**validated_data)
+            return comment.add_child(**validated_data, user_id=user_id, product_id=product_pk)
 
+    @extend_schema_field(serializers.BooleanField())
     def get_user_is_staff(self, obj):
         return obj.user.is_staff

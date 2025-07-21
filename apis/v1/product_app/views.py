@@ -5,6 +5,7 @@ from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFi
     ProductAttributeFilter, ProductFilter, ProductHomePageFilter, ProductTagFilter
 # from core.utils.mixin import Rud
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
+from core.utils.permissions import IsOwnerOrReadOnly
 from . import serializers
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
     ProductAttributeValue, VariantAttribute, ProductComment
@@ -427,8 +428,12 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class ProductCommentViewSet(viewsets.ModelViewSet):
+    """
+    pagination --> 20 item
+    """
     serializer_class = serializers.ProductCommentSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+    pagination_class = TwentyPageNumberPagination
 
     def get_queryset(self):
         return ProductComment.objects.filter(
@@ -440,5 +445,11 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
             "user__is_staff",
             "created_at",
             "updated_at",
-            "product_id"
+            "product_id",
+            "comment_body"
         )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['product_pk'] = self.kwargs['product_pk']
+        return context
