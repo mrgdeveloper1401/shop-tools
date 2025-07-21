@@ -7,7 +7,7 @@ from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
 from discount_app.models import Coupon
 from order_app.models import Order
-from product_app.models import Category, ProductBrand, ProductImages, ProductAttribute, Product, Tag
+from product_app.models import Category, ProductBrand, ProductImages, Attribute, Product, Tag
 
 
 class AdminUserInformationFilter(FilterSet):
@@ -114,9 +114,9 @@ class AdminProductImageFilter(FilterSet):
         return queryset
 
 
-class ProductAttributeFilter(FilterSet):
+class AttributeFilter(FilterSet):
     class Meta:
-        model = ProductAttribute
+        model = Attribute
         fields = {
             "attribute_name": ['contains'],
             "is_active": ['exact'],

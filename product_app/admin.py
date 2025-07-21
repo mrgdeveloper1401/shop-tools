@@ -3,15 +3,15 @@ from django.contrib import admin
 from .models import (
     Category,
     Product,
-    ProductAttribute,
-    ProductAttributeValue,
+    Attribute,
+    AttributeValue,
     FavoriteProduct,
     ProductImages,
     ProductBrand,
     Tag,
     ProductComment,
     ProductVariant,
-    VariantAttribute
+    ProductAttributeValues
 )
 
 
@@ -25,12 +25,12 @@ class ProductAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ProductAttribute)
-class ProductAttributeAdmin(admin.ModelAdmin):
+@admin.register(Attribute)
+class AttributeAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ProductAttributeValue)
+@admin.register(AttributeValue)
 class ProductAttributeValueAdmin(admin.ModelAdmin):
     pass
 
@@ -65,6 +65,6 @@ class ProductVariantAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(VariantAttribute)
-class VariantAttributeAdmin(admin.ModelAdmin):
+@admin.register(ProductAttributeValues)
+class ProductAttributeValuesAdmin(admin.ModelAdmin):
     pass

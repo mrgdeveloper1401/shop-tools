@@ -1,6 +1,5 @@
 from django.db import models
 from treebeard.mp_tree import MP_Node
-from django.utils.translation import gettext_lazy as _
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
@@ -25,7 +24,7 @@ class Tag(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = 'tag'
 
 
-class ProductAttribute(CreateMixin, UpdateMixin, SoftDeleteMixin):
+class Attribute(CreateMixin, UpdateMixin, SoftDeleteMixin):
     attribute_name = models.CharField(max_length=255, db_index=True)
     is_active = models.BooleanField(default=True)
 
@@ -34,9 +33,9 @@ class ProductAttribute(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = 'product_attribute'
 
 
-class ProductAttributeValue(CreateMixin, UpdateMixin, SoftDeleteMixin):
+class AttributeValue(CreateMixin, UpdateMixin, SoftDeleteMixin):
     attribute = models.ForeignKey(
-        ProductAttribute,
+        Attribute,
         on_delete=models.PROTECT,
         related_name="attribute_values")
     attribute_value = models.CharField(max_length=255, db_index=True)
@@ -145,19 +144,19 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = "product_variant"
 
 
-class VariantAttribute(CreateMixin, UpdateMixin, SoftDeleteMixin):
+class ProductAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin):
     variant = models.ForeignKey(
         ProductVariant,
         on_delete=models.PROTECT,
         related_name="attributes"
     )
     attribute = models.ForeignKey(
-        ProductAttribute,
+        Attribute,
         on_delete=models.PROTECT,
         related_name="variant_attributes"
     )
     value = models.ForeignKey(
-        ProductAttributeValue,
+        AttributeValue,
         on_delete=models.PROTECT,
         related_name="variant_attribute_values"
     )

@@ -3,8 +3,18 @@ from rest_framework.generics import get_object_or_404
 from drf_spectacular.utils import extend_schema_field
 
 from core_app.models import Image
-from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
-    ProductAttributeValue, VariantAttribute, ProductComment
+from product_app.models import (
+    Category,
+    Product,
+    ProductBrand,
+    ProductImages,
+    Tag,
+    ProductVariant,
+    Attribute,
+    AttributeValue,
+    ProductAttributeValues,
+    ProductComment
+)
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -120,7 +130,7 @@ class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
 
 class NestedProductAttributeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductAttribute
+        model = Attribute
         fields = (
             "attribute_name",
         )
@@ -128,7 +138,7 @@ class NestedProductAttributeSerializer(serializers.ModelSerializer):
 
 class NestedProductAttributeValueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductAttributeValue
+        model = AttributeValue
         fields = ("attribute_value",)
 
 
@@ -137,7 +147,7 @@ class NestedVariantAttributeSerializer(serializers.ModelSerializer):
     value = NestedProductAttributeValueSerializer()
 
     class Meta:
-        model = VariantAttribute
+        model = ProductAttributeValues
         fields = (
             "attribute",
             "value"
@@ -154,7 +164,8 @@ class NestedProductVariantAttributeSerializer(serializers.ModelSerializer):
 
 
 class RetrieveAdminProductSerializer(ProductSerializer):
-    variants = NestedProductVariantAttributeSerializer(many=True, read_only=True)
+    # variants = NestedProductVariantAttributeSerializer(many=True, read_only=True)
+    pass
 
 
 class NestedImageSerializer(serializers.ModelSerializer):
@@ -293,7 +304,7 @@ class AdminProductAttributeSerializer(serializers.ModelSerializer):
     # attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
 
     class Meta:
-        model = ProductAttribute
+        model = Attribute
         exclude = (
             "is_deleted",
             "deleted_at",
@@ -304,11 +315,11 @@ class AdminProductAttributeSerializer(serializers.ModelSerializer):
 
 class AdminProductAttributeValueSerializer(serializers.ModelSerializer):
     attribute = serializers.PrimaryKeyRelatedField(
-        queryset=ProductAttribute.objects.only('id'),
+        queryset=Attribute.objects.only('id'),
     )
 
     class Meta:
-        model = ProductAttributeValue
+        model = AttributeValue
         exclude = (
             "is_deleted",
             "deleted_at",
@@ -322,14 +333,14 @@ class AdminVariantAttributeSerializer(serializers.ModelSerializer):
         queryset=ProductVariant.objects.only("id")
     )
     attribute = serializers.PrimaryKeyRelatedField(
-        queryset=ProductAttribute.objects.only('id')
+        queryset=Attribute.objects.only('id')
     )
     value = serializers.PrimaryKeyRelatedField(
-        queryset=ProductAttributeValue.objects.only("id")
+        queryset=AttributeValue.objects.only("id")
     )
 
     class Meta:
-        model = VariantAttribute
+        model = ProductAttributeValues
         exclude = (
             "is_deleted",
             "deleted_at",

@@ -1,15 +1,30 @@
 from django.db.models import Prefetch
 from rest_framework import viewsets, permissions, generics
 
-from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFilter, AdminProductImageFilter, \
-    ProductAttributeFilter, ProductFilter, ProductHomePageFilter, ProductTagFilter
-# from core.utils.mixin import Rud
+from core.utils.custom_filters import (
+    AdminProductCategoryFilter,
+    ProductBrandFilter,
+    AdminProductImageFilter,
+    AttributeFilter,
+    ProductFilter,
+    ProductHomePageFilter,
+    ProductTagFilter
+)
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from core.utils.permissions import IsOwnerOrReadOnly
 from . import serializers
-from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
-    ProductAttributeValue, VariantAttribute, ProductComment
-
+from product_app.models import (
+    Category,
+    Product,
+    ProductBrand,
+    ProductImages,
+    Tag,
+    ProductVariant,
+    Attribute,
+    AttributeValue,
+    ProductAttributeValues,
+    ProductComment
+)
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
@@ -99,7 +114,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         base_query = Product.objects.filter(category_id=self.kwargs["category_pk"])
 
         if self.request.user.is_staff:
-            return Product.objects.select_related(
+            base_query = base_query.select_related(
                 "product_brand",
                 "category"
             ).only(
@@ -115,31 +130,44 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "sku",
                 "base_price"
             ).prefetch_related(
-                Prefetch(
-                    "tags", queryset=Tag.objects.only("tag_name")
-                ),
-                Prefetch(
-                    "product_product_image", queryset=ProductImages.objects.select_related("image").only(
-                        "image__image",
-                        # "image__alt_text",
-                        "order",
-                        "product_id"
-                    )
-                ),
-                Prefetch(
-                    "variants", queryset=ProductVariant.objects.only("product_id", "price").prefetch_related(
-                        Prefetch(
-                            "attributes", queryset=VariantAttribute.objects.select_related(
-                                "attribute", "value"
-                            ).only(
-                                "variant_id",
-                                "attribute__attribute_name",
-                                "value__attribute_value"
-                            )
+                    Prefetch(
+                "product_product_image", queryset=ProductImages.objects.select_related("image").only(
+                    "image__image",
+                    # "image__alt_text",
+                    "order",
+                    "product_id"
                         )
-                    )
-                )
+                ),
+                Prefetch(
+                "tags", queryset=Tag.objects.only("tag_name")
+                ),
             )
+            # print(base_query)
+            return base_query
+
+            # if self.action == "list":
+                # return base_query
+            # else:
+                # print(base_query)
+                # print(self.action)
+                # return base_query.prefetch_related(
+                #     Prefetch(
+                #         "tags", queryset=Tag.objects.only("tag_name")
+                #     ),
+                    # Prefetch(
+                    #     "variants", queryset=ProductVariant.objects.only("product_id", "price").prefetch_related(
+                    #         Prefetch(
+                    #             "attributes", queryset=ProductAttributeValues.objects.select_related(
+                    #                 "attribute", "value"
+                    #             ).only(
+                    #                 "variant_id",
+                    #                 "attribute__attribute_name",
+                    #                 "value__attribute_value"
+                    #             )
+                    #         )
+                    #     )
+                    # )
+                # )
 
         else:
             query = base_query.filter(is_active=True).prefetch_related(
@@ -253,7 +281,7 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         base_query = ProductVariant.objects.filter(product_id=self.kwargs['product_pk']).prefetch_related(
             Prefetch(
-                "attributes", queryset=VariantAttribute.objects.select_related(
+                "attributes", queryset=ProductAttributeValues.objects.select_related(
                     "attribute",
                     "value",
                 ).only(
@@ -270,8 +298,8 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
         pass
 
 
-class ProductAttributeViewSet(viewsets.ModelViewSet):
-    filterset_class = ProductAttributeFilter
+class AttributeViewSet(viewsets.ModelViewSet):
+    filterset_class = AttributeFilter
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -284,7 +312,7 @@ class ProductAttributeViewSet(viewsets.ModelViewSet):
         pass
 
     def get_queryset(self):
-        base_query = ProductAttribute.objects.defer(
+        base_query = Attribute.objects.defer(
             "is_deleted",
             "deleted_at",
             "created_at",
@@ -302,7 +330,7 @@ class ProductAttributeViewSet(viewsets.ModelViewSet):
             return base_query
 
 
-class ProductAttributeValueViewSet(viewsets.ModelViewSet):
+class AttributeValueViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.user.is_staff:
             return serializers.AdminProductAttributeValueSerializer
@@ -313,7 +341,7 @@ class ProductAttributeValueViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        base_query = ProductAttributeValue.objects.defer(
+        base_query = AttributeValue.objects.defer(
             "is_deleted",
             "deleted_at",
             "created_at",
@@ -327,7 +355,7 @@ class ProductAttributeValueViewSet(viewsets.ModelViewSet):
 class AdminCreateVariantAttributeView(generics.CreateAPIView):
     serializer_class = serializers.AdminVariantAttributeSerializer
     permission_classes = (permissions.IsAdminUser,)
-    queryset = VariantAttribute.objects.defer(
+    queryset = ProductAttributeValues.objects.defer(
         "is_deleted",
         "deleted_at",
         "created_at",
@@ -346,7 +374,7 @@ class VariantAttributeViewSet(viewsets.ModelViewSet):
             return serializers.AdminVariantAttributeSerializer
 
     def get_queryset(self):
-        base_query = VariantAttribute.objects.filter(
+        base_query = ProductAttributeValues.objects.filter(
             variant_id=self.kwargs['variant_pk']
         ).defer(
             "is_deleted",
