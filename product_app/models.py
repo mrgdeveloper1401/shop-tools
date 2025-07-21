@@ -106,12 +106,12 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     #     help_text=_("you can defined social link by json")
     # )
     sku = models.CharField(max_length=50, blank=True, null=True) # TODO, when clear migration, we remove field blank and null and set field unique
-    # base_price = models.DecimalField(
-    #     max_digits=12,
-    #     decimal_places=3,
-    #     null=True,
-    #     blank=True
-    # )
+    base_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ('-id',)

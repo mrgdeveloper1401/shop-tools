@@ -112,7 +112,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 # "social_links",
                 "product_name",
                 "description_slug",
-                "sku"
+                "sku",
+                "base_price"
             ).prefetch_related(
                 Prefetch(
                     "tags", queryset=Tag.objects.only("tag_name")
@@ -156,7 +157,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             if self.action == "list":
                 return query.only(
                     "product_name",
-                    # "price",
+                    "base_price",
                     # "product_images"
                 )
             else:
@@ -167,6 +168,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 ).select_related(
                     "product_brand"
                 ).only(
+                    "base_price",
                     "product_name",
                     "description",
                     # "social_links",
@@ -368,7 +370,8 @@ class ProductListHomePageView(generics.ListAPIView):
         "product_slug",
         "description_slug",
         "created_at",
-        "updated_at"
+        "updated_at",
+        "base_price"
     ).prefetch_related(
         Prefetch(
             "product_product_image", queryset=ProductImages.objects.filter(

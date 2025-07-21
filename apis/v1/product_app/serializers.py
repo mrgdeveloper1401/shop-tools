@@ -172,7 +172,8 @@ class UserListProductSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "product_name",
-            "product_product_image"
+            "product_product_image",
+            "base_price"
         )
 
 
@@ -190,6 +191,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
+            "base_price",
             "product_name",
             "description",
             # "social_links",
@@ -351,7 +353,8 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "product_slug",
             "description_slug",
             "created_at",
-            "updated_at"
+            "updated_at",
+            "base_price"
         )
 
 
