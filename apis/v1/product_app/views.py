@@ -119,7 +119,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 Prefetch(
                     "product_product_image", queryset=ProductImages.objects.select_related("image").only(
                         "image__image",
-                        "image__alt_text",
+                        # "image__alt_text",
                         "order",
                         "product_id"
                     )
@@ -233,7 +233,6 @@ class ProductImageViewSet(viewsets.ModelViewSet):
             "order",
             "is_active",
             "image__image",
-            "image__alt_text",
             "product_id"
         )
 

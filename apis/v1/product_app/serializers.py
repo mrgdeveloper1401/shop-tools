@@ -56,7 +56,7 @@ class SimpleProductTagSerializer(serializers.ModelSerializer):
 class AdminSimpleProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('get_image_url', "alt_text")
+        fields = ('get_image_url',)
 
 
 class NestedProductImageSerializer(serializers.ModelSerializer):
@@ -240,7 +240,8 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
             "product",
             "image",
             "order",
-            "is_active"
+            "is_active",
+            "alt_text_image"
         )
 
     def to_representation(self, instance):

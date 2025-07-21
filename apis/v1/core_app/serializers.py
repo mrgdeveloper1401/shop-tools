@@ -16,9 +16,9 @@ class PublicNotificationSerializer(serializers.ModelSerializer):
 
 
 class AdminImageSerializer(serializers.ModelSerializer):
-    uploaded_by = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(is_active=True).only("mobile_phone"),
-    )
+    # uploaded_by = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.filter(is_active=True).only("mobile_phone"),
+    # )
 
     class Meta:
         model = Image
