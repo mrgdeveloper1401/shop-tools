@@ -145,10 +145,12 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 
 class ProductAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    variant = models.ForeignKey(
-        ProductVariant,
+    product = models.ForeignKey(
+        "Product",
         on_delete=models.PROTECT,
-        related_name="attributes"
+        related_name="attributes",
+        blank=True, # TODO, when clean migrations we remove field blank and null
+        null=True
     )
     attribute = models.ForeignKey(
         Attribute,
@@ -163,7 +165,7 @@ class ProductAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "variant_attribute"
-        unique_together = ('variant', 'attribute')
+        unique_together = ('product', 'attribute')
 
 
 class ProductComment(MP_Node, CreateMixin, UpdateMixin):

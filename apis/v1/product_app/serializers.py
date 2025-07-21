@@ -136,7 +136,7 @@ class NestedProductAttributeSerializer(serializers.ModelSerializer):
         )
 
 
-class NestedProductAttributeValueSerializer(serializers.ModelSerializer):
+class NestedAttributeValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = AttributeValue
         fields = ("attribute_value",)
@@ -144,7 +144,7 @@ class NestedProductAttributeValueSerializer(serializers.ModelSerializer):
 
 class NestedVariantAttributeSerializer(serializers.ModelSerializer):
     attribute = NestedProductAttributeSerializer()
-    value = NestedProductAttributeValueSerializer()
+    value = NestedAttributeValueSerializer()
 
     class Meta:
         model = ProductAttributeValues

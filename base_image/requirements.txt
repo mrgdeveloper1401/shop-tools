@@ -22,3 +22,4 @@ django-ckeditor-5
 django-debug-toolbar
 gunicorn
 colorlog
+django-extensions

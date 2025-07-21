@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "drf_spectacular_sidecar",
     "rest_framework_simplejwt",
     "django_filters",
+    "django_extensions",
 
     "account_app.apps.AccountAppConfig",
     "product_app.apps.ProductAppConfig",
