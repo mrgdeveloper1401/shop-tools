@@ -1,4 +1,3 @@
-from django.db.models import Count
 from rest_framework import pagination
 
 
@@ -12,3 +11,8 @@ class AdminTwentyPageNumberPagination(pagination.PageNumberPagination):
     def paginate_queryset(self, queryset, request, view=None):
         if request.user.is_staff:
             return super().paginate_queryset(queryset, request, view)
+
+
+class FlexiblePagination(pagination.LimitOffsetPagination):
+    default_limit = 20
+    max_limit = 100

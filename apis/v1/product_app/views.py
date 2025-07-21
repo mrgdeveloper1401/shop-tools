@@ -10,7 +10,7 @@ from core.utils.custom_filters import (
     ProductHomePageFilter,
     ProductTagFilter
 )
-from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
+from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination, FlexiblePagination
 from core.utils.permissions import IsOwnerOrReadOnly
 from . import serializers
 from product_app.models import (
@@ -32,7 +32,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     filter query --> (category_name, is_active) --> only user admin have filter
     """
     filterset_class = AdminProductCategoryFilter
-    pagination_class = AdminTwentyPageNumberPagination
+    pagination_class = FlexiblePagination
 
     def get_queryset(self):
         if not self.request.user.is_staff:
@@ -210,7 +210,7 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
     pagination --> 20 item for normal user and admin user \n
     filter query --> (category_name, is_active)
     """
-    pagination_class = TwentyPageNumberPagination
+    pagination_class = FlexiblePagination
     filterset_class = ProductBrandFilter
 
     def get_permissions(self):
@@ -433,7 +433,7 @@ class TagViewSet(viewsets.ModelViewSet):
     permissions --> method post and put and patch and deleted only user admin
     """
     filterset_class = ProductTagFilter
-    pagination_class = TwentyPageNumberPagination
+    pagination_class = FlexiblePagination
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
