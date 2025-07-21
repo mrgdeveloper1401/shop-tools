@@ -280,4 +280,4 @@ class LoginByPhonePasswordView(views.APIView):
                 }
             )
         else:
-            return exceptions.NotFound()
+            raise exceptions.NotFound()

@@ -21,13 +21,18 @@ product_router = routers.NestedSimpleRouter(category_router, "products", lookup=
 product_router.register("product_variant", views.ProductVariantViewSet, basename="product_variant")
 product_router.register("product_images", views.ProductImageViewSet, basename="product_images")
 product_router.register("comments", views.ProductCommentViewSet, basename="product_comment")
+product_router.register(
+    "product_attribute_values",
+    views.ProductAttributesValuesViewSet,
+    basename="product_attribute_values"
+)
 
 product_variant_router = NestedSimpleRouter(product_router, "product_variant", lookup="variant")
-product_variant_router.register(
-    "variant_attribute",
-    views.VariantAttributeViewSet,
-    basename="variant_attribute"
-)
+# product_variant_router.register(
+#     "variant_attribute",
+#     views.VariantAttributeViewSet,
+#     basename="variant_attribute"
+# )
 product_variant_router.register("discount", DiscountViewSet, basename="discount_variant")
 
 urlpatterns = [

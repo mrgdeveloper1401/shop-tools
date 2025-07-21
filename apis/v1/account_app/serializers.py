@@ -92,6 +92,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
     def get_access_token(self, obj):
         return get_tokens_for_user(obj)
 
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
 
 class UserInformationSerializer(serializers.ModelSerializer):
     class Meta:

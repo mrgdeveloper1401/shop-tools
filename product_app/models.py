@@ -155,14 +155,10 @@ class ProductAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="variant_attributes"
     )
-    value = models.ForeignKey(
-        AttributeValue,
-        on_delete=models.PROTECT,
-        related_name="variant_attribute_values"
-    )
+    value = models.CharField(max_length=255)
 
     class Meta:
-        db_table = "variant_attribute"
+        db_table = "product_attribute_values"
         unique_together = ('product', 'attribute')
 
 

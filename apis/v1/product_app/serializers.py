@@ -163,9 +163,20 @@ class NestedProductVariantAttributeSerializer(serializers.ModelSerializer):
         fields = ("price", "variant_id", "attributes")
 
 
+class NestedProductAttributeValuesSerializer(serializers.ModelSerializer):
+    attribute_name = serializers.CharField(source="attribute.attribute_name")
+
+    class Meta:
+        model = ProductAttributeValues
+        fields = (
+            "attribute_name",
+            "value"
+        )
+
+
 class RetrieveAdminProductSerializer(ProductSerializer):
     # variants = NestedProductVariantAttributeSerializer(many=True, read_only=True)
-    pass
+    attributes = NestedProductAttributeValuesSerializer(many=True)
 
 
 class NestedImageSerializer(serializers.ModelSerializer):
@@ -198,6 +209,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     tags = NestedProductTagsSerializer(many=True)
     product_brand = SimpleProductBrandSerializer()
     product_product_image = NestedProductImageSerializer(many=True)
+    attributes = NestedProductAttributeValuesSerializer(many=True)
 
     class Meta:
         model = Product
@@ -208,7 +220,8 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             # "social_links",
             "product_brand",
             "tags",
-            "product_product_image"
+            "product_product_image",
+            "attributes",
         )
 
 
@@ -302,9 +315,18 @@ class AdminProductVariantSerializer(serializers.ModelSerializer):
 
 class AdminProductAttributeSerializer(serializers.ModelSerializer):
     # attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.only("id")
+    )
+    attribute = serializers.PrimaryKeyRelatedField(
+        queryset=Attribute.objects.only("id")
+    )
+    # value = serializers.PrimaryKeyRelatedField(
+    #     queryset=AttributeValue.objects.only("id")
+    # )
 
     class Meta:
-        model = Attribute
+        model = ProductAttributeValues
         exclude = (
             "is_deleted",
             "deleted_at",
@@ -313,7 +335,7 @@ class AdminProductAttributeSerializer(serializers.ModelSerializer):
         )
 
 
-class AdminProductAttributeValueSerializer(serializers.ModelSerializer):
+class AdminAttributeValueSerializer(serializers.ModelSerializer):
     attribute = serializers.PrimaryKeyRelatedField(
         queryset=Attribute.objects.only('id'),
     )
@@ -328,7 +350,7 @@ class AdminProductAttributeValueSerializer(serializers.ModelSerializer):
         )
 
 
-class AdminVariantAttributeSerializer(serializers.ModelSerializer):
+class AdminProducttAttributeSerializer(serializers.ModelSerializer):
     variant = serializers.PrimaryKeyRelatedField(
         queryset=ProductVariant.objects.only("id")
     )
@@ -427,3 +449,12 @@ class ProductCommentSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.BooleanField())
     def get_user_is_staff(self, obj):
         return obj.user.is_staff
+
+
+class AdminAttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute
+        fields = (
+            "id",
+            "attribute_name"
+        )

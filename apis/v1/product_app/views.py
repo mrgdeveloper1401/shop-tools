@@ -10,7 +10,7 @@ from core.utils.custom_filters import (
     ProductHomePageFilter,
     ProductTagFilter
 )
-from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination, FlexiblePagination
+from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from core.utils.permissions import IsOwnerOrReadOnly
 from . import serializers
 from product_app.models import (
@@ -141,6 +141,13 @@ class ProductViewSet(viewsets.ModelViewSet):
                 Prefetch(
                 "tags", queryset=Tag.objects.only("tag_name")
                 ),
+                Prefetch(
+                    "attributes", queryset=ProductAttributeValues.objects.select_related("attribute").only(
+                        "attribute__attribute_name",
+                        "product_id",
+                        "value"
+                    )
+                )
             )
             # print(base_query)
             return base_query
@@ -193,6 +200,15 @@ class ProductViewSet(viewsets.ModelViewSet):
                     Prefetch(
                         "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
                     ),
+                    Prefetch(
+                        "attributes", queryset=ProductAttributeValues.objects.select_related(
+                            "attribute"
+                        ).only(
+                            "attribute__attribute_name",
+                            "value",
+                            "product_id"
+                        )
+                    )
                 ).select_related(
                     "product_brand"
                 ).only(
@@ -308,7 +324,7 @@ class AttributeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            return serializers.AdminProductAttributeSerializer
+            return serializers.AdminAttributeSerializer
         pass
 
     def get_queryset(self):
@@ -333,7 +349,7 @@ class AttributeViewSet(viewsets.ModelViewSet):
 class AttributeValueViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            return serializers.AdminProductAttributeValueSerializer
+            return serializers.AdminAttributeValueSerializer
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -352,18 +368,18 @@ class AttributeValueViewSet(viewsets.ModelViewSet):
             return base_query
 
 
-class AdminCreateVariantAttributeView(generics.CreateAPIView):
-    serializer_class = serializers.AdminVariantAttributeSerializer
-    permission_classes = (permissions.IsAdminUser,)
-    queryset = ProductAttributeValues.objects.defer(
-        "is_deleted",
-        "deleted_at",
-        "created_at",
-        "updated_at"
-    )
+# class AdminCreateProductAttributeView(generics.CreateAPIView):
+#     serializer_class = serializers.AdminProductAttributeSerializer
+#     permission_classes = (permissions.IsAdminUser,)
+#     queryset = ProductAttributeValues.objects.defer(
+#         "is_deleted",
+#         "deleted_at",
+#         "created_at",
+#         "updated_at"
+#     )
 
 
-class VariantAttributeViewSet(viewsets.ModelViewSet):
+class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
@@ -371,11 +387,11 @@ class VariantAttributeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            return serializers.AdminVariantAttributeSerializer
+            return serializers.AdminProductAttributeSerializer
 
     def get_queryset(self):
         base_query = ProductAttributeValues.objects.filter(
-            variant_id=self.kwargs['variant_pk']
+            product_id=self.kwargs['product_pk']
         ).defer(
             "is_deleted",
             "deleted_at",
