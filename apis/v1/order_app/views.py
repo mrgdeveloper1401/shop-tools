@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import OrderFilter
 from core.utils.pagination import TwentyPageNumberPagination
@@ -8,7 +8,7 @@ from . import serializers
 
 class OrderViewSet(viewsets.ModelViewSet):
     """
-    filter query --> field is_complete \n
+    filter query --> field (is_complete,) \n
     pagination --> 20 item
     """
     pagination_class = TwentyPageNumberPagination
@@ -16,10 +16,10 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Order.objects.all().defer("is_deleted", "deleted_at")
+            return Order.objects.defer("is_deleted", "deleted_at")
         else:
             return Order.objects.filter(
-                user_id=self.request.user.id
+                profile__user_id=self.request.user.id
             ).only(
                 "is_complete",
                 "created_at",
@@ -32,7 +32,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             return serializers.OrderSerializer
 
     def get_permissions(self):
-        if self.action in ("update", "partial_update", "destroy"):
+        if self.action in ("update", "partial_update", "destroy", "create"):
             self.permission_classes = (permissions.IsAdminUser,)
         else:
             self.permission_classes = (permissions.IsAuthenticated,)
@@ -61,8 +61,10 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return base_query.defer("is_deleted", "deleted_at")
         else:
-            return base_query.select_related(
-                "product_variant__product__category",
+            return base_query.filter(
+                order__profile__user_id=self.request.user.id
+            ).select_related(
+                "product_variant__product",
             ).only(
                 "order_id",
                 "price",
@@ -72,3 +74,9 @@ class OrderItemViewSet(viewsets.ModelViewSet):
                 "product_variant__product_id",
                 "product_variant__product__category_id",
             )
+
+
+class CreateOrderView(generics.CreateAPIView):
+    queryset = None
+    serializer_class = serializers.CreateOrderSerializer
+    permission_classes = (permissions.IsAuthenticated,)

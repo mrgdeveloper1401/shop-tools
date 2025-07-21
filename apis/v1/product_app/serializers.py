@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core_app.models import Image
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
-    ProductAttributeValue, VariantAttribute
+    ProductAttributeValue, VariantAttribute, ProductComment
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -370,3 +370,34 @@ class UserProductTagSerializer(serializers.ModelSerializer):
         fields = (
             "tag_name",
         )
+
+
+class ProductCommentSerializer(serializers.ModelSerializer):
+    parent = serializers.IntegerField(required=False)
+    user_is_staff = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductComment
+        fields = (
+            "parent",
+            "product_id",
+            "user_id",
+            "user_is_staff",
+            "path",
+            "numchild",
+            "depth",
+            "created_at",
+            "updated_at"
+        )
+
+    def create(self, validated_data):
+        parent = validated_data.pop("parent", None)
+
+        if parent is None:
+            return ProductComment.add_root(**validated_data)
+        else:
+            comment = get_object_or_404(ProductComment, pk=parent)
+            return comment.add_child(**validated_data)
+
+    def get_user_is_staff(self, obj):
+        return obj.user.is_staff

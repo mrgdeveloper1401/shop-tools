@@ -1,4 +1,5 @@
 from rest_framework_nested import routers
+from django.urls import path
 
 from . import views
 
@@ -11,4 +12,6 @@ router.register(r'orders', views.OrderViewSet, basename='orders')
 order_router = routers.NestedSimpleRouter(router, "orders", lookup="order")
 order_router.register("items", views.OrderItemViewSet, basename="order-items")
 
-urlpatterns = [] + router.urls + order_router.urls
+urlpatterns = [
+    path("create_order/", views.CreateOrderView.as_view(), name="create_order"),
+] + router.urls + order_router.urls

@@ -1,6 +1,7 @@
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
+from django.utils.translation import gettext_lazy as _
 
-from account_app.models import User
+from account_app.models import Profile
 from order_app.models import Order, OrderItem
 from product_app.models import ProductVariant
 
@@ -16,16 +17,22 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ("is_complete",)
 
     def create(self, validated_data):
+        # get user id by context request
         user_id = self.context["request"].user.id
+
+        # get profile
+        profile_id = Profile.objects.filter(user_id=user_id).only("id").first()
+
+        # create order
         return Order.objects.create(
-            user_id=user_id,
+            profile_id=profile_id,
             **validated_data
         )
 
 
 class AdminOrderSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.only("mobile_phone",),
+    profile = serializers.PrimaryKeyRelatedField(
+        queryset=Profile.objects.only("id",),
     )
 
     class Meta:
@@ -37,7 +44,7 @@ class AdminOrderSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    category_id = serializers.IntegerField(source="product.category_id")
+    category_id = serializers.IntegerField(source="product_variant.product.category_id")
     product_id = serializers.IntegerField(source="product_variant.product_id")
 
     class Meta:
@@ -49,6 +56,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "product_id",
             "quantity",
             "price",
+            "calc_price_quantity",
             "created_at"
         )
 
@@ -67,3 +75,52 @@ class AdminOrderItemSerializer(serializers.ModelSerializer):
             "is_deleted",
             "deleted_at",
         )
+
+
+class NestedCartItemSerializer(serializers.Serializer):
+    product_variant_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1)
+
+
+class CreateOrderSerializer(serializers.Serializer):
+    items = NestedCartItemSerializer(many=True)
+
+    def validate(self, data):
+        # check variant dose exits
+        variant_ids = [item['product_variant_id'] for item in data['items']]
+        existing_variants = ProductVariant.objects.filter(id__in=variant_ids)
+
+        if len(existing_variants) != len(variant_ids):
+            existing_ids = set(existing_variants.values_list('id', flat=True))
+            missing_ids = set(variant_ids) - existing_ids
+            raise serializers.ValidationError(
+                f"Product variants with ids {missing_ids} do not exist"
+            )
+
+        return data
+
+    def create(self, validated_data):
+        # create order
+        profile = Profile.objects.filter(
+            user_id=self.context["request"].user.id
+        ).only("id").first()
+
+        order = Order.objects.create(profile_id=profile.id)
+
+        # create order item
+        order_items = []
+        for item in validated_data['items']:
+            variant = ProductVariant.objects.filter(id=item['product_variant_id']).only('id').first()
+            order_items.append(
+                OrderItem(
+                    order_id=order.id,
+                    product_variant_id=variant.id,
+                    price=variant.price,
+                    quantity=item['quantity']
+                )
+            )
+
+        items = OrderItem.objects.bulk_create(order_items)
+        return {
+            "items": items,
+        }

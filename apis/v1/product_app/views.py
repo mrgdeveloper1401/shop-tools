@@ -7,7 +7,7 @@ from core.utils.custom_filters import AdminProductCategoryFilter, ProductBrandFi
 from core.utils.pagination import AdminTwentyPageNumberPagination, TwentyPageNumberPagination
 from . import serializers
 from product_app.models import Category, Product, ProductBrand, ProductImages, Tag, ProductVariant, ProductAttribute, \
-    ProductAttributeValue, VariantAttribute
+    ProductAttributeValue, VariantAttribute, ProductComment
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
@@ -423,3 +423,21 @@ class TagViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+
+class ProductCommentViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.ProductCommentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return ProductComment.objects.filter(
+            product_id=self.kwargs['product_pk']
+        ).only(
+            "path",
+            "numchild",
+            "depth",
+            "user__is_staff",
+            "created_at",
+            "updated_at",
+            "product_id"
+        )
