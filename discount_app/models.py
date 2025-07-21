@@ -66,8 +66,6 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
         ProductVariant,
         on_delete=models.DO_NOTHING,
         related_name="discounts",
-        blank=True, # TODO, when clean migration we remove field blank and null
-        null=True
     )
     discount_type = models.CharField(
         choices=CouponEnums.choices,

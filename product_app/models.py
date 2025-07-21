@@ -104,7 +104,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     #     null=True,
     #     help_text=_("you can defined social link by json")
     # )
-    sku = models.CharField(max_length=50, blank=True, null=True) # TODO, when clear migration, we remove field blank and null and set field unique
+    sku = models.CharField(max_length=50, db_index=True)
     base_price = models.DecimalField(
         max_digits=12,
         decimal_places=3,
@@ -149,8 +149,6 @@ class ProductAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin):
         "Product",
         on_delete=models.PROTECT,
         related_name="attributes",
-        blank=True, # TODO, when clean migrations we remove field blank and null
-        null=True
     )
     attribute = models.ForeignKey(
         Attribute,

@@ -71,15 +71,11 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
         State,
         on_delete=models.PROTECT,
         related_name="user_address_state",
-        blank=True, # TODO, when clear migration, remove field blank and null
-        null=True
     )
     city = models.ForeignKey(
         City,
         on_delete=models.PROTECT,
         related_name="user_address_city",
-        blank=True, # TODO, when clear migration, remove field blank and null
-        null=True,
     )
     user = models.ForeignKey(
         User,
@@ -88,7 +84,9 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     title = models.CharField(
         max_length=100,
-        help_text="مثلاً خانه، محل کار، ..."
+        blank=True,
+        null=True,
+        help_text=_("مثلاً خانه، محل کار، ...")
     )
     address_line = models.CharField(
         max_length=255,
