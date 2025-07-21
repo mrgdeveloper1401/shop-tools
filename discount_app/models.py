@@ -18,7 +18,10 @@ class Coupon(CreateMixin, UpdateMixin, SoftDeleteMixin):
         max_length=255,
         unique=True
     )
+
     # number_of_days = models.PositiveIntegerField()
+    maximum_use = models.PositiveIntegerField(default=1)
+    number_of_uses = models.PositiveIntegerField(default=1)
     for_first = models.BooleanField(default=False)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
