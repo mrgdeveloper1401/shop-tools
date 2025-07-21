@@ -178,14 +178,12 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
     # product = serializers.PrimaryKeyRelatedField(
     #     queryset=Product.objects.filter(is_active=True).only("id")
     # )
-    # image = serializers.PrimaryKeyRelatedField(
-    #     queryset=Image.objects.only("id")
-    # )
+    image = serializers.PrimaryKeyRelatedField(
+        queryset=Image.objects.only("id")
+    )
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.only("id",)
     )
-    alt_image = serializers.CharField(required=False)
-    image = serializers.ImageField(required=False)
 
     class Meta:
         model = ProductImages
@@ -193,7 +191,6 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
             "id",
             "product",
             "image",
-            "alt_image",
             "order",
             "is_active"
         )
