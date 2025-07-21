@@ -1,9 +1,11 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils import timezone
+from django.utils.functional import cached_property
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from product_app.models import Product
+from product_app.models import ProductVariant
 
 
 class CouponEnums(models.TextChoices):
@@ -57,7 +59,13 @@ class Discount(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 
 class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, related_name="discounts")
+    product_variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.DO_NOTHING,
+        related_name="discounts",
+        blank=True, # TODO, when clean migration we remove field blank and null
+        null=True
+    )
     discount_type = models.CharField(
         choices=CouponEnums.choices,
         default=CouponEnums.percent,
@@ -68,5 +76,14 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
     end_date = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
+    @cached_property
+    def is_valid_discount(self):
+        if self.start_date and self.end_date:
+            if self.start_date > timezone.now() > self.end_date:
+                return True
+            return False
+        return None
+
     class Meta:
+        ordering = ('-id',)
         db_table = "product_discount"

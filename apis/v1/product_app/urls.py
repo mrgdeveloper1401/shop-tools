@@ -3,6 +3,7 @@ from django.urls import path, include
 from rest_framework_nested.routers import NestedSimpleRouter
 
 from . import views
+from apis.v1.discount_app.views import DiscountViewSet
 
 app_name = "v1_product_app"
 
@@ -27,6 +28,7 @@ product_variant_router.register(
     views.VariantAttributeViewSet,
     basename="variant_attribute"
 )
+product_variant_router.register("discount", DiscountViewSet, basename="discount_variant")
 
 urlpatterns = [
     path("", include(category_router.urls)),
