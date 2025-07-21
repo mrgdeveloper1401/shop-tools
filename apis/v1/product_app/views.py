@@ -365,7 +365,9 @@ class ProductListHomePageView(generics.ListAPIView):
         "category_id",
         "product_name",
         "product_slug",
-        "description_slug"
+        "description_slug",
+        "created_at",
+        "updated_at"
     ).prefetch_related(
         Prefetch(
             "product_product_image", queryset=ProductImages.objects.filter(

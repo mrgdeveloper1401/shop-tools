@@ -88,7 +88,7 @@ class CreateOrderSerializer(serializers.Serializer):
     def validate(self, data):
         # check variant dose exits
         variant_ids = [item['product_variant_id'] for item in data['items']]
-        existing_variants = ProductVariant.objects.filter(id__in=variant_ids)
+        existing_variants = ProductVariant.objects.filter(id__in=variant_ids).only("id")
 
         if len(existing_variants) != len(variant_ids):
             existing_ids = set(existing_variants.values_list('id', flat=True))
@@ -110,7 +110,7 @@ class CreateOrderSerializer(serializers.Serializer):
         # create order item
         order_items = []
         for item in validated_data['items']:
-            variant = ProductVariant.objects.filter(id=item['product_variant_id']).only('id').first()
+            variant = ProductVariant.objects.filter(id=item['product_variant_id']).only('id', "price").first()
             order_items.append(
                 OrderItem(
                     order_id=order.id,

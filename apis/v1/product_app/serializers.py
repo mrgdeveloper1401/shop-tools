@@ -349,7 +349,9 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "product_product_image",
             "variants",
             "product_slug",
-            "description_slug"
+            "description_slug",
+            "created_at",
+            "updated_at"
         )
 
 

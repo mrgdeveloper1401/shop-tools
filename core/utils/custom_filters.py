@@ -5,6 +5,7 @@ from django_filters.widgets import RangeWidget
 from account_app.models import User, UserAddress
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
+from discount_app.models import Coupon
 from order_app.models import Order
 from product_app.models import Category, ProductBrand, ProductImages, ProductAttribute, Product, Tag
 
@@ -152,4 +153,13 @@ class OrderFilter(FilterSet):
         model = Order
         fields = {
             "is_complete": ['exact'],
+        }
+
+
+class AdminCouponFilter(FilterSet):
+    class Meta:
+        model = Coupon
+        fields = {
+            "code": ['contains'],
+            "is_active": ['exact']
         }

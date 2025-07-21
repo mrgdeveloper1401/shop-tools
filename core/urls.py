@@ -26,6 +26,7 @@ v1_api_urls = [
     path("v1/blog/", include("apis.v1.blog_app.urls", namespace="v1_blog")),
     path("v1/product/", include("apis.v1.product_app.urls", namespace="v1_product_app")),
     path("v1/order/", include("apis.v1.order_app.urls", namespace="v1_order_app")),
+    path("v1/discount/", include("apis.v1.discount_app.urls", namespace="v1_discount_app")),
 ]
 
 
