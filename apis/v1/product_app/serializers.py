@@ -3,6 +3,7 @@ from rest_framework.generics import get_object_or_404
 from drf_spectacular.utils import extend_schema_field
 
 from core_app.models import Image
+from discount_app.models import ProductDiscount
 from product_app.models import (
     Category,
     Product,
@@ -185,9 +186,15 @@ class NestedImageSerializer(serializers.ModelSerializer):
         fields = ("get_image_url",)
 
 
+class NestedProductDiscount(serializers.ModelSerializer):
+    class Meta:
+        model = ProductDiscount
+        fields = ("amount", "discount_type")
+
 
 class UserListProductSerializer(serializers.ModelSerializer):
     product_product_image = NestedProductImageSerializer(many=True)
+    product_discounts = NestedProductDiscount(many=True)
 
     class Meta:
         model = Product
@@ -195,7 +202,8 @@ class UserListProductSerializer(serializers.ModelSerializer):
             "id",
             "product_name",
             "product_product_image",
-            "base_price"
+            "base_price",
+            "product_discounts",
         )
 
 
@@ -385,6 +393,7 @@ class AdminProducttAttributeSerializer(serializers.ModelSerializer):
 class ProductListHomePageSerializer(serializers.ModelSerializer):
     product_product_image = NestedProductImageSerializer(many=True)
     variants = NestedProductVariantPriceAttributeSerializer(many=True)
+    product_discounts = NestedProductDiscount(many=True)
 
     class Meta:
         model = Product
@@ -398,7 +407,8 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "description_slug",
             "created_at",
             "updated_at",
-            "base_price"
+            "base_price",
+            "product_discounts"
         )
 
 

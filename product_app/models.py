@@ -62,7 +62,7 @@ class ProductImages(CreateMixin, UpdateMixin, SoftDeleteMixin):
     order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
-        ordering = ('order', '-id')
+        ordering = ('-id',)
         db_table = "product_image"
 
 

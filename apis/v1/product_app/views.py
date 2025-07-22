@@ -12,6 +12,7 @@ from core.utils.custom_filters import (
 )
 from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from core.utils.permissions import IsOwnerOrReadOnly
+from discount_app.models import ProductDiscount
 from . import serializers
 from product_app.models import (
     Category,
@@ -147,7 +148,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                         "product_id",
                         "value"
                     )
-                )
+                ),
             )
             # print(base_query)
             return base_query
@@ -194,6 +195,14 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_name",
                     "base_price",
                     # "product_images"
+                ).prefetch_related(
+                    Prefetch(
+                        "product_discounts", queryset=ProductDiscount.objects.only(
+                            "discount_type",
+                            "amount",
+                            "product_id"
+                        ).valid_discount()
+                    )
                 )
             else:
                 return query.prefetch_related(
@@ -435,6 +444,13 @@ class ProductListHomePageView(generics.ListAPIView):
                 "price",
                 "product_id"
             )
+        ),
+        Prefetch(
+            "product_discounts", queryset=ProductDiscount.objects.only(
+                "product_id",
+                "amount",
+                "discount_type"
+            ).valid_discount()
         )
     )
     serializer_class = serializers.ProductListHomePageSerializer

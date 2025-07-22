@@ -5,7 +5,8 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from product_app.models import ProductVariant
+from discount_app.managers import ProductDiscountManager
+from product_app.models import ProductVariant, Product
 
 
 class CouponEnums(models.TextChoices):
@@ -65,7 +66,16 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
     product_variant = models.ForeignKey(
         ProductVariant,
         on_delete=models.DO_NOTHING,
-        related_name="discounts",
+        related_name="product_variant_discounts",
+        blank=True,
+        null=True
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="product_discounts",
+        blank=True,
+        null=True,
     )
     discount_type = models.CharField(
         choices=CouponEnums.choices,
@@ -84,6 +94,9 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
                 return True
             return False
         return None
+
+    objects = ProductDiscountManager().as_manager()
+    # valid_discount = ProductDiscountManager()
 
     class Meta:
         ordering = ('-id',)
