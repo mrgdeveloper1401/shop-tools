@@ -430,7 +430,7 @@ class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
 class ProductListHomePageView(generics.ListAPIView):
     """
     pagination --> 20 item \n
-    filter query --> product_name
+    filter query --> product_name, tag, min_price, max_price, category_name, price_range
     """
     queryset = Product.objects.filter(is_active=True).only(
         "product_name",

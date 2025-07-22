@@ -1,5 +1,5 @@
 from django_filters import DateTimeFromToRangeFilter
-from django_filters.rest_framework import FilterSet
+from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter
 from django_filters.widgets import RangeWidget
 
 from account_app.models import User, UserAddress
@@ -133,11 +133,29 @@ class ProductFilter(FilterSet):
 
 
 class ProductHomePageFilter(FilterSet):
+    more_price = NumberFilter(method='more_price_filter')
+    min_price = NumberFilter(method="min_price_filter")
+    price = RangeFilter(field_name='variants__price', label='Price range')
+
     class Meta:
         model = Product
         fields = {
-            "product_name": ['contains']
+            "product_name": ['contains'],
+            "category__category_name": ['contains'],
+            "tags__tag_name": ['contains'],
         }
+
+    def more_price_filter(self, queryset, name, value):
+        return queryset.filter(
+            variants__price__gte=value,
+            variants__is_active=True
+        ).distinct()
+
+    def min_price_filter(self, queryset, name, value):
+        return queryset.filter(
+            variants__price__lte=value,
+            variants__is_active=True
+        ).distinct()
 
 
 class ProductTagFilter(FilterSet):

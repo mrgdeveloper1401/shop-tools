@@ -120,7 +120,7 @@ class ShippingViewSet(viewsets.ModelViewSet):
 class ShippingMethodViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            return serializers.AdminShippingSerializer
+            return serializers.AdminShippingMethodSerializer
         else:
             return serializers.UserShippingMethodSerializer
 
