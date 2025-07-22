@@ -10,6 +10,16 @@ from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 # Create your models here.
 class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    STATUS_CHOICES = [
+        ('pending', 'در انتظار پرداخت'),
+        ('paid', 'پرداخت شده'),
+        ('processing', 'در حال پردازش'),
+        ('shipped', 'ارسال شده'),
+        ('delivered', 'تحویل داده شده'),
+        ('cancelled', 'لغو شده'),
+    ]
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     profile = models.ForeignKey(
         "account_app.Profile",
         on_delete=models.PROTECT,

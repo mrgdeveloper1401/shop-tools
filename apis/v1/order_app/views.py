@@ -8,7 +8,8 @@ from . import serializers
 
 class OrderViewSet(viewsets.ModelViewSet):
     """
-    filter query --> field (is_complete,) \n
+    filter query --> field (is_complete, is_active, status) \n
+    status --> pending, paid, processing, shipped, delivered, cancelled
     pagination --> 20 item
     """
     pagination_class = TwentyPageNumberPagination
@@ -26,7 +27,8 @@ class OrderViewSet(viewsets.ModelViewSet):
                 "created_at",
                 "tracking_code",
                 "payment_date",
-                "address_id"
+                "address_id",
+                "status"
             )
 
     def get_serializer_class(self):

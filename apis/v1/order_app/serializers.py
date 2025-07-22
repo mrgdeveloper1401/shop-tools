@@ -15,7 +15,8 @@ class OrderSerializer(serializers.ModelSerializer):
             "created_at",
             "tracking_code",
             "payment_date",
-            "address_id"
+            "address_id",
+            "status"
         )
         read_only_fields = ("is_complete", "tracking_code", "address_id")
 
