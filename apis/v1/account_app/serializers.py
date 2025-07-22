@@ -144,6 +144,12 @@ class UserAddressSerializer(serializers.ModelSerializer):
             "updated_at",
         )
 
+    def create(self, validated_data):
+        user = self.context['request'].user
+        if user.is_staff is False:
+            return UserAddress.objects.create(user_id=user.id, **validated_data)
+        return super().create(validated_data)
+
     def get_fields(self):
         request = self.context.get("request")
         fields = super().get_fields()
