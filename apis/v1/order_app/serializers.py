@@ -40,6 +40,9 @@ class AdminOrderSerializer(serializers.ModelSerializer):
     address = serializers.PrimaryKeyRelatedField(
         queryset=UserAddress.objects.only("id",),
     )
+    shipping = serializers.PrimaryKeyRelatedField(
+        queryset=ShippingMethod.objects.only("id",),
+    )
 
     class Meta:
         model = Order
@@ -90,7 +93,10 @@ class NestedCartItemSerializer(serializers.Serializer):
 
 class CreateOrderSerializer(serializers.Serializer):
     items = NestedCartItemSerializer(many=True)
-    address_id = serializers.IntegerField(required=True)
+    address_id = serializers.IntegerField()
+    shipping = serializers.PrimaryKeyRelatedField(
+        queryset=ShippingMethod.objects.only("id",),
+    )
 
     def validate(self, data):
         # check variant dose exits
@@ -114,8 +120,10 @@ class CreateOrderSerializer(serializers.Serializer):
 
         # get address id
         address_id = validated_data.pop("address_id", None)
-
-        order = Order.objects.create(profile_id=profile.id, address_id=address_id)
+        # get shipping
+        shipping = validated_data.pop("shipping", None)
+        # create order
+        order = Order.objects.create(profile_id=profile.id, address_id=address_id, shipping_id=shipping)
 
         # create order item
         order_items = []
@@ -145,10 +153,41 @@ class AdminShippingSerializer(serializers.ModelSerializer):
         )
 
 
-class UserShippingCompanySerializer(serializers.ModelSerializer):
+class SimpleUserShippingCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippingCompany
         fields = (
             "id",
             "name",
         )
+
+
+class AdminShippingMethodSerializer(serializers.ModelSerializer):
+    company = serializers.PrimaryKeyRelatedField(
+        queryset=ShippingCompany.objects.only("id", "name")
+    )
+
+    class Meta:
+        model = ShippingMethod
+        exclude = (
+            "is_deleted",
+            "deleted_at"
+        )
+
+class UserShippingMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShippingMethod
+        fields = (
+            "id",
+            "company",
+            "price",
+            "estimated_days",
+            "name",
+            "price",
+            "shipping_type"
+        )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['company'] = SimpleUserShippingCompanySerializer(instance.company).data
+        return data

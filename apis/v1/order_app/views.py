@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import OrderFilter
 from core.utils.pagination import TwentyPageNumberPagination
-from order_app.models import Order, OrderItem, ShippingCompany
+from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod
 from . import serializers
 
 
@@ -91,20 +91,38 @@ class CreateOrderView(generics.CreateAPIView):
 
 
 class ShippingViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.AdminShippingSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    queryset = ShippingCompany.objects.defer("is_deleted", "deleted_at")
 
+    # def get_serializer_class(self):
+    #     if self.request.user.is_staff:
+    #         return serializers.AdminShippingSerializer
+    #     else:
+    #         return serializers.UserShippingCompanySerializer
+
+    # def get_queryset(self):
+    #     if self.request.user.is_staff:
+    #         return ShippingCompany.objects.defer("is_deleted", "deleted_at")
+    #     else:
+    #         return ShippingCompany.objects.filter(is_active=True).only(
+    #             "name"
+    #         )
+
+    # def get_permissions(self):
+    #     if self.action in ("update", "partial_update", "destroy", "create"):
+    #         self.permission_classes = (permissions.IsAdminUser,)
+    #     else:
+    #         self.permission_classes = (permissions.IsAuthenticated,)
+    #     return super().get_permissions()
+
+
+class ShippingMethodViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.user.is_staff:
             return serializers.AdminShippingSerializer
         else:
-            return serializers.UserShippingCompanySerializer
-
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return ShippingCompany.objects.defer("is_deleted", "deleted_at")
-        else:
-            return ShippingCompany.objects.filter(is_active=True).only(
-                "name"
-            )
+            return serializers.UserShippingMethodSerializer
 
     def get_permissions(self):
         if self.action in ("update", "partial_update", "destroy", "create"):
@@ -112,3 +130,21 @@ class ShippingViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = (permissions.IsAuthenticated,)
         return super().get_permissions()
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return ShippingMethod.objects.defer("is_deleted", "deleted_at")
+        else:
+            return ShippingMethod.objects.filter(
+                is_active=True,
+                company__is_active=True
+            ).select_related(
+                "company"
+            ).only(
+            "company__name",
+            "price",
+            "estimated_days",
+            "name",
+            "price",
+            "shipping_type"
+            )

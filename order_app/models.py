@@ -36,6 +36,13 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     tracking_code = models.CharField(max_length=50, unique=True, null=True, blank=True)
     payment_date = models.DateTimeField(null=True, blank=True)
+    shipping = models.ForeignKey(
+        "ShippingMethod",
+        on_delete=models.PROTECT,
+        related_name="order_shipping_methods",
+        blank=True, # TODO, when clean migration we remove field blank and null
+        null=True
+    )
     is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
@@ -97,7 +104,7 @@ class ShippingMethod(CreateMixin, UpdateMixin, SoftDeleteMixin):
         verbose_name=_("شرکت ارسال‌کننده")
     )
     name = models.CharField(_("نام روش ارسال"), max_length=100)
-    type = models.CharField(
+    shipping_type = models.CharField(
         _("نوع ارسال"),
         max_length=20,
         choices=ShippingType.choices,
