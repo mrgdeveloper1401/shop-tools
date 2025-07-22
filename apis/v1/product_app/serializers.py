@@ -313,6 +313,12 @@ class AdminProductVariantSerializer(serializers.ModelSerializer):
         )
 
 
+class SimpleAttribute(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute
+        fields = ("id", "attribute_name")
+
+
 class AdminProductAttributeSerializer(serializers.ModelSerializer):
     # attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
     product = serializers.PrimaryKeyRelatedField(
@@ -333,6 +339,11 @@ class AdminProductAttributeSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['attribute'] = SimpleAttribute(instance=instance.attribute, read_only=True).data
+        return data
 
 
 class AdminAttributeValueSerializer(serializers.ModelSerializer):
