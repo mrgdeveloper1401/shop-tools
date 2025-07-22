@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
@@ -72,3 +73,44 @@ class OrderItem(CreateMixin, UpdateMixin, SoftDeleteMixin):
     class Meta:
         ordering = ("-id",)
         db_table = "order_item"
+
+
+class ShippingCompany(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    name = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ("-id",)
+        db_table = "shipping_company"
+
+
+class ShippingMethod(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    class ShippingType(models.TextChoices):
+        STANDARD = "standard", _("پست معمولی")
+        EXPRESS = "express", _("پست پیشتاز")
+        FREE = "free", _("ارسال رایگان")
+
+    company = models.ForeignKey(
+        ShippingCompany,
+        on_delete=models.CASCADE,
+        related_name="methods",
+        verbose_name=_("شرکت ارسال‌کننده")
+    )
+    name = models.CharField(_("نام روش ارسال"), max_length=100)
+    type = models.CharField(
+        _("نوع ارسال"),
+        max_length=20,
+        choices=ShippingType.choices,
+        default=ShippingType.STANDARD
+    )
+    price = models.DecimalField(
+        _("هزینه ارسال"),
+        max_digits=10,
+        decimal_places=2
+    )
+    estimated_days = models.PositiveIntegerField(_("تعداد روزهای تخمینی تحویل"))
+    is_active = models.BooleanField(_("فعال"), default=True)
+
+    class Meta:
+        db_table = "shipping_method"
+        ordering = ("-id",)
