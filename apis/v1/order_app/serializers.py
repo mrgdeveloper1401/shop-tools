@@ -138,7 +138,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
 class AdminShippingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ShippingMethod
+        model = ShippingCompany
         exclude = (
             "is_deleted",
             "deleted_at"

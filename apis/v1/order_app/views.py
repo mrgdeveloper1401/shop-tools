@@ -91,7 +91,6 @@ class CreateOrderView(generics.CreateAPIView):
 
 
 class ShippingViewSet(viewsets.ModelViewSet):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
@@ -106,3 +105,10 @@ class ShippingViewSet(viewsets.ModelViewSet):
             return ShippingCompany.objects.filter(is_active=True).only(
                 "name"
             )
+
+    def get_permissions(self):
+        if self.action in ("update", "partial_update", "destroy", "create"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
