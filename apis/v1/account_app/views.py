@@ -5,7 +5,7 @@ from rest_framework import viewsets, mixins, views, response, status, exceptions
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
-from core.utils.pagination import  AdminTwentyPageNumberPagination
+from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter
 from core.utils.permissions import NotAuthenticated
 from . import serializers
@@ -281,3 +281,20 @@ class LoginByPhonePasswordView(views.APIView):
             )
         else:
             raise exceptions.NotFound()
+
+
+class AdminListProfileView(generics.ListAPIView):
+    """
+    permission --> only admin user \n
+    pagination -->limit & offset
+    """
+    serializer_class = serializers.AdminProfileListSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = FlexiblePagination
+    queryset = Profile.objects.select_related(
+        "user"
+    ).only(
+        "first_name",
+        "last_name",
+        "user__mobile_phone"
+    )

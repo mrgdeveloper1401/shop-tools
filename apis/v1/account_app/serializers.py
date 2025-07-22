@@ -190,3 +190,16 @@ class CitySerializer(serializers.ModelSerializer):
 class LoginByPhonePasswordSerializer(serializers.Serializer):
     phone = serializers.CharField()
     password = serializers.CharField()
+
+
+class AdminProfileListSerializer(serializers.ModelSerializer):
+    user_phone = serializers.CharField(source="user.mobile_phone")
+
+    class Meta:
+        model = Profile
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "user_phone"
+        )

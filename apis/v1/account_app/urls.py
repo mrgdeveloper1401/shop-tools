@@ -23,5 +23,6 @@ urlpatterns = [
     path("verify-otp/", views.RequestPhoneVerifyOtpView.as_view(), name="verify_otp"),
     path("admin_user_list/", views.AdminUserListview.as_view(), name="admin_user_list"),
     path("login_by_phone_password/", views.LoginByPhonePasswordView.as_view(), name="login_phone_password"),
-    path("", include(state_router.urls))
+    path("", include(state_router.urls)),
+    path("admin_profile_list/", views.AdminListProfileView.as_view(), name="admin_profile_list")
 ] + router.urls
