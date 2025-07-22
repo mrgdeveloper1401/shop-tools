@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from discount_app.managers import ProductDiscountManager
+from discount_app.managers import ProductDiscountQuerySet, ProductDiscountManager
 from product_app.models import ProductVariant, Product
 
 
@@ -95,7 +95,7 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
             return False
         return None
 
-    objects = ProductDiscountManager().as_manager()
+    objects = ProductDiscountManager()
     # valid_discount = ProductDiscountManager()
 
     class Meta:

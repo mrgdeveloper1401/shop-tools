@@ -77,7 +77,8 @@ class NestedProductImageSerializer(serializers.ModelSerializer):
         model = ProductImages
         fields = (
             "image",
-            "order"
+            "order",
+            "alt_text_image"
         )
 
 
@@ -253,7 +254,7 @@ class UserProductBrandSerializer(serializers.ModelSerializer):
 class AdminSimpleProductNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ("product_name",)
+        fields = ("product_name", "id")
 
 
 class AdminProductImageSerializer(serializers.ModelSerializer):
@@ -309,7 +310,7 @@ class AdminProductVariantSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.only("id")
     )
-    attributes = NestedVariantAttributeSerializer(many=True, read_only=True)
+    # attributes = NestedVariantAttributeSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductVariant
@@ -319,6 +320,11 @@ class AdminProductVariantSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['product'] = AdminSimpleProductNameSerializer(instance.product, read_only=True).data
+        return data
 
 
 class SimpleAttribute(serializers.ModelSerializer):

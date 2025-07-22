@@ -25,5 +25,11 @@ class DiscountViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ProductDiscount.objects.defer("deleted_at", "is_deleted").filter(
-            product_variant_id=self.kwargs["variant_pk"]
+            product_variant_id=self.kwargs["variant_pk"],
         )
+
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     context['product_pk'] = self.kwargs['product_pk']
+    #     context['variant_pk'] = self.kwargs['variant_pk']
+    #     return context

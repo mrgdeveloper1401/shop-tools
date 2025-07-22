@@ -294,33 +294,48 @@ class ProductImageViewSet(viewsets.ModelViewSet):
 
 
 class ProductVariantViewSet(viewsets.ModelViewSet):
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            return serializers.AdminProductVariantSerializer
+    """
+    permission --> only admin user
+    """
+    serializer_class = serializers.AdminProductVariantSerializer
+    permission_classes = (permissions.IsAdminUser,)
 
-    def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
-            self.permission_classes = (permissions.IsAdminUser,)
-        return super().get_permissions()
+    # def get_serializer_class(self):
+    #     if self.request.user.is_staff:
+    #         return serializers.AdminProductVariantSerializer
+
+    # def get_permissions(self):
+    #     if self.action in ("create", "update", "partial_update", "destroy"):
+    #         self.permission_classes = (permissions.IsAdminUser,)
+    #     return super().get_permissions()
 
     def get_queryset(self):
-        base_query = ProductVariant.objects.filter(product_id=self.kwargs['product_pk']).prefetch_related(
-            Prefetch(
-                "attributes", queryset=ProductAttributeValues.objects.select_related(
-                    "attribute",
-                    "value",
-                ).only(
-                    "attribute__attribute_name",
-                    "value__attribute_value",
-                    "variant_id"
-                )
-            )
-        )
+         return ProductVariant.objects.select_related(
+             "product"
+         ).filter(product_id=self.kwargs['product_pk']).only(
+             "product__product_name",
+             "price",
+             "stock_number",
+             "is_active",
+         )
+
+        # prefetch_related(
+        #     Prefetch(
+        #         "attributes", queryset=ProductAttributeValues.objects.select_related(
+        #             "attribute",
+        #             "value",
+        #         ).only(
+        #             "attribute__attribute_name",
+        #             "value__attribute_value",
+        #             "variant_id"
+        #         )
+        #     )
+        # )
 
         # filter admin user
-        if self.request.user.is_staff:
-            return base_query.defer("is_deleted", "deleted_at", "created_at", "updated_at")
-        pass
+        # if self.request.user.is_staff:
+        #     return base_query.defer("is_deleted", "deleted_at", "created_at", "updated_at")
+        # pass
 
 
 class AttributeViewSet(viewsets.ModelViewSet):
@@ -434,7 +449,8 @@ class ProductListHomePageView(generics.ListAPIView):
             ).only(
                 "image__image",
                 "order",
-                "product_id"
+                "product_id",
+                "alt_text_image"
             )
         ),
         Prefetch(
