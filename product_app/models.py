@@ -123,21 +123,21 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="variants"
     )
-    barcode = models.CharField(max_length=100, unique=True)
+    # barcode = models.CharField(max_length=100, unique=True)
     price = models.DecimalField(max_digits=12, decimal_places=3)
     stock_number = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    weight = models.DecimalField(
-        max_digits=10,
-        decimal_places=3,
-        null=True,
-        blank=True
-    )
-    dimensions = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True
-    )
+    # weight = models.DecimalField(
+    #     max_digits=10,
+    #     decimal_places=3,
+    #     null=True,
+    #     blank=True
+    # )
+    # dimensions = models.CharField(
+    #     max_length=100,
+    #     null=True,
+    #     blank=True
+    # )
 
     class Meta:
         ordering = ('-id',)

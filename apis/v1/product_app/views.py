@@ -87,7 +87,7 @@ class CreateAdminProductView(generics.CreateAPIView):
 
 class ProductViewSet(viewsets.ModelViewSet):
     """
-    search_filter --> product_name \n
+    search_filter --> (product_name, sku) \n
     pagination --> 20 item
     """
     pagination_class = TwentyPageNumberPagination
