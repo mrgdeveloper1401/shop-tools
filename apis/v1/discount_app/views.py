@@ -1,4 +1,6 @@
-from rest_framework import viewsets, permissions
+from django.db.models import F
+from rest_framework import viewsets, permissions, views, response, status
+from django.utils import timezone
 
 from core.utils.custom_filters import AdminCouponFilter
 from core.utils.pagination import TwentyPageNumberPagination
@@ -33,3 +35,33 @@ class DiscountViewSet(viewsets.ModelViewSet):
     #     context['product_pk'] = self.kwargs['product_pk']
     #     context['variant_pk'] = self.kwargs['variant_pk']
     #     return context
+
+
+class ValidCouponCodeView(views.APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        code = request.GET.get("code", None)
+
+        if code:
+            coupon = Coupon.objects.filter(
+                code=code,
+                is_active=True,
+                valid_from__lte=timezone.now(),
+                valid_to__gte=timezone.now(),
+                number_of_uses__lt=F("maximum_use")
+            ).only("id")
+            if coupon:
+                return response.Response(
+                    {
+                        "data": "ok"
+                    }
+                )
+            else:
+                return response.Response(
+                    {
+                        "data": "invalid"
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        return response.Response()

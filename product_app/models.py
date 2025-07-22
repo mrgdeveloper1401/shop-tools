@@ -125,6 +125,7 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     # barcode = models.CharField(max_length=100, unique=True)
     price = models.DecimalField(max_digits=12, decimal_places=3)
+    name = models.CharField(max_length=255, db_index=True, blank=True, null=True) # TODO when clean migration, remove field blank and null
     stock_number = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     # weight = models.DecimalField(

@@ -317,6 +317,7 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
              "price",
              "stock_number",
              "is_active",
+             "name"
          )
 
         # prefetch_related(

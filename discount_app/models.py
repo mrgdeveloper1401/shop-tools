@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from discount_app.managers import ProductDiscountQuerySet, ProductDiscountManager
+from . import managers
 from product_app.models import ProductVariant, Product
 
 
@@ -36,7 +36,11 @@ class Coupon(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     is_active = models.BooleanField(default=True)
 
+    # objects = models.Manager()
+    # valid_coupon = managers.ValidCouponManager()
+
     class Meta:
+        ordering = ("-id",)
         db_table = "coupon"
 
 
@@ -95,7 +99,7 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
             return False
         return None
 
-    objects = ProductDiscountManager()
+    objects = managers.ProductDiscountManager()
     # valid_discount = ProductDiscountManager()
 
     class Meta:
