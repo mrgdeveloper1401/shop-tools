@@ -19,6 +19,7 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD", cast=str),
         "HOST": config("DB_HOST", cast=str),
         "PORT": config("DB_PORT", cast=int),
+        "CONN_MAX_AGE": config("CON_MAX_AGE", cast=int, default=600)
     }
 }
 
