@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import OrderFilter
 from core.utils.pagination import TwentyPageNumberPagination
-from order_app.models import Order, OrderItem
+from order_app.models import Order, OrderItem, ShippingCompany
 from . import serializers
 
 
@@ -88,3 +88,21 @@ class CreateOrderView(generics.CreateAPIView):
     queryset = None
     serializer_class = serializers.CreateOrderSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+
+class ShippingViewSet(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminShippingSerializer
+        else:
+            return serializers.UserShippingCompanySerializer
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return ShippingCompany.objects.defer("is_deleted", "deleted_at")
+        else:
+            return ShippingCompany.objects.filter(is_active=True).only(
+                "name"
+            )

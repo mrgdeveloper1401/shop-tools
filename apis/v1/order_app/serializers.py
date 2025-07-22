@@ -1,8 +1,7 @@
-from rest_framework import serializers, exceptions
-from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from account_app.models import Profile, UserAddress
-from order_app.models import Order, OrderItem
+from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany
 from product_app.models import ProductVariant
 
 
@@ -135,3 +134,21 @@ class CreateOrderSerializer(serializers.Serializer):
         return {
             "items": items,
         }
+
+
+class AdminShippingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShippingMethod
+        exclude = (
+            "is_deleted",
+            "deleted_at"
+        )
+
+
+class UserShippingCompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShippingCompany
+        fields = (
+            "id",
+            "name",
+        )
