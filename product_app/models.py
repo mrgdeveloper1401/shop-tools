@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
@@ -111,6 +112,10 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         null=True,
         blank=True
     )
+
+    def save(self, *args, **kwargs):
+        self.product_slug = slugify(self.product_name, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ('-id',)
