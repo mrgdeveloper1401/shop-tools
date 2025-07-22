@@ -153,6 +153,7 @@ class OrderFilter(FilterSet):
         model = Order
         fields = {
             "is_complete": ['exact'],
+            "is_active": ['exact']
         }
 
 

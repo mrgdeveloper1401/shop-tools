@@ -19,10 +19,14 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.defer("is_deleted", "deleted_at")
         else:
             return Order.objects.filter(
-                profile__user_id=self.request.user.id
+                profile__user_id=self.request.user.id,
+                is_active=True
             ).only(
                 "is_complete",
                 "created_at",
+                "tracking_code",
+                "payment_date",
+                "address_id"
             )
 
     def get_serializer_class(self):
@@ -62,11 +66,13 @@ class OrderItemViewSet(viewsets.ModelViewSet):
             return base_query.defer("is_deleted", "deleted_at")
         else:
             return base_query.filter(
-                order__profile__user_id=self.request.user.id
+                order__profile__user_id=self.request.user.id,
+                order__is_active=True
             ).select_related(
                 "product_variant__product",
+                "order"
             ).only(
-                "order_id",
+                "order__is_active",
                 "price",
                 "created_at",
                 "quantity",

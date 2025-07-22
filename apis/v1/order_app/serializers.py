@@ -1,7 +1,7 @@
 from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
 
-from account_app.models import Profile
+from account_app.models import Profile, UserAddress
 from order_app.models import Order, OrderItem
 from product_app.models import ProductVariant
 
@@ -12,9 +12,12 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "is_complete",
-            "created_at"
+            "created_at",
+            "tracking_code",
+            "payment_date",
+            "address_id"
         )
-        read_only_fields = ("is_complete",)
+        read_only_fields = ("is_complete", "tracking_code", "address_id")
 
     def create(self, validated_data):
         # get user id by context request
@@ -33,6 +36,9 @@ class OrderSerializer(serializers.ModelSerializer):
 class AdminOrderSerializer(serializers.ModelSerializer):
     profile = serializers.PrimaryKeyRelatedField(
         queryset=Profile.objects.only("id",),
+    )
+    address = serializers.PrimaryKeyRelatedField(
+        queryset=UserAddress.objects.only("id",),
     )
 
     class Meta:
@@ -84,6 +90,7 @@ class NestedCartItemSerializer(serializers.Serializer):
 
 class CreateOrderSerializer(serializers.Serializer):
     items = NestedCartItemSerializer(many=True)
+    address_id = serializers.IntegerField(required=True)
 
     def validate(self, data):
         # check variant dose exits
@@ -105,7 +112,10 @@ class CreateOrderSerializer(serializers.Serializer):
             user_id=self.context["request"].user.id
         ).only("id").first()
 
-        order = Order.objects.create(profile_id=profile.id)
+        # get address id
+        address_id = validated_data.pop("address_id", None)
+
+        order = Order.objects.create(profile_id=profile.id, address_id=address_id)
 
         # create order item
         order_items = []
