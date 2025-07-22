@@ -159,7 +159,7 @@ class ProductAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "product_attribute_values"
-        unique_together = ('product', 'attribute')
+        # unique_together = ('product', 'attribute')
 
 
 class ProductComment(MP_Node, CreateMixin, UpdateMixin):
