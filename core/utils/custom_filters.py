@@ -128,6 +128,7 @@ class ProductFilter(FilterSet):
         model = Product
         fields = {
             "product_name": ['contains'],
+            "sku": ['contains']
         }
 
 
