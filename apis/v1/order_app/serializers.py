@@ -210,3 +210,48 @@ class UserShippingMethodSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data['company'] = SimpleUserShippingCompanySerializer(instance.company).data
         return data
+
+
+class NestedOrderProfileUserSerializer(serializers.ModelSerializer):
+    user_phone = serializers.SerializerMethodField()
+    user_email = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = (
+            "first_name",
+            "last_name",
+            "user_phone",
+            "created_at",
+            "user_email"
+        )
+
+    def get_user_phone(self, obj):
+        return obj.user.mobile_phone
+
+    def get_user_email(self, obj):
+        return obj.user.email
+
+
+class ResultOrderCityStateNameSerializer(serializers.ModelSerializer):
+    state_name = serializers.CharField(source="state.state_name")
+
+    class Meta:
+        model = UserAddress
+        fields = (
+            "city",
+            "state_name"
+        )
+
+
+class ResultOrderSerializer(serializers.ModelSerializer):
+    profile = NestedOrderProfileUserSerializer()
+    address = ResultOrderCityStateNameSerializer()
+
+    class Meta:
+        model = Order
+        fields = (
+            "id",
+            "profile",
+            "address"
+        )

@@ -1,6 +1,7 @@
-from rest_framework import viewsets, permissions, generics
+from django.db.models import Count
+from rest_framework import viewsets, permissions, generics, mixins
 
-from core.utils.custom_filters import OrderFilter
+from core.utils.custom_filters import OrderFilter, ResultOrderFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod
 from . import serializers
@@ -171,3 +172,27 @@ class ShippingMethodViewSet(viewsets.ModelViewSet):
             "price",
             "shipping_type"
             )
+
+
+class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+    serializer_class = serializers.ResultOrderSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = TwentyPageNumberPagination
+    filterset_class = ResultOrderFilter
+
+    def get_queryset(self):
+        return Order.objects.filter(
+            is_active=True
+        ).select_related(
+            "profile__user",
+            "address__city",
+            "address__state"
+        ).only(
+            "profile__first_name",
+            "profile__last_name",
+            "profile__created_at",
+            "profile__user__email",
+            "profile__user__mobile_phone",
+            "address__city__name",
+            "address__state__state_name"
+        )

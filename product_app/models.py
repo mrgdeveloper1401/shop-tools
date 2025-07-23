@@ -115,6 +115,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def save(self, *args, **kwargs):
         self.product_slug = slugify(self.product_name, allow_unicode=True)
+        self.description_slug = slugify(self.description, allow_unicode=True)
         return super().save(*args, **kwargs)
 
     class Meta:
