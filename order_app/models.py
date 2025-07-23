@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from order_app.tasks import send_notification_order_complete
 
 
 # Create your models here.
@@ -49,6 +50,8 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         if not self.tracking_code:
             uid = uuid.uuid4().hex[:10]
             self.tracking_code = f"gs-{str(timezone.now().date())}-{uid}"
+        if self.is_complete:
+            send_notification_order_complete.delay()
         super().save(*args, **kwargs)
 
     class Meta:
