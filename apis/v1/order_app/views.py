@@ -204,7 +204,11 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             "is_complete",
             "status"
         ).annotate(
-            user_order_count=Count("profile__orders", filter=Q(is_active=True)),
+            user_order_count=Count(
+                "profile__orders",
+                filter=Q(profile__orders__is_active=True),
+                distinct=True
+            ),
             # total_price=Sum(
             #     F("order_items__price") * F("order_items__quantity"), filter=Q(order_items__is_active=True)
             # ),
