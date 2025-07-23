@@ -173,6 +173,11 @@ class AdminShippingMethodSerializer(serializers.ModelSerializer):
             "is_deleted",
             "deleted_at"
         )
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['company'] = SimpleUserShippingCompanySerializer(instance.company, read_only=True).data
+        return data
+
 
 class UserShippingMethodSerializer(serializers.ModelSerializer):
     class Meta:

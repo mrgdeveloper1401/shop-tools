@@ -132,14 +132,23 @@ class ShippingMethodViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
+        base_query = ShippingMethod.objects.select_related("company")
+
         if self.request.user.is_staff:
-            return ShippingMethod.objects.defer("is_deleted", "deleted_at")
+            return base_query.only(
+                "company__name",
+                "created_at",
+                "updated_at",
+                "shipping_type",
+                "price",
+                "name",
+                "estimated_days",
+                "is_active",
+            )
         else:
-            return ShippingMethod.objects.filter(
+            return base_query.filter(
                 is_active=True,
                 company__is_active=True
-            ).select_related(
-                "company"
             ).only(
             "company__name",
             "price",
