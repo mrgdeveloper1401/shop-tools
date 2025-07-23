@@ -138,7 +138,7 @@ class CreateOrderSerializer(serializers.Serializer):
         # get shipping
         shipping = validated_data.pop("shipping", None)
         # create order
-        order = Order.objects.create(profile_id=profile.id, address_id=address_id, shipping_id=shipping)
+        order = Order.objects.create(profile_id=profile.id, address_id=address_id, shipping=shipping)
 
         # create order item
         order_items = []
