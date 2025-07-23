@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from account_app.models import Profile, UserAddress
@@ -215,6 +216,7 @@ class UserShippingMethodSerializer(serializers.ModelSerializer):
 class NestedOrderProfileUserSerializer(serializers.ModelSerializer):
     user_phone = serializers.SerializerMethodField()
     user_email = serializers.SerializerMethodField()
+    # user_order_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
@@ -223,8 +225,12 @@ class NestedOrderProfileUserSerializer(serializers.ModelSerializer):
             "last_name",
             "user_phone",
             "created_at",
-            "user_email"
+            "user_email",
+            # "user_order_count",
         )
+
+    # def get_user_order_count(self, obj):
+    #     return obj.orders.count()
 
     def get_user_phone(self, obj):
         return obj.user.mobile_phone
@@ -247,11 +253,25 @@ class ResultOrderCityStateNameSerializer(serializers.ModelSerializer):
 class ResultOrderSerializer(serializers.ModelSerializer):
     profile = NestedOrderProfileUserSerializer()
     address = ResultOrderCityStateNameSerializer()
+    user_order_count = serializers.SerializerMethodField()
+    # total_price = serializers.SerializerMethodField()
+
+    @extend_schema_field(serializers.IntegerField())
+    def get_user_order_count(self, obj):
+        return obj.user_order_count
+
+    # @extend_schema_field(serializers.DecimalField(decimal_places=3, max_digits=12))
+    # def get_total_price(self, obj):
+    #     return obj.total_price
 
     class Meta:
         model = Order
         fields = (
             "id",
             "profile",
-            "address"
+            "address",
+            "user_order_count",
+            "is_complete",
+            "status",
+            # "total_price"
         )

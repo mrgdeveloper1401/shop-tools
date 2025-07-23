@@ -72,6 +72,7 @@ class OrderItem(CreateMixin, UpdateMixin, SoftDeleteMixin):
         default=1,
         validators=(MinValueValidator(1),),
     )
+    is_active = models.BooleanField(default=True)
 
     @cached_property
     def calc_price_quantity(self):

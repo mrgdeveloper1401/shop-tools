@@ -192,4 +192,6 @@ class ResultOrderFilter(FilterSet):
         model = Order
         fields = {
             "profile__user__mobile_phone": ['contains'],
+            "is_complete": ['exact'],
+            "status": ['exact']
         }

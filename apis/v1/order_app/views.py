@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Sum, F, Q
 from rest_framework import viewsets, permissions, generics, mixins
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter
@@ -175,6 +175,10 @@ class ShippingMethodViewSet(viewsets.ModelViewSet):
 
 
 class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+    """
+    filter query --> is_complete --> true or false /n
+    status --> pending, paid, processing, shipped, delivered, cancelled
+    """
     serializer_class = serializers.ResultOrderSerializer
     permission_classes = (permissions.IsAdminUser,)
     pagination_class = TwentyPageNumberPagination
@@ -187,6 +191,8 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             "profile__user",
             "address__city",
             "address__state"
+        ).filter(
+            is_active=True
         ).only(
             "profile__first_name",
             "profile__last_name",
@@ -194,5 +200,12 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             "profile__user__email",
             "profile__user__mobile_phone",
             "address__city__name",
-            "address__state__state_name"
+            "address__state__state_name",
+            "is_complete",
+            "status"
+        ).annotate(
+            user_order_count=Count("profile__orders", filter=Q(is_active=True)),
+            # total_price=Sum(
+            #     F("order_items__price") * F("order_items__quantity"), filter=Q(order_items__is_active=True)
+            # ),
         )
