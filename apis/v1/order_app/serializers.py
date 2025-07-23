@@ -33,6 +33,15 @@ class OrderSerializer(serializers.ModelSerializer):
         )
 
 
+class SimpleProfileOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = (
+            "first_name",
+            "last_name",
+        )
+
+
 class AdminOrderSerializer(serializers.ModelSerializer):
     profile = serializers.PrimaryKeyRelatedField(
         queryset=Profile.objects.only("id",),
@@ -50,6 +59,11 @@ class AdminOrderSerializer(serializers.ModelSerializer):
             "is_deleted",
             "deleted_at",
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['profile'] = SimpleProfileOrderSerializer(instance.profile, read_only=True).data
+        return data
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

@@ -91,6 +91,12 @@ class SimpleProductCategorySerializer(serializers.ModelSerializer):
         )
 
 
+class NestedProductVariantPriceStockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = ("price", "stock_number")
+
+
 class ProductSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.only("id"),
@@ -103,6 +109,7 @@ class ProductSerializer(serializers.ModelSerializer):
         queryset=Category.objects.only("id"),
     )
     product_product_image = NestedProductImageSerializer(many=True, read_only=True)
+    variants = NestedProductVariantPriceStockSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product

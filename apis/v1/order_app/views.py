@@ -17,7 +17,21 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Order.objects.defer("is_deleted", "deleted_at")
+            return Order.objects.select_related(
+                "profile"
+            ).only(
+                "profile__first_name",
+                "profile__last_name",
+                "created_at",
+                "updated_at",
+                "status",
+                "is_complete",
+                "tracking_code",
+                "payment_date",
+                "address_id",
+                "shipping_id",
+                "is_active"
+            )
         else:
             return Order.objects.filter(
                 profile__user_id=self.request.user.id,

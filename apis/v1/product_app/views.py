@@ -1,4 +1,4 @@
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import (
@@ -149,6 +149,13 @@ class ProductViewSet(viewsets.ModelViewSet):
                         "value"
                     )
                 ),
+                Prefetch(
+                    "variants", queryset=ProductVariant.objects.only(
+                        "price",
+                        "product_id",
+                        "stock_number"
+                    )
+                )
             )
             # print(base_query)
             return base_query
