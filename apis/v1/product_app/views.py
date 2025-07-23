@@ -222,7 +222,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                         ).only(
                             "price",
                             "product_id",
-                            "stock_number"
+                            "stock_number",
+                            "name"
                         ).prefetch_related(
                             Prefetch(
                                 "product_variant_discounts", queryset=ProductDiscount.objects.only(
@@ -465,7 +466,7 @@ class ProductListHomePageView(generics.ListAPIView):
         "created_at",
         "updated_at",
         "base_price",
-        "sku"
+        "sku",
     ).prefetch_related(
         Prefetch(
             "product_product_image", queryset=ProductImages.objects.filter(
@@ -485,7 +486,8 @@ class ProductListHomePageView(generics.ListAPIView):
             ).only(
                 "price",
                 "product_id",
-                "stock_number"
+                "stock_number",
+                "name"
             ).prefetch_related(
                 Prefetch(
                     "product_variant_discounts", queryset=ProductDiscount.objects.only(
