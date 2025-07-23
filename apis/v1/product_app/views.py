@@ -203,13 +203,13 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "base_price",
                     # "product_images"
                 ).prefetch_related(
-                    Prefetch(
-                        "product_discounts", queryset=ProductDiscount.objects.only(
-                            "discount_type",
-                            "amount",
-                            "product_id"
-                        ).valid_discount()
-                    )
+                    # Prefetch(
+                    #     "product_discounts", queryset=ProductDiscount.objects.only(
+                    #         "discount_type",
+                    #         "amount",
+                    #         "product_id"
+                    #     ).valid_discount()
+                    # )
                 )
             else:
                 return query.prefetch_related(
@@ -447,7 +447,8 @@ class ProductListHomePageView(generics.ListAPIView):
         "description_slug",
         "created_at",
         "updated_at",
-        "base_price"
+        "base_price",
+        "sku"
     ).prefetch_related(
         Prefetch(
             "product_product_image", queryset=ProductImages.objects.filter(
@@ -467,15 +468,23 @@ class ProductListHomePageView(generics.ListAPIView):
             ).only(
                 "price",
                 "product_id"
+            ).prefetch_related(
+                Prefetch(
+                    "product_variant_discounts", queryset=ProductDiscount.objects.only(
+                        "amount",
+                        "discount_type",
+                        "product_variant_id"
+                    ).valid_discount()
+                )
             )
         ),
-        Prefetch(
-            "product_discounts", queryset=ProductDiscount.objects.only(
-                "product_id",
-                "amount",
-                "discount_type"
-            ).valid_discount()
-        )
+        # Prefetch(
+        #     "product_discounts", queryset=ProductDiscount.objects.only(
+        #         "product_id",
+        #         "amount",
+        #         "discount_type"
+        #     ).valid_discount()
+        # )
     )
     serializer_class = serializers.ProductListHomePageSerializer
     pagination_class = TwentyPageNumberPagination

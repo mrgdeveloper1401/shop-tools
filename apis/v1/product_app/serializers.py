@@ -128,13 +128,20 @@ class ProductSerializer(serializers.ModelSerializer):
         return data
 
 
+class NestedProductDiscountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductDiscount
+        fields = ("amount", "discount_type")
+
+
 class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
     # attributes = NestedVariantAttributeSerializer(many=True)
     variant_id = serializers.IntegerField(source="id")
+    product_variant_discounts = NestedProductDiscountSerializer(many=True)
 
     class Meta:
         model = ProductVariant
-        fields = ("price", "variant_id")
+        fields = ("price", "variant_id", "product_variant_discounts")
 
 
 class NestedProductAttributeSerializer(serializers.ModelSerializer):
@@ -194,15 +201,9 @@ class NestedImageSerializer(serializers.ModelSerializer):
         fields = ("get_image_url",)
 
 
-class NestedProductDiscount(serializers.ModelSerializer):
-    class Meta:
-        model = ProductDiscount
-        fields = ("amount", "discount_type")
-
-
 class UserListProductSerializer(serializers.ModelSerializer):
     product_product_image = NestedProductImageSerializer(many=True)
-    product_discounts = NestedProductDiscount(many=True)
+    # product_discounts = NestedProductDiscount(many=True)
 
     class Meta:
         model = Product
@@ -211,7 +212,7 @@ class UserListProductSerializer(serializers.ModelSerializer):
             "product_name",
             "product_product_image",
             "base_price",
-            "product_discounts",
+            # "product_discounts",
         )
 
 
@@ -406,7 +407,7 @@ class AdminProducttAttributeSerializer(serializers.ModelSerializer):
 class ProductListHomePageSerializer(serializers.ModelSerializer):
     product_product_image = NestedProductImageSerializer(many=True)
     variants = NestedProductVariantPriceAttributeSerializer(many=True)
-    product_discounts = NestedProductDiscount(many=True)
+    # product_discounts = NestedProductDiscount(many=True)
 
     class Meta:
         model = Product
@@ -421,7 +422,8 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "base_price",
-            "product_discounts"
+            "sku"
+            # "product_discounts"
         )
 
 
