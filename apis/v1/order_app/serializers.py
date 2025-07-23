@@ -156,6 +156,8 @@ class CreateOrderSerializer(serializers.Serializer):
         items = OrderItem.objects.bulk_create(order_items)
         return {
             "items": items,
+            "shipping": shipping,
+            "address_id": address_id,
         }
 
 
