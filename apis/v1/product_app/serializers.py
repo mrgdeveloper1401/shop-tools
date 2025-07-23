@@ -141,7 +141,7 @@ class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ("price", "variant_id", "product_variant_discounts")
+        fields = ("price", "variant_id", "product_variant_discounts", "is_available")
 
 
 class NestedProductAttributeSerializer(serializers.ModelSerializer):
@@ -227,6 +227,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     product_brand = SimpleProductBrandSerializer()
     product_product_image = NestedProductImageSerializer(many=True)
     attributes = NestedProductAttributeValuesSerializer(many=True, read_only=True)
+    variants = NestedProductVariantPriceAttributeSerializer(many=True)
 
     class Meta:
         model = Product
@@ -239,6 +240,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "tags",
             "product_product_image",
             "attributes",
+            "variants"
         )
 
 

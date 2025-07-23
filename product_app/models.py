@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
 
@@ -145,6 +146,10 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
     #     null=True,
     #     blank=True
     # )
+
+    @cached_property
+    def is_available(self):
+        return False if self.stock_number == 0 else True
 
     class Meta:
         ordering = ('-id',)

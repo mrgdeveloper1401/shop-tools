@@ -217,6 +217,23 @@ class ProductViewSet(viewsets.ModelViewSet):
                         "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
                     ),
                     Prefetch(
+                        "variants", queryset=ProductVariant.objects.filter(
+                            is_active=True
+                        ).only(
+                            "price",
+                            "product_id",
+                            "stock_number"
+                        ).prefetch_related(
+                            Prefetch(
+                                "product_variant_discounts", queryset=ProductDiscount.objects.only(
+                                    "amount",
+                                    "discount_type",
+                                    "product_variant_id"
+                                ).valid_discount()
+                            )
+                        )
+                    ),
+                    Prefetch(
                         "attributes", queryset=ProductAttributeValues.objects.select_related(
                             "attribute"
                         ).only(
@@ -467,7 +484,8 @@ class ProductListHomePageView(generics.ListAPIView):
                 is_active=True
             ).only(
                 "price",
-                "product_id"
+                "product_id",
+                "stock_number"
             ).prefetch_related(
                 Prefetch(
                     "product_variant_discounts", queryset=ProductDiscount.objects.only(
