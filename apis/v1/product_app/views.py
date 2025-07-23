@@ -1,6 +1,7 @@
 from django.db.models import Prefetch, Count
 from rest_framework import viewsets, permissions, generics
 
+from account_app.models import Profile
 from core.utils.custom_filters import (
     AdminProductCategoryFilter,
     ProductBrandFilter,
@@ -553,7 +554,13 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ProductComment.objects.filter(
-            product_id=self.kwargs['product_pk']
+            product_id=self.kwargs['product_pk'],
+        ).select_related(
+            "user",
+        ).prefetch_related(
+            Prefetch(
+                "user__profile", queryset=Profile.objects.only("first_name", "last_name", "user_id")
+            )
         ).only(
             "path",
             "numchild",

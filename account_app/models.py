@@ -29,6 +29,10 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         ordering = ("-id",)
         db_table = "auth_user"
 
+    @cached_property
+    def full_name(self):
+        name = f'{self.profile.first_name} {self.profile.last_name}'
+        return name if name else None
 
 class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name="profile")

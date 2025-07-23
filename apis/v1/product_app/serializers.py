@@ -452,13 +452,19 @@ class UserProductTagSerializer(serializers.ModelSerializer):
 class ProductCommentSerializer(serializers.ModelSerializer):
     parent = serializers.IntegerField(required=False)
     user_is_staff = serializers.SerializerMethodField()
+    user_name = serializers.SerializerMethodField()
+
+    def get_user_name(self, obj):
+        return obj.user.full_name
 
     class Meta:
         model = ProductComment
         fields = (
+            "id",
             "parent",
             "product_id",
-            "user_id",
+            # "user_id",
+            "user_name",
             "user_is_staff",
             "path",
             "numchild",
