@@ -590,3 +590,21 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
         return super().get_permissions()
+
+
+class AdminCategoryNameView(generics.ListAPIView):
+    queryset = Category.objects.only("category_name")
+    serializer_class = serializers.AdminCategoryNameSerializer
+    permission_classes = (permissions.IsAdminUser,)
+
+
+class AdminTagNameView(generics.ListAPIView):
+    queryset = Tag.objects.only("tag_name")
+    serializer_class = serializers.AdminTagNameSerializer
+    permission_classes = (permissions.IsAdminUser,)
+
+
+class AdminBrandNameView(generics.ListAPIView):
+    serializer_class = serializers.AdminBrandNameSerializer
+    permission_classes = (permissions.IsAdminUser,)
+    queryset = ProductBrand.objects.only("brand_name")

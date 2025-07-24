@@ -511,3 +511,29 @@ class AdminAttributeSerializer(serializers.ModelSerializer):
             "id",
             "attribute_name"
         )
+
+class AdminCategoryNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            "id",
+            "category_name"
+        )
+
+
+class AdminTagNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = (
+            "id",
+            "tag_name"
+        )
+
+
+class AdminBrandNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductBrand
+        fields = (
+            "id",
+            "brand_name"
+        )
