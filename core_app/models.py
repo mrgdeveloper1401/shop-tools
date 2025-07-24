@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -93,3 +94,16 @@ class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "public_notification"
+
+
+class MainSite(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    # header_title = ArrayField(models.CharField(max_length=50))
+    header_title = models.CharField(max_length=50)
+    images = models.ManyToManyField(Image, related_name="main_site_images")
+    text_color = models.CharField(max_length=50)
+    background_color = models.CharField(max_length=50)
+    is_publish = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "main_site"
+        ordering = ("-id",)

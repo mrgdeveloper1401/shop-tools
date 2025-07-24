@@ -1,9 +1,10 @@
+from django.db.models import Prefetch
 from rest_framework import viewsets, permissions
 
 from core.utils.custom_filters import AdminImageFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
-from core_app.models import PublicNotification, Image
+from core_app.models import PublicNotification, Image, MainSite
 
 
 class PublicNotificationViewSet(viewsets.ModelViewSet):
@@ -34,3 +35,33 @@ class AdminImageViewSet(viewsets.ModelViewSet):
         "is_deleted",
         "deleted_at",
     )
+
+
+class MainSiteViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.MainSiteSerializer
+
+    def get_permissions(self):
+        if self.action in ("create", "partial_update", "update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
+
+    def get_queryset(self):
+        base_query = MainSite.objects.prefetch_related(
+            Prefetch(
+                "images", queryset=Image.objects.only("image",)
+            )
+        )
+
+        if self.request.user.is_staff:
+            return base_query.defer(
+                "is_deleted",
+                "deleted_at",
+                "created_at",
+                "updated_at"
+            )
+        else:
+            return base_query.only(
+                "text_color",
+                "background_color",
+                "header_title"
+            )
