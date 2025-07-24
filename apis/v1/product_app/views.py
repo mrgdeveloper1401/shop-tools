@@ -583,7 +583,7 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
             "updated_at",
             "product_id",
             "comment_body"
-        )
+        ).order_by("-id")
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
