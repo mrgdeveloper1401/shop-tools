@@ -99,7 +99,7 @@ class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 class MainSite(CreateMixin, UpdateMixin, SoftDeleteMixin):
     # header_title = ArrayField(models.CharField(max_length=50))
     header_title = models.CharField(max_length=50)
-    images = models.ManyToManyField(Image, related_name="main_site_images")
+    images = models.ManyToManyField(Image, related_name="main_site_images", blank=True)
     text_color = models.CharField(max_length=50)
     background_color = models.CharField(max_length=50)
     is_publish = models.BooleanField(default=True)

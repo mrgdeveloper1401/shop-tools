@@ -39,6 +39,7 @@ class MainSiteSerializer(serializers.ModelSerializer):
     images = serializers.PrimaryKeyRelatedField(
         queryset=Image.objects.only("image"),
         many=True,
+        required=False
     )
 
     class Meta:
