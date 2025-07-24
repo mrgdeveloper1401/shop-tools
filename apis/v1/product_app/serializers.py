@@ -20,11 +20,14 @@ from product_app.models import (
 
 class ProductCategorySerializer(serializers.ModelSerializer):
     parent = serializers.IntegerField(required=False)
-    category_url = serializers.CharField(source="category_image.image.get_image_url", read_only=True)
+    category_url = serializers.SerializerMethodField()
     category_image = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.only("id"),
+        queryset=Image.objects.only("id", "image"),
         required=False
     )
+
+    def get_category_url(self, obj):
+        return obj.category_image.get_image_url if obj.category_image else None
 
     class Meta:
         model = Category
