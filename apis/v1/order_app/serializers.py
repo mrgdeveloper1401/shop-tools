@@ -112,8 +112,11 @@ class CreateOrderSerializer(serializers.Serializer):
     shipping = serializers.PrimaryKeyRelatedField(
         queryset=ShippingMethod.objects.only("id",),
     )
+    coupon_code = serializers.CharField(required=False)
 
     def validate(self, data):
+        coupon_code = data.get("coupon_code", None)
+
         # check variant dose exits
         variant_ids = [item['product_variant_id'] for item in data['items']]
         existing_variants = ProductVariant.objects.filter(id__in=variant_ids).only("id")
@@ -124,6 +127,12 @@ class CreateOrderSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 f"Product variants with ids {missing_ids} do not exist"
             )
+
+        final_price = 0
+        discount_price = 0
+
+        # if coupon_code:
+        #     res = Order.objects
 
         return data
 

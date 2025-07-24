@@ -1,12 +1,15 @@
 import uuid
+from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import F
 from django.utils.functional import cached_property
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from discount_app.models import Coupon
 from order_app.tasks import send_notification_order_complete
 
 
@@ -53,6 +56,40 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         if self.is_complete:
             send_notification_order_complete.delay()
         super().save(*args, **kwargs)
+
+    @property
+    def sub_total(self):
+        total = sum(
+            item.calc_price_quantity for item in self.order_items.filter(is_active=True).only(
+                "order_id", "price", "quantity"
+            )
+        )
+        return total
+
+    @property
+    def shipping_cost(self):
+        return self.shipping.price if self.shipping else None
+
+    @property
+    def tax_amount(self):
+        amount = (self.sub_total * Decimal("0.09")) + self.sub_total + self.shipping_cost
+        return amount
+
+    def is_valid_coupon(self, code):
+        coupon = Coupon.objects.filter(
+            is_active=True,
+            valid_from__lte=timezone.now(),
+            valid_to__gte=timezone.now(),
+            maximum_use__gt=F("number_of_uses")
+        ).only("id")
+
+        if not coupon:
+            return False
+        return coupon
+
+    @property
+    def total_price(self):
+        return self.sub_total + self.tax_amount + self.shi
 
     class Meta:
         ordering = ("-id",)
