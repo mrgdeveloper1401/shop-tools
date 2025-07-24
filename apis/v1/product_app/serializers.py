@@ -20,6 +20,10 @@ from product_app.models import (
 
 class ProductCategorySerializer(serializers.ModelSerializer):
     parent = serializers.IntegerField(required=False)
+    category_url = serializers.CharField(source="category_image.image.get_image_url", read_only=True)
+    category_image = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.only("id"),
+    )
 
     class Meta:
         model = Category
@@ -44,11 +48,14 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
 
 class UserProductCategorySerializer(serializers.ModelSerializer):
+    category_url = serializers.CharField(source="category.image.get_image_url", read_only=True)
+
     class Meta:
         model = Category
         fields = (
             "id",
             "category_name",
+            "category_url"
         )
 
 

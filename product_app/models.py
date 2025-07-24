@@ -11,6 +11,13 @@ class Category(MP_Node, CreateMixin, UpdateMixin):
     is_active = models.BooleanField(default=True)
     category_name = models.CharField(max_length=255, db_index=True)
     category_slug = models.CharField(max_length=500, blank=True)
+    category_image = models.ForeignKey(
+        "core_app.Image",
+        on_delete=models.PROTECT,
+        related_name="category_images",
+        blank=True, #TODO, when clean migration we remove field blank and null
+        null=True,
+    )
 
     class Meta:
         ordering = ('-id',)

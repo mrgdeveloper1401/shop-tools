@@ -37,12 +37,20 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     pagination_class = FlexiblePagination
 
     def get_queryset(self):
+        base_query = Category.objects.select_related("category_image")
         if not self.request.user.is_staff:
-            return Category.objects.filter(is_active=True).only("category_name",)
+            return base_query.only("category_name", "category_image__image")
         else:
-            return Category.objects.defer(
+            return base_query.only(
+                "category_image__image",
+                "category_name",
+                "path",
+                "depth",
+                "numchild",
+                "is_active",
+                "created_at",
                 "updated_at",
-                "created_at"
+                "category_slug"
             )
 
     def get_permissions(self):
