@@ -114,6 +114,8 @@ class Carousel(CreateMixin, UpdateMixin, SoftDeleteMixin):
         "core_app.Image",
         on_delete=models.PROTECT,
         related_name="carousel_images",
+        blank=True,
+        null=True,
     )
     name = models.CharField(max_length=255)
 

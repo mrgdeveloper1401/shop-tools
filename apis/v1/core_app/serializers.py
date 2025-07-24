@@ -68,11 +68,12 @@ class MainSiteSerializer(serializers.ModelSerializer):
 class CarouselSerializer(serializers.ModelSerializer):
     image = serializers.PrimaryKeyRelatedField(
         queryset=Image.objects.only("image", "id"),
+        required=False
     )
     image_url = serializers.SerializerMethodField()
 
     def get_image_url(self, obj):
-        return obj.image.get_image_url
+        return obj.image.get_image_url if obj.image else None
 
     class Meta:
         model = Carousel
