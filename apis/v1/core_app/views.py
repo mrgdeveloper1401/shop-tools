@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions
 from core.utils.custom_filters import AdminImageFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
-from core_app.models import PublicNotification, Image, MainSite
+from core_app.models import PublicNotification, Image, MainSite, Carousel
 
 
 class PublicNotificationViewSet(viewsets.ModelViewSet):
@@ -65,3 +65,17 @@ class MainSiteViewSet(viewsets.ModelViewSet):
                 "background_color",
                 "header_title"
             )
+
+
+class CarouselViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.CarouselSerializer
+    queryset = Carousel.objects.select_related("image").only(
+        "name",
+        "image__image"
+    )
+
+    def get_permissions(self):
+        if self.action in ("create", "partial_update", "update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
+

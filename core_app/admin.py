@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Image, PublicNotification, MainSite
+from .models import Image, PublicNotification, MainSite, Carousel
 
 
 @admin.register(Image)
@@ -15,4 +15,9 @@ class PublicNotificationAdmin(admin.ModelAdmin):
 
 @admin.register(MainSite)
 class MainSiteAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Carousel)
+class CarouselNameAdmin(admin.ModelAdmin):
     pass

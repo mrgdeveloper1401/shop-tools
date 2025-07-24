@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from account_app.models import User
-from core_app.models import PublicNotification, Image, MainSite
+from core_app.models import PublicNotification, Image, MainSite, Carousel
 
 
 class PublicNotificationSerializer(serializers.ModelSerializer):
@@ -63,3 +63,17 @@ class MainSiteSerializer(serializers.ModelSerializer):
             field.pop("is_publish", None)
 
         return field
+
+
+class CarouselSerializer(serializers.ModelSerializer):
+    image = serializers.PrimaryKeyRelatedField(
+        queryset=Image.objects.only("image", "id"),
+    )
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        return obj.image.get_image_url
+
+    class Meta:
+        model = Carousel
+        fields = ("id", "image", "image_url", "name")

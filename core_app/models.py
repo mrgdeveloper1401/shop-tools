@@ -107,3 +107,16 @@ class MainSite(CreateMixin, UpdateMixin, SoftDeleteMixin):
     class Meta:
         db_table = "main_site"
         ordering = ("-id",)
+
+
+class Carousel(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    image = models.ForeignKey(
+        "core_app.Image",
+        on_delete=models.PROTECT,
+        related_name="carousel_images",
+    )
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = "carousel"
+        ordering = ("-id",)
