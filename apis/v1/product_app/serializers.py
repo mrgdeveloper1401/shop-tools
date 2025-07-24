@@ -247,7 +247,9 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "tags",
             "product_product_image",
             "attributes",
-            "variants"
+            "variants",
+            "product_slug",
+            "description_slug"
         )
 
 

@@ -261,6 +261,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                     # "social_links",
                     "product_brand__brand_name",
                     "tags",
+                    "product_slug",
+                    "description_slug"
                 )
 
 
@@ -557,7 +559,6 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
     pagination --> 20 item
     """
     serializer_class = serializers.ProductCommentSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
     pagination_class = TwentyPageNumberPagination
 
     def get_queryset(self):
@@ -584,3 +585,8 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context['product_pk'] = self.kwargs['product_pk']
         return context
+
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+        return super().get_permissions()
