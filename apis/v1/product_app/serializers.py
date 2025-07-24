@@ -230,7 +230,7 @@ class UserListProductSerializer(serializers.ModelSerializer):
 class NestedProductTagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ("tag_name",)
+        fields = ("tag_name", "id")
 
 
 class UserRetrieveProductSerializer(serializers.ModelSerializer):
@@ -253,7 +253,8 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "attributes",
             "variants",
             "product_slug",
-            "description_slug"
+            "description_slug",
+            "sku"
         )
 
 

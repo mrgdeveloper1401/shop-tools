@@ -263,7 +263,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_brand__brand_name",
                     "tags",
                     "product_slug",
-                    "description_slug"
+                    "description_slug",
+                    "sku"
                 )
 
 
