@@ -1,5 +1,6 @@
-from django.db.models import Prefetch, Count
-from rest_framework import viewsets, permissions, generics
+from django.db.models import Prefetch
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, permissions, generics, filters
 
 from account_app.models import Profile
 from core.utils.custom_filters import (
@@ -468,6 +469,8 @@ class ProductListHomePageView(generics.ListAPIView):
     pagination --> 20 item \n
     filter query --> product_name, tag, min_price, max_price, category_name, price_range
     """
+    ordering_fields = ("id", "variants__price")
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     queryset = Product.objects.filter(is_active=True).only(
         "product_name",
         "category_id",
