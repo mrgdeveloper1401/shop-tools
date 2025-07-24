@@ -47,7 +47,7 @@ urlpatterns = [
     #     views.AdminCreateVariantAttributeView.as_view(),
     #     name='admin_create_variant_attribute'
     # )
-    path("admin_tag_name/", views.AdminBrandNameView.as_view(), name="admin_tag_name"),
+    path("admin_tag_name/", views.AdminTagNameView.as_view(), name="admin_tag_name"),
     path("admin_category_name/", views.AdminCategoryNameView.as_view(), name="admin_category_name"),
     path("admin_brand_name/", views.AdminBrandNameView.as_view(), name="admin_brand_name"),
 ] + router.urls
