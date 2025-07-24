@@ -23,6 +23,7 @@ class ProductCategorySerializer(serializers.ModelSerializer):
     category_url = serializers.CharField(source="category_image.image.get_image_url", read_only=True)
     category_image = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.only("id"),
+        required=False
     )
 
     class Meta:
