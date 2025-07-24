@@ -114,14 +114,29 @@ class UserInformationSerializer(serializers.ModelSerializer):
 
 
 class UserPrivateNotification(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.only("mobile_phone")
+    )
+
     class Meta:
         model = PrivateNotification
         fields = (
             "id",
             "title",
             "body",
-            "created_at"
+            "created_at",
+            "notif_type",
+            "user"
         )
+
+    def get_fields(self):
+        field = super().get_fields()
+        user_admin = self.context['request'].user.is_staff
+
+        if not user_admin:
+            field.pop("user", None)
+
+        return field
 
 
 class UserAddressSerializer(serializers.ModelSerializer):

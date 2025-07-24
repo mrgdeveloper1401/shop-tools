@@ -131,6 +131,7 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
         related_name="private_notifications"
     )
     title = models.CharField(max_length=255)
+    notif_type = models.CharField(max_length=100, blank=True, null=True, db_index=True) # TODO, when clean migration we remove property blank and null
     body = models.TextField()
     is_active = models.BooleanField(default=True)
 

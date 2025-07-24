@@ -5,8 +5,9 @@ from rest_framework import viewsets, mixins, views, response, status, exceptions
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
-from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination
-from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter
+from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
+from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
+    PrivateNotificationFilter
 from core.utils.permissions import NotAuthenticated
 from . import serializers
 
@@ -163,10 +164,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
     """
     permission (create and delete and update) --> user must be admin \n
-    pagination --> 20 item , only user admin have pagination
+    pagination --> 20 item , only user admin have pagination \n
+    filter query --> ?notif_type=
     """
     serializer_class = serializers.UserPrivateNotification
-    pagination_class = AdminTwentyPageNumberPagination
+    pagination_class = TwentyPageNumberPagination
+    filterset_class = PrivateNotificationFilter
 
     def get_permissions(self):
         if self.action in ("create", "destroy", "update", "partial_update"):
@@ -176,14 +179,20 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        query = PrivateNotification.objects.only(
+        if not self.request.user.is_staff:
+            query = PrivateNotification.objects.filter(user_id=self.request.user.id).only(
+                "title",
+                "body",
+                "created_at",
+                "notif_type"
+            )
+        return PrivateNotification.objects.select_related("user").only(
+            "user__mobile_phone",
             "title",
             "body",
-            "created_at"
+            "created_at",
+            "notif_type"
         )
-        if not self.request.user.is_staff:
-            query = query.filter(user_id=self.request.user.id)
-        return query
 
 
 class UserAddressViewSet(viewsets.ModelViewSet):

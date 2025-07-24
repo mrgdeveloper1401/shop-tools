@@ -2,7 +2,7 @@ from django_filters import DateTimeFromToRangeFilter
 from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter
 from django_filters.widgets import RangeWidget
 
-from account_app.models import User, UserAddress
+from account_app.models import User, UserAddress, PrivateNotification
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
 from discount_app.models import Coupon
@@ -194,4 +194,12 @@ class ResultOrderFilter(FilterSet):
             "profile__user__mobile_phone": ['contains'],
             "is_complete": ['exact'],
             "status": ['exact']
+        }
+
+
+class PrivateNotificationFilter(FilterSet):
+    class Meta:
+        model = PrivateNotification
+        fields = {
+            "notif_type": ['iexact']
         }
