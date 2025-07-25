@@ -596,10 +596,9 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-class AdminCategoryNameView(generics.ListAPIView):
-    queryset = Category.objects.only("category_name")
-    serializer_class = serializers.AdminCategoryNameSerializer
-    permission_classes = (permissions.IsAdminUser,)
+class CategoryNameView(generics.ListAPIView):
+    queryset = Category.objects.filter(is_active=True).only("category_name")
+    serializer_class = serializers.ListCategoryNameSerializer
 
 
 class AdminTagNameView(generics.ListAPIView):
@@ -608,7 +607,7 @@ class AdminTagNameView(generics.ListAPIView):
     permission_classes = (permissions.IsAdminUser,)
 
 
-class AdminBrandNameView(generics.ListAPIView):
-    serializer_class = serializers.AdminBrandNameSerializer
-    permission_classes = (permissions.IsAdminUser,)
-    queryset = ProductBrand.objects.only("brand_name")
+class BrandNameView(generics.ListAPIView):
+    serializer_class = serializers.ListBrandNameSerializer
+    # permission_classes = (permissions.IsAdminUser,)
+    queryset = ProductBrand.objects.filter(is_active=True).only("brand_name")

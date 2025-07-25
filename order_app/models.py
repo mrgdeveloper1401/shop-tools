@@ -1,7 +1,6 @@
 import uuid
 from decimal import Decimal
 
-from django.contrib.postgres.fields import JSONField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F
@@ -165,25 +164,25 @@ class ShippingMethod(CreateMixin, UpdateMixin, SoftDeleteMixin):
         ordering = ("-id",)
 
 
-# class PaymentGateWay(CreateMixin, SoftDeleteMixin):
-#     order = models.ForeignKey(
-#         Order,
-#         on_delete=models.PROTECT,
-#         related_name="payment_gateways",
-#     )
-#     payment_gateway = JSONField()
-#
-#     class Meta:
-#         db_table = "payment_gateway"
-#
-#
-# class ResultPaymentGateWay(CreateMixin, UpdateMixin, SoftDeleteMixin):
-#     payment_gateway = models.ForeignKey(
-#         PaymentGateWay,
-#         on_delete=models.PROTECT,
-#         related_name="result_payment_gateways",
-#     )
-#     result = JSONField()
-#
-#     class Meta:
-#         db_table = "result_payment_gateway"
+class PaymentGateWay(CreateMixin, SoftDeleteMixin):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.PROTECT,
+        related_name="payment_gateways",
+    )
+    payment_gateway = models.JSONField()
+
+    class Meta:
+        db_table = "payment_gateway"
+
+
+class VerifyPaymentGateWay(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    payment_gateway = models.ForeignKey(
+        PaymentGateWay,
+        on_delete=models.PROTECT,
+        related_name="result_payment_gateways",
+    )
+    result = models.JSONField()
+
+    class Meta:
+        db_table = "result_payment_gateway"

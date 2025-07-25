@@ -517,7 +517,7 @@ class AdminAttributeSerializer(serializers.ModelSerializer):
             "attribute_name"
         )
 
-class AdminCategoryNameSerializer(serializers.ModelSerializer):
+class ListCategoryNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = (
@@ -535,7 +535,7 @@ class AdminTagNameSerializer(serializers.ModelSerializer):
         )
 
 
-class AdminBrandNameSerializer(serializers.ModelSerializer):
+class ListBrandNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductBrand
         fields = (
