@@ -5,8 +5,8 @@ from .models import (
     OrderItem,
     ShippingCompany,
     ShippingMethod,
-    PaymentGateWay,
-    ResultPaymentGateWay
+    # PaymentGateWay,
+    # ResultPaymentGateWay
 )
 
 
