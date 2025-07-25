@@ -2,6 +2,8 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from account_app.models import Profile, UserAddress
+from account_app.validators import MobileRegexValidator
+from core.utils.gate_way import request_gate_way
 from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany
 from product_app.models import ProductVariant
 
@@ -113,7 +115,13 @@ class CreateOrderSerializer(serializers.Serializer):
         queryset=ShippingMethod.objects.only("id",),
     )
     coupon_code = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    payment_gateway = serializers.JSONField(read_only=True)
 
+    mobile_phone = serializers.CharField(
+        required=False,
+        validators=(MobileRegexValidator,)
+    )
     def validate(self, data):
         coupon_code = data.get("coupon_code", None)
 
@@ -163,10 +171,19 @@ class CreateOrderSerializer(serializers.Serializer):
             )
 
         items = OrderItem.objects.bulk_create(order_items)
+
+        # create gateway
+        payment_gateway = request_gate_way(
+            amount=order.total_price,
+            description=validated_data.get("description", None),
+            order_id=order.id,
+            mobile=validated_data.get("mobile_phone", None)
+        )
         return {
             "items": items,
             "shipping": shipping,
             "address_id": address_id,
+            "payment_gateway": payment_gateway,
         }
 
 
