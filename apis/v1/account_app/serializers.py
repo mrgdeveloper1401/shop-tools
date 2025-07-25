@@ -126,7 +126,8 @@ class UserPrivateNotification(serializers.ModelSerializer):
             "body",
             "created_at",
             "notif_type",
-            "user"
+            "user",
+            "is_read"
         )
 
     def get_fields(self):
@@ -135,6 +136,7 @@ class UserPrivateNotification(serializers.ModelSerializer):
 
         if not user_admin:
             field.pop("user", None)
+            field.pop("is_read", None)
 
         return field
 

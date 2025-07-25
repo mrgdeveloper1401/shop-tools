@@ -165,7 +165,7 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
     """
     permission (create and delete and update) --> user must be admin \n
     pagination --> 20 item , only user admin have pagination \n
-    filter query --> ?notif_type=
+    filter query --> notif_type,is_read
     """
     serializer_class = serializers.UserPrivateNotification
     pagination_class = TwentyPageNumberPagination
@@ -180,18 +180,19 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if not self.request.user.is_staff:
-            query = PrivateNotification.objects.filter(user_id=self.request.user.id).only(
+            return PrivateNotification.objects.filter(user_id=self.request.user.id).only(
                 "title",
                 "body",
                 "created_at",
-                "notif_type"
+                "notif_type",
             )
         return PrivateNotification.objects.select_related("user").only(
             "user__mobile_phone",
             "title",
             "body",
             "created_at",
-            "notif_type"
+            "notif_type",
+            "is_read"
         )
 
 

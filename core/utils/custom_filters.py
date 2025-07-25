@@ -211,5 +211,6 @@ class PrivateNotificationFilter(FilterSet):
     class Meta:
         model = PrivateNotification
         fields = {
-            "notif_type": ['iexact']
+            "notif_type": ['iexact'],
+            "is_read": ['exact']
         }
