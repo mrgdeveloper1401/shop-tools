@@ -1,5 +1,6 @@
+from django.utils import timezone
 from django_filters import DateTimeFromToRangeFilter
-from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter
+from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter, BooleanFilter
 from django_filters.widgets import RangeWidget
 
 from account_app.models import User, UserAddress, PrivateNotification
@@ -137,6 +138,7 @@ class ProductHomePageFilter(FilterSet):
     more_price = NumberFilter(method='more_price_filter')
     min_price = NumberFilter(method="min_price_filter")
     price = RangeFilter(field_name='variants__price', label='Price range')
+    has_discount = BooleanFilter(method='filter_has_discount', label="Has discount")
 
     class Meta:
         model = Product
@@ -158,6 +160,14 @@ class ProductHomePageFilter(FilterSet):
             variants__is_active=True
         ).distinct()
 
+    def filter_has_discount(self, queryset, name, value):
+        if value:
+            return queryset.filter(
+                variants__product_variant_discounts__is_active=True,
+                variants__product_variant_discounts__start_date__lte=timezone.now(),
+                variants__product_variant_discounts__end_date__gte=timezone.now()
+            ).distinct()
+        return queryset
 
 class ProductTagFilter(FilterSet):
     class Meta:
