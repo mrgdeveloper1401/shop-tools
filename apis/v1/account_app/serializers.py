@@ -1,5 +1,6 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
+from django.utils.translation import gettext_lazy as _
 
 from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City
 from account_app.validators import MobileRegexValidator
@@ -220,3 +221,43 @@ class AdminProfileListSerializer(serializers.ModelSerializer):
             "last_name",
             "user_phone"
         )
+
+
+class ForgetPasswordSerializer(serializers.Serializer):
+    mobile_phone = serializers.CharField(validators=(MobileRegexValidator,))
+
+    def validate(self, attrs):
+        user = User.objects.filter(
+            mobile_phone=attrs["mobile_phone"]
+        ).only(
+            "mobile_phone"
+        )
+
+        if not user.exists():
+            raise serializers.ValidationError(
+                {
+                    "message": _("user dose not exits")
+                }
+            )
+        attrs['user'] = user[0]
+        return attrs
+
+
+class ForgetPasswordChangeSerializer(serializers.Serializer):
+    otp = serializers.CharField()
+    password = serializers.CharField()
+    confirm_password = serializers.CharField()
+    mobile_phone = serializers.CharField()
+
+    def validate(self, attrs):
+        password = attrs.get("password")
+        confirm_password = attrs.get("confirm_password")
+
+        if password and confirm_password and password != confirm_password:
+            raise serializers.ValidationError(
+                {
+                    "message": _("password and confirm_password do not match")
+                }
+            )
+
+        return attrs

@@ -308,3 +308,92 @@ class AdminListProfileView(generics.ListAPIView):
         "last_name",
         "user__mobile_phone"
     )
+
+
+class ForgetPasswordView(views.APIView):
+    permission_classes = (NotAuthenticated,)
+    serializer_class = serializers.ForgetPasswordSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # get user in validated data
+        user = serializer.validated_data['user']
+
+        # get phone
+        user_phone = user.phone
+
+        # get user ip
+        user_ip = request.META.get('REMOTE_ADDR', "X-FORWARDED-FOR")
+
+        # create otp code
+        otp = OtpService.generate_otp()
+
+        # key for redis
+        forget_password_key = f'forget-{user_phone}-{user_ip}-{otp}'
+
+        # save key and otp in redis
+        OtpService.store_otp(key=forget_password_key, otp=otp)
+
+        # send otp code by celery
+        send_otp_code_by_celery.delay(user_phone, otp)
+
+        # return response
+        return response.Response(
+            data={
+                "message": "OTP sent successfully",
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class ForgetPasswordConfirmView(views.APIView):
+    permission_classes = (NotAuthenticated,)
+    serializer_class = serializers.ForgetPasswordChangeSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # get_user_ip
+        user_ip = request.META.get('REMOTE_ADDR', "X-FORWARDED-FOR")
+
+        # get otp code
+        get_otp = serializer.validated_data['otp']
+
+        # get phone
+        user_phone = serializer.validated_data['mobile_phone']
+
+        # key for redis
+        forget_password_key = f'forget-{user_phone}-{user_ip}-{get_otp}'
+
+        # validate redis_key
+        otp_verify = OtpService.verify_otp(forget_password_key, get_otp)
+        if not otp_verify:
+            raise exceptions.NotFound()
+
+        # filter user
+        user = User.objects.filter(mobile_phone=user_phone).only("mobile_phone")
+
+        # check user exists
+        if not user.exists():
+            raise exceptions.NotFound()
+
+        # get_user and set new password
+        get_user = user[0]
+        password = serializer.validated_data['password']
+        get_user.set_password(password)
+        get_user.save()
+
+        # generate_token
+        token = get_tokens_for_user(get_user)
+
+        # return success data
+        return response.Response(
+            {
+                "message": "password change successfully",
+                "token": token,
+                "is_staff": get_user.is_staff,
+            }
+        )
