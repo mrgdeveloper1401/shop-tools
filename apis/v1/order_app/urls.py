@@ -17,4 +17,5 @@ order_router.register("items", views.OrderItemViewSet, basename="order-items")
 
 urlpatterns = [
     path("create_order/", views.CreateOrderView.as_view(), name="create_order"),
+    path('verify_payment/', views.VerifyPaymentGatewayView.as_view(), name="verify_payment"),
 ] + router.urls + order_router.urls

@@ -5,8 +5,8 @@ from .models import (
     OrderItem,
     ShippingCompany,
     ShippingMethod,
-    # PaymentGateWay,
-    # ResultPaymentGateWay
+    PaymentGateWay,
+    VerifyPaymentGateWay
 )
 
 
@@ -30,11 +30,11 @@ class ShippingMethodAdmin(admin.ModelAdmin):
     pass
 
 
-# @admin.register(PaymentGateWay)
-# class PaymentGateWayAdmin(admin.ModelAdmin):
-#     pass
-#
-#
-# @admin.register(ResultPaymentGateWay)
-# class ResultPaymentGateWayAdmin(admin.ModelAdmin):
-#     pass
+@admin.register(PaymentGateWay)
+class PaymentGateWayAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(VerifyPaymentGateWay)
+class ResultPaymentGateWayAdmin(admin.ModelAdmin):
+    pass

@@ -1,9 +1,13 @@
-from django.db.models import Count, Sum, F, Q
-from rest_framework import viewsets, permissions, generics, mixins
+from django.db.models import Count, Q
+from rest_framework import viewsets, permissions, generics, mixins, views, exceptions
+from django.utils.translation import gettext_lazy as _
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter
+from core.utils.exceptions import PaymentBaseError
+from core.utils.gate_way import verify_payment
 from core.utils.pagination import TwentyPageNumberPagination
-from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod
+from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
+# from order_app.tasks import create_verify_payment
 from . import serializers
 
 
@@ -213,3 +217,49 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             #     F("order_items__price") * F("order_items__quantity"), filter=Q(order_items__is_active=True)
             # ),
         )
+
+
+class VerifyPaymentGatewayView(views.APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        status = request.query_params.get("status")
+        track_id = int(request.query_params.get("trackId"))
+        order_id = request.query_params.get("orderId")
+
+        # send request into gateway
+        verify_req = verify_payment(track_id)
+
+        if verify_req:
+            # create instance of model by celery
+            # create_verify_payment.delay(verify, track_id)
+
+            # filter query PaymentGateway
+            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id).only("id", "order_id")
+
+            if payment:
+                # get obj payment
+                get_payment = payment.last()
+
+                # create instance of model VerifyPaymentGateWay
+                verify = VerifyPaymentGateWay.objects.create(
+                    payment_gateway_id=get_payment.id,
+                    result=verify_req
+                )
+
+                verify_status = verify_req.get("status")
+
+                if verify_status == 1:
+                    # update payment after response successfully
+                    Order.objects.filter(id=get_payment.id).update(
+                        is_complete=True,
+                        status="paid"
+                    )
+                else:
+                    raise exceptions.ValidationError(
+                        {
+                            "message": _("Your payment encountered an error.")
+                        }
+                    )
+            else:
+                raise PaymentBaseError

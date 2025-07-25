@@ -5,6 +5,7 @@ from account_app.models import Profile, UserAddress
 from account_app.validators import MobileRegexValidator
 from core.utils.gate_way import request_gate_way
 from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany
+from order_app.tasks import create_gateway_payment
 from product_app.models import ProductVariant
 
 
@@ -179,6 +180,7 @@ class CreateOrderSerializer(serializers.Serializer):
             order_id=order.id,
             mobile=validated_data.get("mobile_phone", None)
         )
+        create_gateway_payment.delay(order.id, payment_gateway)
         return {
             "items": items,
             "shipping": shipping,
