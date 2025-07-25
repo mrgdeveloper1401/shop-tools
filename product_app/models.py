@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
+from django.utils.functional import cached_property
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
@@ -18,6 +19,10 @@ class Category(MP_Node, CreateMixin, UpdateMixin):
         blank=True, #TODO, when clean migration we remove field blank and null
         null=True,
     )
+
+    @cached_property
+    def get_category_image_url(self):
+        return self.category_image.get_image_url if self.category_image else None
 
     class Meta:
         ordering = ('-id',)
@@ -77,7 +82,18 @@ class ProductImages(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 class ProductBrand(CreateMixin, UpdateMixin, SoftDeleteMixin):
     brand_name = models.CharField(max_length=255, db_index=True)
+    brand_image = models.ForeignKey(
+        "core_app.Image",
+        on_delete=models.PROTECT,
+        related_name="product_brand_images",
+        blank=True,
+        null=True
+    )
     is_active = models.BooleanField(default=True)
+
+    @cached_property
+    def brand_image_url(self):
+        return self.brand_image.get_image_url if self.brand_image else None
 
     class Meta:
         ordering = ('-id',)

@@ -522,7 +522,8 @@ class ListCategoryNameSerializer(serializers.ModelSerializer):
         model = Category
         fields = (
             "id",
-            "category_name"
+            "category_name",
+            "get_category_image_url"
         )
 
 
@@ -540,5 +541,6 @@ class ListBrandNameSerializer(serializers.ModelSerializer):
         model = ProductBrand
         fields = (
             "id",
-            "brand_name"
+            "brand_name",
+            "brand_image_url"
         )

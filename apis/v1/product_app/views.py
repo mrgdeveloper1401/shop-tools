@@ -597,17 +597,25 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
 
 
 class CategoryNameView(generics.ListAPIView):
-    queryset = Category.objects.filter(is_active=True).only("category_name")
+    queryset = Category.objects.filter(is_active=True).select_related(
+        "category_image"
+    ).only(
+        "category_image__image",
+        "category_name"
+    )
     serializer_class = serializers.ListCategoryNameSerializer
 
 
 class AdminTagNameView(generics.ListAPIView):
-    queryset = Tag.objects.only("tag_name")
+    queryset = Tag.objects.filter(is_active=True).only("tag_name")
     serializer_class = serializers.AdminTagNameSerializer
-    permission_classes = (permissions.IsAdminUser,)
 
 
 class BrandNameView(generics.ListAPIView):
     serializer_class = serializers.ListBrandNameSerializer
-    # permission_classes = (permissions.IsAdminUser,)
-    queryset = ProductBrand.objects.filter(is_active=True).only("brand_name")
+    queryset = ProductBrand.objects.filter(is_active=True).select_related(
+        "brand_image"
+    ).only(
+        "brand_image__image",
+        "brand_name"
+    )
