@@ -288,10 +288,20 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
             return serializers.UserProductBrandSerializer
 
     def get_queryset(self):
+        base_query = ProductBrand.objects.select_related("brand_image")
+
         if self.request.user.is_staff:
-            return ProductBrand.objects.defer("is_deleted", "deleted_at", "created_at", "updated_at")
+            return base_query.only(
+                "brand_image__image",
+                "brand_name",
+                "is_active"
+            )
         else:
-            return ProductBrand.objects.filter(is_active=True).only("brand_name",)
+            return base_query.filter(
+                is_active=True
+            ).only(
+                "brand_name", "brand_image__image"
+            )
 
 
 class AdminCreateProductImage(generics.CreateAPIView):

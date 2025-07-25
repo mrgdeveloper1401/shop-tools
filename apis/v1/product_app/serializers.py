@@ -259,20 +259,26 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
 
 
 class AdminProductBrandSerializer(serializers.ModelSerializer):
+    brand_image = serializers.PrimaryKeyRelatedField(
+        queryset=Image.objects.only("id"),
+        required=False
+    )
+
     class Meta:
         model = ProductBrand
-        exclude = (
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at"
+        fields = (
+            "id",
+            "brand_image",
+            "brand_image_url",
+            "brand_name",
+            "is_active",
         )
 
 
 class UserProductBrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductBrand
-        fields = ("brand_name", "id")
+        fields = ("brand_name", "id", "brand_image_url")
 
 
 class AdminSimpleProductNameSerializer(serializers.ModelSerializer):
