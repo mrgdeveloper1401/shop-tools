@@ -163,36 +163,13 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "variants", queryset=ProductVariant.objects.only(
                         "price",
                         "product_id",
-                        "stock_number"
+                        "stock_number",
+                        "name"
                     )
                 )
             )
             # print(base_query)
             return base_query
-
-            # if self.action == "list":
-                # return base_query
-            # else:
-                # print(base_query)
-                # print(self.action)
-                # return base_query.prefetch_related(
-                #     Prefetch(
-                #         "tags", queryset=Tag.objects.only("tag_name")
-                #     ),
-                    # Prefetch(
-                    #     "variants", queryset=ProductVariant.objects.only("product_id", "price").prefetch_related(
-                    #         Prefetch(
-                    #             "attributes", queryset=ProductAttributeValues.objects.select_related(
-                    #                 "attribute", "value"
-                    #             ).only(
-                    #                 "variant_id",
-                    #                 "attribute__attribute_name",
-                    #                 "value__attribute_value"
-                    #             )
-                    #         )
-                    #     )
-                    # )
-                # )
 
         else:
             query = base_query.filter(is_active=True).prefetch_related(
@@ -211,15 +188,24 @@ class ProductViewSet(viewsets.ModelViewSet):
                 return query.only(
                     "product_name",
                     "base_price",
-                    # "product_images"
+                    "description_slug",
+                    "product_slug"
                 ).prefetch_related(
-                    # Prefetch(
-                    #     "product_discounts", queryset=ProductDiscount.objects.only(
-                    #         "discount_type",
-                    #         "amount",
-                    #         "product_id"
-                    #     ).valid_discount()
-                    # )
+                    Prefetch(
+                        "variants", queryset=ProductVariant.objects.filter(
+                            is_active=True
+                        ).only(
+                            "name",
+                            "product_id",
+                            "price"
+                        )
+                    ),
+                    Prefetch(
+                        "variants__product_variant_discounts", queryset=ProductDiscount.objects.only(
+                            "amount",
+                            "product_variant_id"
+                        ).valid_discount()
+                    )
                 )
             else:
                 return query.prefetch_related(

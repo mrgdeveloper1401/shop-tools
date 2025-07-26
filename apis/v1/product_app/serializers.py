@@ -106,7 +106,7 @@ class SimpleProductCategorySerializer(serializers.ModelSerializer):
 class NestedProductVariantPriceStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ("price", "stock_number")
+        fields = ("price", "stock_number", "name")
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -213,9 +213,26 @@ class NestedImageSerializer(serializers.ModelSerializer):
         fields = ("get_image_url",)
 
 
+class SimpleUserProductVariantDiscountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductDiscount
+        fields = (
+            "amount",
+        )
+
+
+class SimpleUserProductVariantNameSerializer(serializers.ModelSerializer):
+    product_variant_discounts = SimpleUserProductVariantDiscountSerializer(many=True)
+
+    class Meta:
+        model = ProductVariant
+        fields = ("name", "price", "product_variant_discounts")
+
+
 class UserListProductSerializer(serializers.ModelSerializer):
     product_product_image = NestedProductImageSerializer(many=True)
     # product_discounts = NestedProductDiscount(many=True)
+    variants = SimpleUserProductVariantNameSerializer(many=True)
 
     class Meta:
         model = Product
@@ -224,6 +241,9 @@ class UserListProductSerializer(serializers.ModelSerializer):
             "product_name",
             "product_product_image",
             "base_price",
+            "variants",
+            "product_slug",
+            "description_slug"
             # "product_discounts",
         )
 

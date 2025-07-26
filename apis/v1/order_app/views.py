@@ -273,6 +273,7 @@ class VerifyPaymentGatewayView(views.APIView):
                         is_complete=True,
                         status="paid"
                     )
+                    return verify_req
                 else:
                     raise exceptions.ValidationError(
                         {
