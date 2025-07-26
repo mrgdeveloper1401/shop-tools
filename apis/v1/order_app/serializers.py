@@ -1,5 +1,6 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 
 from account_app.models import Profile, UserAddress
 from account_app.validators import MobileRegexValidator
@@ -137,12 +138,16 @@ class CreateOrderSerializer(serializers.Serializer):
                 f"Product variants with ids {missing_ids} do not exist"
             )
 
-        final_price = 0
-        discount_price = 0
-
-        # if coupon_code:
-        #     res = Order.objects
-
+        if coupon_code:
+            res = Order.is_valid_coupon(code=coupon_code)
+            print(res)
+            if not res:
+                raise serializers.ValidationError(
+                    {
+                        "message": _("coupon code is invalid")
+                    },
+                )
+        data['valid_coupon'] = res
         return data
 
     def create(self, validated_data):

@@ -75,12 +75,14 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     #     amount = (self.sub_total * Decimal("0.09")) + self.sub_total + self.shipping_cost
     #     return amount
 
+    @classmethod
     def is_valid_coupon(self, code):
         coupon = Coupon.objects.filter(
             is_active=True,
             valid_from__lte=timezone.now(),
             valid_to__gte=timezone.now(),
-            maximum_use__gt=F("number_of_uses")
+            number_of_uses__lt=F("maximum_use"),
+            code=code
         ).only("id")
 
         if not coupon:
