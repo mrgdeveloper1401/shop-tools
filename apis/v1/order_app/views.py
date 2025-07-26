@@ -1,4 +1,4 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Prefetch
 from rest_framework import viewsets, permissions, generics, mixins, views, exceptions
 from django.utils.translation import gettext_lazy as _
 
@@ -206,6 +206,9 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             "address__city__name",
             "address__state__state_name",
             "is_complete",
+            "shipping_id",
+            "created_at",
+            "updated_at",
             "status"
         ).annotate(
             user_order_count=Count(
@@ -216,6 +219,10 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             # total_price=Sum(
             #     F("order_items__price") * F("order_items__quantity"), filter=Q(order_items__is_active=True)
             # ),
+        ).prefetch_related(
+            Prefetch(
+                "payment_gateways", queryset=PaymentGateWay.objects.only("order_id", "payment_gateway")
+            )
         )
 
 

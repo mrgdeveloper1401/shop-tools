@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from account_app.models import Profile, UserAddress
 from account_app.validators import MobileRegexValidator
 from core.utils.gate_way import request_gate_way
-from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany
+from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany, PaymentGateWay
 from order_app.tasks import create_gateway_payment
 from product_app.models import ProductVariant
 
@@ -258,6 +258,7 @@ class NestedOrderProfileUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
+            "id",
             "first_name",
             "last_name",
             "user_phone",
@@ -283,8 +284,17 @@ class ResultOrderCityStateNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAddress
         fields = (
+            "id",
             "city",
             "state_name"
+        )
+
+
+class ResultOrderPaymentGatewaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentGateWay
+        fields = (
+            "payment_gateway",
         )
 
 
@@ -292,6 +302,7 @@ class ResultOrderSerializer(serializers.ModelSerializer):
     profile = NestedOrderProfileUserSerializer()
     address = ResultOrderCityStateNameSerializer()
     user_order_count = serializers.SerializerMethodField()
+    payment_gateways = ResultOrderPaymentGatewaySerializer(many=True)
     # total_price = serializers.SerializerMethodField()
 
     @extend_schema_field(serializers.IntegerField())
@@ -310,6 +321,10 @@ class ResultOrderSerializer(serializers.ModelSerializer):
             "address",
             "user_order_count",
             "is_complete",
+            "shipping_id",
+            "created_at",
+            "updated_at",
             "status",
+            "payment_gateways"
             # "total_price"
         )
