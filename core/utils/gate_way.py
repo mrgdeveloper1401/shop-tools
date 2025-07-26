@@ -12,12 +12,14 @@ def http_header():
 
 @http_error
 def request_gate_way(amount, description, order_id, mobile):
+    change_amount = amount * 10 # rial into Toma
+
     with httpx.Client() as client:
         response = client.post(
             url=config("ZIBAL_REQUEST_GATE_WAY", cast=str),
             headers=http_header(),
             json={
-                "amount": int(amount),
+                "amount": int(change_amount),
                 "merchant": config("ZIBAL_MERCHANT_API_KEY", cast=str),
                 "description": description,
                 "orderId": order_id,
