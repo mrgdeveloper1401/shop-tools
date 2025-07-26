@@ -140,14 +140,13 @@ class CreateOrderSerializer(serializers.Serializer):
 
         if coupon_code:
             res = Order.is_valid_coupon(code=coupon_code)
-            print(res)
             if not res:
                 raise serializers.ValidationError(
                     {
                         "message": _("coupon code is invalid")
                     },
                 )
-        data['valid_coupon'] = res
+            data['valid_coupon'] = res
         return data
 
     def create(self, validated_data):
@@ -178,9 +177,12 @@ class CreateOrderSerializer(serializers.Serializer):
 
         items = OrderItem.objects.bulk_create(order_items)
 
+        # get coupon in validated data
+        coupon = validated_data.get("valid_coupon")
+    
         # create gateway
         payment_gateway = request_gate_way(
-            amount=order.total_price,
+            amount=order.total_price(coupon),
             description=validated_data.get("description", None),
             order_id=order.id,
             mobile=validated_data.get("mobile_phone", None)

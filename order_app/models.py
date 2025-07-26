@@ -83,15 +83,35 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             valid_to__gte=timezone.now(),
             number_of_uses__lt=F("maximum_use"),
             code=code
-        ).only("id")
+        ).only("id", "amount", "coupon_type")
 
         if not coupon:
             return False
         return coupon
 
-    @property
-    def total_price(self):
-        return self.sub_total + self.shipping_cost
+    # @property
+    # def calc_price_coupon(self, valid_coupon, price):
+    #     get_valid_coupon = valid_coupon[0]
+    #     coupon_price = 0
+    #     if get_valid_coupon.coupon_type == "percent":
+    #         coupon_price = price - (price * get_valid_coupon.amount / 100)
+    #     else:
+    #         coupon_price = price - get_valid_coupon.amount
+    #     return coupon_price
+
+    def total_price(self, valid_coupon=None):
+        final_price_sub_total =  self.sub_total
+        final_price_sub_total = int(final_price_sub_total)
+        if valid_coupon:
+            get_valid_coupon = valid_coupon[0]
+            if get_valid_coupon.coupon_type == "percent":
+                final_price_sub_total = final_price_sub_total - (final_price_sub_total * int(get_valid_coupon.amount) / 100)
+            else:
+                final_price_sub_total = final_price_sub_total - int(get_valid_coupon.amount)
+            get_valid_coupon.number_of_uses += 1
+            get_valid_coupon.save()
+        final_price = final_price_sub_total + int(self.shipping_cost)
+        return final_price
 
     class Meta:
         ordering = ("-id",)
