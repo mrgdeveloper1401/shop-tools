@@ -50,11 +50,12 @@ class ValidCouponCodeView(views.APIView):
                 valid_from__lte=timezone.now(),
                 valid_to__gte=timezone.now(),
                 number_of_uses__lt=F("maximum_use")
-            ).only("id")
+            ).only("id", "amount")
             if coupon:
                 return response.Response(
                     {
-                        "data": "ok"
+                        "data": "ok",
+                        "amount": coupon[0].amount
                     }
                 )
             else:

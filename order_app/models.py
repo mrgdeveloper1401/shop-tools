@@ -70,10 +70,10 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     def shipping_cost(self):
         return self.shipping.price if self.shipping else None
 
-    @property
-    def tax_amount(self):
-        amount = (self.sub_total * Decimal("0.09")) + self.sub_total + self.shipping_cost
-        return amount
+    # @property
+    # def tax_amount(self):
+    #     amount = (self.sub_total * Decimal("0.09")) + self.sub_total + self.shipping_cost
+    #     return amount
 
     def is_valid_coupon(self, code):
         coupon = Coupon.objects.filter(
@@ -89,7 +89,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     @property
     def total_price(self):
-        return self.sub_total + self.tax_amount + self.shipping_cost
+        return self.sub_total + self.shipping_cost
 
     class Meta:
         ordering = ("-id",)
