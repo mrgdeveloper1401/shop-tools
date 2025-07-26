@@ -189,7 +189,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_name",
                     "base_price",
                     "description_slug",
-                    "product_slug"
+                    "product_slug",
+                    "category_id"
                 ).prefetch_related(
                     Prefetch(
                         "variants", queryset=ProductVariant.objects.filter(

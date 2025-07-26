@@ -243,7 +243,8 @@ class UserListProductSerializer(serializers.ModelSerializer):
             "base_price",
             "variants",
             "product_slug",
-            "description_slug"
+            "description_slug",
+            "category_id"
             # "product_discounts",
         )
 
