@@ -84,7 +84,18 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         )
 
         if self.request.user.is_staff:
-            return base_query.defer("is_deleted", "deleted_at")
+            return base_query.select_related(
+                "product_variant__product"
+            ).only(
+                "order_id",
+                "product_variant__name",
+                "product_variant__product__product_name",
+                "created_at",
+                "updated_at",
+                "price",
+                "quantity",
+                "is_active"
+            )
         else:
             return base_query.filter(
                 order__profile__user_id=self.request.user.id,
@@ -223,7 +234,7 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             Prefetch(
                 "payment_gateways", queryset=PaymentGateWay.objects.only("order_id", "payment_gateway")
             )
-        )
+        ).order_by("-id")
 
 
 class VerifyPaymentGatewayView(views.APIView):

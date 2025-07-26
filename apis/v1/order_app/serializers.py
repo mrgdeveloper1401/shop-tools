@@ -96,6 +96,12 @@ class AdminOrderItemSerializer(serializers.ModelSerializer):
     product_variant = serializers.PrimaryKeyRelatedField(
         queryset=ProductVariant.objects.only("id")
     )
+    variant_name = serializers.CharField(source="product_variant.name")
+    product_name = serializers.CharField(source="product_variant.product.product_name")
+    calc_price_quantity = serializers.SerializerMethodField()
+
+    def get_calc_price_quantity(self, obj):
+        return obj.price * obj.quantity
 
     class Meta:
         model = OrderItem
