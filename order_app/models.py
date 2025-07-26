@@ -99,9 +99,9 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     #         coupon_price = price - get_valid_coupon.amount
     #     return coupon_price
 
-    def total_price(self, valid_coupon=None):
+    def total_price(self, valid_coupon=None, product_discounts=None):
         final_price_sub_total =  self.sub_total
-        final_price_sub_total = int(final_price_sub_total)
+        final_price_sub_total = int(final_price_sub_total) # convert decimal to int
         if valid_coupon:
             get_valid_coupon = valid_coupon[0]
             if get_valid_coupon.coupon_type == "percent":
@@ -110,6 +110,14 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
                 final_price_sub_total = final_price_sub_total - int(get_valid_coupon.amount)
             get_valid_coupon.number_of_uses += 1
             get_valid_coupon.save()
+
+        # check product variant coupon
+        if product_discounts:
+            for i in product_discounts:
+                if i.discount_type == "percent":
+                    final_price_sub_total = final_price_sub_total - (final_price_sub_total * int(i.amount) / 100)
+                else:
+                    final_price_sub_total = final_price_sub_total - int(i.amount)
         final_price = final_price_sub_total + int(self.shipping_cost)
         return final_price
 

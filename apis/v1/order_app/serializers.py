@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from account_app.models import Profile, UserAddress
 from account_app.validators import MobileRegexValidator
 from core.utils.gate_way import request_gate_way
+from discount_app.models import ProductDiscount
 from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany, PaymentGateWay
 from order_app.tasks import create_gateway_payment
 from product_app.models import ProductVariant
@@ -135,14 +136,14 @@ class CreateOrderSerializer(serializers.Serializer):
 
         # check variant dose exits
         variant_ids = [item['product_variant_id'] for item in data['items']]
-        existing_variants = ProductVariant.objects.filter(id__in=variant_ids).only("id")
-
-        if len(existing_variants) != len(variant_ids):
-            existing_ids = set(existing_variants.values_list('id', flat=True))
-            missing_ids = set(variant_ids) - existing_ids
-            raise serializers.ValidationError(
-                f"Product variants with ids {missing_ids} do not exist"
-            )
+        # existing_variants = ProductVariant.objects.filter(id__in=variant_ids).only("id")
+        #
+        # if len(existing_variants) != len(variant_ids):
+        #     existing_ids = set(existing_variants.values_list('id', flat=True))
+        #     missing_ids = set(variant_ids) - existing_ids
+        #     raise serializers.ValidationError(
+        #         f"Product variants with ids {missing_ids} do not exist"
+        #     )
 
         if coupon_code:
             res = Order.is_valid_coupon(code=coupon_code)
@@ -185,10 +186,16 @@ class CreateOrderSerializer(serializers.Serializer):
 
         # get coupon in validated data
         coupon = validated_data.get("valid_coupon")
-    
+
+        # get product_variant on serializer
+        variant_ids = [item['product_variant_id'] for item in validated_data['items']]
+        product_discounts = ProductDiscount.objects.filter(id__in=variant_ids).valid_discount().only(
+            "amount",
+            "discount_type"
+        )
         # create gateway
         payment_gateway = request_gate_way(
-            amount=order.total_price(coupon),
+            amount=order.total_price(coupon, product_discounts),
             description=validated_data.get("description", None),
             order_id=order.id,
             mobile=validated_data.get("mobile_phone", None)
