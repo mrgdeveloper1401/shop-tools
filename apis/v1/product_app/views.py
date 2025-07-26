@@ -598,6 +598,7 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['product_pk'] = self.kwargs['product_pk']
+        context['category_pk'] = self.kwargs['category_pk']
         return context
 
     def get_permissions(self):

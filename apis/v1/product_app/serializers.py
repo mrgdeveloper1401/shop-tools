@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from drf_spectacular.utils import extend_schema_field
 
+from product_app.tasks import create_comment_notification_admin
 from core_app.models import Image
 from discount_app.models import ProductDiscount
 from product_app.models import (
@@ -503,12 +504,20 @@ class ProductCommentSerializer(serializers.ModelSerializer):
         parent = validated_data.pop("parent", None)
         user_id = self.context['request'].user.id
         product_pk = self.context['product_pk']
+        category_pk = self.context['category_pk']
 
+        self.instance = None
         if parent is None:
-            return ProductComment.add_root(**validated_data, user_id=user_id, product_id=product_pk)
+            self.instance = ProductComment.add_root(**validated_data, user_id=user_id, product_id=product_pk)
         else:
             comment = get_object_or_404(ProductComment, pk=parent)
-            return comment.add_child(**validated_data, user_id=user_id, product_id=product_pk)
+            self.instance = comment.add_child(**validated_data, user_id=user_id, product_id=product_pk)
+        create_comment_notification_admin.delay(
+            category_id= category_pk,
+            product_id= product_pk,
+            comment_id= self.instance.id,
+        )
+        return self.instance
 
     @extend_schema_field(serializers.BooleanField())
     def get_user_is_staff(self, obj):
