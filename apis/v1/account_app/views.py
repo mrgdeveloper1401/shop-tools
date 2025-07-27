@@ -322,7 +322,7 @@ class ForgetPasswordView(views.APIView):
         user = serializer.validated_data['user']
 
         # get phone
-        user_phone = user.phone
+        user_phone = user.mobile_phone
 
         # get user ip
         user_ip = request.META.get('REMOTE_ADDR', "X-FORWARDED-FOR")
@@ -374,7 +374,11 @@ class ForgetPasswordConfirmView(views.APIView):
             raise exceptions.NotFound()
 
         # filter user
-        user = User.objects.filter(mobile_phone=user_phone).only("mobile_phone")
+        user = User.objects.filter(mobile_phone=user_phone).only(
+            "mobile_phone",
+            "is_active",
+            "is_staff"
+    )
 
         # check user exists
         if not user.exists():
@@ -388,6 +392,7 @@ class ForgetPasswordConfirmView(views.APIView):
 
         # generate_token
         token = get_tokens_for_user(get_user)
+
 
         # return success data
         return response.Response(
