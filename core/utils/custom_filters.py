@@ -198,10 +198,10 @@ class AdminCouponFilter(FilterSet):
 
 
 class ResultOrderFilter(FilterSet):
-    range_created_at = DateTimeFromToRangeFilter(
-        field_name="created_at",
-        widget=RangeWidget(attrs={'type': 'datetime-local'})
-    )
+    # range_created_at = DateTimeFromToRangeFilter(
+    #     field_name="created_at",
+    #     widget=RangeWidget(attrs={'type': 'datetime-local'})
+    # )
 
     class Meta:
         model = Order
