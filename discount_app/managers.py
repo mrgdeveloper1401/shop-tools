@@ -19,18 +19,18 @@ class ProductDiscountManager(models.Manager):
     )
 
 
-# class ValidCouponManager(models.Manager):
-#     def is_valid_coupon(self, coupon_code):
-#         from discount_app.models import Coupon
-#         try:
-#             coupon = self.filter(
-#                 code=coupon_code,
-#                 is_active=True,
-#                 valid_from__lte=timezone.now(),
-#                 valid_to__gte=timezone.now(),
-#             ).only("id", "maximum_use", "number_of_uses").first()
-#             if coupon:
-#                 return coupon.number_of_uses < coupon.maximum_use
-#             return False
-#         except Coupon.DoesNotExist:
-#             return False
+class ValidCouponManager(models.Manager):
+    def is_valid_coupon(self, coupon_code):
+        from discount_app.models import Coupon
+        try:
+            coupon = self.filter(
+                code=coupon_code,
+                is_active=True,
+                valid_from__lte=timezone.now(),
+                valid_to__gte=timezone.now(),
+            ).only("maximum_use", "number_of_uses")[0]
+            if coupon:
+                return coupon.number_of_uses < coupon.maximum_use
+            return False
+        except Coupon.DoesNotExist:
+            return False

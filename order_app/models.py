@@ -83,7 +83,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             valid_to__gte=timezone.now(),
             number_of_uses__lt=F("maximum_use"),
             code=code
-        ).only("id", "amount", "coupon_type")
+        ).only("amount", "coupon_type")
 
         if not coupon:
             return False
@@ -102,6 +102,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     def total_price(self, valid_coupon=None, product_discounts=None):
         final_price_sub_total =  self.sub_total
         final_price_sub_total = int(final_price_sub_total) # convert decimal to int
+
         if valid_coupon:
             get_valid_coupon = valid_coupon[0]
             if get_valid_coupon.coupon_type == "percent":
