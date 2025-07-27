@@ -33,9 +33,10 @@ class CategoryBlogSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         if request and not request.user.is_staff:
-            fields.pop("category_slug", None)
             fields.pop("is_active", None)
-            fields.pop("description_slug", None)
+            fields.pop("path", None)
+            fields.pop("numchild", None)
+            fields.pop("depth", None)
         return fields
 
     def create(self, validated_data):
@@ -46,6 +47,24 @@ class CategoryBlogSerializer(serializers.ModelSerializer):
         else:
             category = get_object_or_404(CategoryBlog, pk=parent)
             return category.add_child(**validated_data)
+
+
+class SimpleCategoryNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryBlog
+        fields = (
+            "id",
+            "category_name",
+        )
+
+
+class SimpleAuthorNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "full_name"
+        )
 
 
 class ListPostBlogSerializer(serializers.ModelSerializer):
@@ -60,11 +79,34 @@ class ListPostBlogSerializer(serializers.ModelSerializer):
             "created_at",
             "post_introduction",
             "post_slug",
-            "description_slug"
+            "description_slug",
+            "post_title",
+            "category"
         )
 
     def get_post_cover_image_url(self, obj):
         return obj.post_cover_image.image.url if obj.post_cover_image else None
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['category'] = SimpleCategoryNameSerializer(instance.category, read_only=True).data
+        data['author'] = SimpleAuthorNameSerializer(instance.author, read_only=True, many=True).data
+        return data
+
+
+class SimplePostCoverImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ("id", "image")
+
+
+class SimpleBlogTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TagBlog
+        fields = (
+            "id",
+            "tag_name"
+        )
 
 
 class PostblogSerializer(serializers.ModelSerializer):
@@ -96,8 +138,11 @@ class PostblogSerializer(serializers.ModelSerializer):
 
         if request and not request.user.is_staff:
             data.pop("is_active", None)
-            data.pop("post_slug", None)
-            data.pop("description_slug", None)
+
+        data['category'] = SimpleCategoryNameSerializer(instance.category, read_only=True).data
+        data['author'] = SimpleAuthorNameSerializer(instance.author, read_only=True, many=True).data
+        data['tags'] = SimpleBlogTagSerializer(instance.tags, many=True, read_only=True).data
+        data['post_cover_image_url'] = SimplePostCoverImageSerializer(instance.post_cover_image, read_only=True).data
         return data
 
 

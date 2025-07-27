@@ -1,5 +1,7 @@
+from django.db.models import Prefetch
 from rest_framework import viewsets, permissions, generics
 
+from account_app.models import Profile
 from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
@@ -50,8 +52,19 @@ class PostBlogViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         query = PostBlog.objects.select_related(
-            "post_cover_image"
-        ).filter(category_id=self.kwargs.get("category_blog_pk"))
+            "post_cover_image",
+            "category"
+        ).filter(
+            category_id=self.kwargs.get("category_blog_pk")
+        ).prefetch_related(
+            Prefetch(
+                "author__profile", queryset=Profile.objects.select_related("user").only(
+                    "first_name",
+                    "last_name",
+                    "user_id"
+                )
+            )
+        )
 
         if not self.request.user.is_staff:
             query = query.filter(is_active=True)
@@ -63,7 +76,9 @@ class PostBlogViewSet(viewsets.ModelViewSet):
                 "author",
                 "post_introduction",
                 "post_slug",
-                "description_slug"
+                "description_slug",
+                "post_title",
+                "category__category_name"
             )
         else:
             query = query.only(
@@ -81,8 +96,11 @@ class PostBlogViewSet(viewsets.ModelViewSet):
                 "is_active",
                 "description_slug",
                 "post_introduction"
+            ).prefetch_related(
+                Prefetch(
+                    "tags", queryset=TagBlog.objects.only("tag_name")
+                )
             )
-
         return query
 
 
