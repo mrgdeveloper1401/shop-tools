@@ -128,7 +128,8 @@ class UserPrivateNotification(serializers.ModelSerializer):
             "created_at",
             "notif_type",
             "user",
-            "is_read"
+            "is_read",
+            "notifi_redirect_url"
         )
 
     def get_fields(self):
@@ -138,6 +139,7 @@ class UserPrivateNotification(serializers.ModelSerializer):
         if not user_admin:
             field.pop("user", None)
             field.pop("is_read", None)
+            field.pop("notifi_redirect_url", None)
 
         return field
 

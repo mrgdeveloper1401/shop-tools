@@ -198,8 +198,10 @@ class AdminCouponFilter(FilterSet):
 
 
 class ResultOrderFilter(FilterSet):
-    start_date_created_at = DateFilter(lookup_expr="gte", field_name="created_at")
-    end_date_created_at = DateFilter(lookup_expr="lte", field_name="created_at")
+    range_created_at = DateTimeFromToRangeFilter(
+        field_name="created_at",
+        widget=RangeWidget(attrs={'type': 'datetime-local'})
+    )
 
     class Meta:
         model = Order
