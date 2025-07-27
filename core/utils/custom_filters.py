@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django_filters import DateTimeFromToRangeFilter, DateFilter
+from django_filters import DateTimeFromToRangeFilter, DateFilter, DateTimeFilter
 from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter, BooleanFilter
 from django_filters.widgets import RangeWidget
 
@@ -219,3 +219,12 @@ class PrivateNotificationFilter(FilterSet):
             "notif_type": ['iexact'],
             "is_read": ['exact']
         }
+
+
+class AnalyticsFilter(FilterSet):
+    start_date = DateTimeFilter(field_name="created_at", lookup_expr="gte")
+    end_date = DateTimeFilter(field_name="created_at", lookup_expr="lte")
+
+    class Meta:
+        model = Order
+        fields = ["start_date", "end_date"]

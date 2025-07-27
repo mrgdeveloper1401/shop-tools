@@ -1,8 +1,12 @@
-from django.db.models import Count, Q, Prefetch
-from rest_framework import viewsets, permissions, generics, mixins, views, exceptions
-from django.utils.translation import gettext_lazy as _
+from datetime import timedelta
 
-from core.utils.custom_filters import OrderFilter, ResultOrderFilter
+from django.db.models import Count, Q, Prefetch, Sum, F, DecimalField
+from django.db.models.functions import TruncMonth, TruncWeek, TruncDate
+from rest_framework import viewsets, permissions, generics, mixins, views, exceptions, response, decorators
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+
+from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
 from core.utils.exceptions import PaymentBaseError
 from core.utils.gate_way import verify_payment
 from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
@@ -284,3 +288,91 @@ class VerifyPaymentGatewayView(views.APIView):
                     )
             else:
                 raise PaymentBaseError
+
+
+# class AnalyticsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+#     """
+#     permission --> is admin user \n
+#     filter query --> ?type=(day, week, month)
+#     """
+#     serializer_class = serializers.AnalyticSaleSerializer
+#     permission_classes = (permissions.IsAdminUser,)
+#
+#     def get_queryset(self):
+#         base_query = Order.objects.filter(is_active=True)
+#
+#         qu_params = self.request.query_params.get("type", None)
+#         today = timezone.now().date()
+#
+#         if qu_params == "day":
+#             return base_query.filter(
+#                 created_at__date=today
+#             ).annotate(
+#                 date_group=TruncDate('created_at')
+#             ).values('date_group').annotate(
+#                 total_sales=Sum(F('order_items__price') * F('order_items__quantity')),
+#                 order_count=Count('id')
+#             ).order_by('date_group')
+#
+#         elif qu_params == "week":
+#             one_week_ago = today - timedelta(days=7)
+#             return base_query.filter(
+#                 created_at__date__gte=one_week_ago,
+#                 created_at__date__lte=today
+#             ).annotate(
+#                 week_group=TruncWeek('created_at')
+#             ).values('week_group').annotate(
+#                 total_sales=Sum(F('order_items__price') * F('order_items__quantity')),
+#                 order_count=Count('id')
+#             ).order_by('week_group')
+#
+#         elif qu_params == "month":
+#             one_month_ago = today - timedelta(days=30)
+#             return base_query.filter(
+#                 created_at__date__gte=one_month_ago,
+#                 created_at__date__lte=today
+#             ).annotate(
+#                 month_group=TruncMonth('created_at')
+#             ).values('month_group').annotate(
+#                 total_sales=Sum(F('order_items__price') * F('order_items__quantity')),
+#                 order_count=Count('id')
+#             ).order_by('month_group')
+#
+#         raise exceptions.NotFound()
+
+
+class AnalyticsViewSet(viewsets.ViewSet):
+    """
+    filter query --> ?start_date=2025-07-25&end_date=2025-07-26 \n
+    permission --> is_admin_user
+    """
+    permission_classes = (permissions.IsAdminUser,)
+    filterset_class = AnalyticsFilter
+
+    @decorators.action(detail=False, methods=["get"], url_path="sale-summary")
+    def sale_summary(self, request):
+        # اعمال فیلتر دستی بر اساس GET پارامترها
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+
+        orders = Order.objects.filter(is_active=True)
+
+        if start_date:
+            orders = orders.filter(created_at__gte=start_date)
+        if end_date:
+            orders = orders.filter(created_at__lte=end_date)
+
+        order_items = OrderItem.objects.filter(
+            order__in=orders,
+            is_active=True
+        )
+
+        summary = order_items.aggregate(
+            total_quantity=Sum("quantity"),
+            total_amount=Sum(F("price") * F("quantity"), output_field=DecimalField())
+        )
+
+        return response.Response({
+            "total_quantity": summary["total_quantity"] or 0,
+            "total_amount": summary["total_amount"] or 0
+        })

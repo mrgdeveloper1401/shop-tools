@@ -349,3 +349,22 @@ class ResultOrderSerializer(serializers.ModelSerializer):
             "payment_gateways"
             # "total_price"
         )
+
+
+# class AnalyticSaleSerializer(serializers.Serializer):
+#     date = serializers.DateTimeField(source='date_group', required=False)
+#     week = serializers.DateTimeField(source='week_group', required=False)
+#     month = serializers.DateTimeField(source='month_group', required=False)
+#     total_sales = serializers.DecimalField(max_digits=12, decimal_places=2)
+#     order_count = serializers.IntegerField()
+
+
+class AnalyticSaleRangeSerializer(serializers.ModelSerializer):
+    # order_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ("created_at", )
+
+    # def get_order_count(self, obj):
+    #     return obj.order_count

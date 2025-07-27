@@ -11,6 +11,8 @@ router.register(r'orders', views.OrderViewSet, basename='orders')
 router.register("shipping_company", views.ShippingViewSet, basename="shipping_company")
 router.register("shipping_method", views.ShippingMethodViewSet, basename="shipping_method")
 router.register("result_order", views.ResultOrderViewSet, basename="result_order")
+# router.register("analytics", views.AnalyticsViewSet, basename="analytics_order")
+router.register("analytics", views.AnalyticsViewSet, basename="analytics_order")
 
 order_router = routers.NestedSimpleRouter(router, "orders", lookup="order")
 order_router.register("items", views.OrderItemViewSet, basename="order-items")

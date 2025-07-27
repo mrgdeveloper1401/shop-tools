@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Sum
 from django.utils.functional import cached_property
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -139,6 +139,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         coupon.save()
 
         return max(discounted_amount, 0)  # اطمینان از عدم منفی شد
+
 
     class Meta:
         ordering = ("-id",)
