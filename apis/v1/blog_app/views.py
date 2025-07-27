@@ -61,6 +61,7 @@ class PostBlogViewSet(viewsets.ModelViewSet):
                 "created_at",
                 "post_cover_image__image",
                 "author",
+                "post_introduction"
             )
         else:
             query = query.only(
@@ -76,7 +77,8 @@ class PostBlogViewSet(viewsets.ModelViewSet):
                 "read_time",
                 "likes",
                 "is_active",
-                "description_slug"
+                "description_slug",
+                "post_introduction"
             )
 
         return query

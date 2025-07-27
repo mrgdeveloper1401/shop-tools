@@ -40,6 +40,7 @@ class PostBlog(CreateMixin, UpdateMixin, SoftDeleteMixin):
     likes = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     description_slug = models.TextField(blank=True, null=True)
+    post_introduction = models.CharField(blank=True, null=True, max_length=255)
 
     class Meta:
         ordering = ("-id",)
