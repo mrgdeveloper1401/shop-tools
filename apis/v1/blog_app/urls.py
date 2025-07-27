@@ -10,6 +10,7 @@ router = routers.SimpleRouter()
 router.register("category_blog", views.CategoryBlogViewSet, basename="category_blog")
 category_router = routers.NestedSimpleRouter(router, "category_blog", lookup="category_blog")
 router.register("tag_blog", views.TagBlogViewSet, basename="tag_blog")
+router.register("latest_ten_post_blog", views.LatestTenPostBlogViewSet, basename="lates_ten_post_blog")
 
 category_router.register("post_blog", views.PostBlogViewSet, basename="post_blog")
 

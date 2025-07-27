@@ -58,7 +58,9 @@ class ListPostBlogSerializer(serializers.ModelSerializer):
             "author",
             "post_cover_image_url",
             "created_at",
-            "post_introduction"
+            "post_introduction",
+            "post_slug",
+            "description_slug"
         )
 
     def get_post_cover_image_url(self, obj):

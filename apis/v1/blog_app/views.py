@@ -61,7 +61,9 @@ class PostBlogViewSet(viewsets.ModelViewSet):
                 "created_at",
                 "post_cover_image__image",
                 "author",
-                "post_introduction"
+                "post_introduction",
+                "post_slug",
+                "description_slug"
             )
         else:
             query = query.only(
@@ -113,3 +115,20 @@ class TagBlogViewSet(viewsets.ModelViewSet):
 class BlogTagWithOutPaginationView(generics.ListAPIView):
     queryset = TagBlog.objects.only("tag_name").filter(is_active=True)
     serializer_class = serializers.BlogTagWithOutPagination
+
+
+class LatestTenPostBlogViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.ListPostBlogSerializer
+
+    def get_queryset(self):
+        query = PostBlog.objects.only(
+            "created_at",
+            "post_cover_image__image",
+            "author",
+            "post_introduction",
+            "post_slug",
+            "description_slug"
+        ).filter(
+            is_active=True
+        ).order_by("-id")[:3]
+        return query
