@@ -355,7 +355,7 @@ class AnalyticsViewSet(viewsets.ViewSet):
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
 
-        orders = Order.objects.filter(is_active=True)
+        orders = Order.objects.filter(is_active=True, is_complete=True, status="paid")
 
         if start_date:
             orders = orders.filter(created_at__gte=start_date)
@@ -366,9 +366,8 @@ class AnalyticsViewSet(viewsets.ViewSet):
             order__in=orders,
             is_active=True
         )
-
         summary = order_items.aggregate(
-            total_quantity=Sum("quantity"),
+            total_quantity=Count("quantity"),
             total_amount=Sum(F("price") * F("quantity"), output_field=DecimalField())
         )
 
@@ -376,3 +375,32 @@ class AnalyticsViewSet(viewsets.ViewSet):
             "total_quantity": summary["total_quantity"] or 0,
             "total_amount": summary["total_amount"] or 0
         })
+
+
+    @decorators.action(detail=False, methods=["get"], url_path="daily-sale-summary")
+    def daily_sale_summary(self, request):
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+
+        order_items = OrderItem.objects.filter(
+            is_active=True,
+            order__is_active=True,
+            order__is_complete=True,
+            order__status="paid"
+        )
+
+        if start_date:
+            order_items = order_items.filter(order__created_at__gte=start_date)
+        if end_date:
+            order_items = order_items.filter(order__created_at__lte=end_date)
+
+        sales_by_day = order_items.annotate(
+            sale_date=TruncDate("order__created_at")
+        ).values(
+            "sale_date"
+        ).annotate(
+            total_quantity=Sum("quantity"),
+            total_amount=Sum(F("price") * F("quantity"), output_field=DecimalField())
+        ).order_by("-sale_date")
+
+        return response.Response(sales_by_day)
