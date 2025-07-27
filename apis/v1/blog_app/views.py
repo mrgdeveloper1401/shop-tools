@@ -51,7 +51,7 @@ class PostBlogViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         query = PostBlog.objects.select_related(
             "post_cover_image"
-        )
+        ).filter(category_id=self.kwargs.get("category_blog_pk"))
 
         if not self.request.user.is_staff:
             query = query.filter(is_active=True)
