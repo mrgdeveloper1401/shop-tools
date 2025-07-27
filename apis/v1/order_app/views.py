@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter
 from core.utils.exceptions import PaymentBaseError
 from core.utils.gate_way import verify_payment
-from core.utils.pagination import TwentyPageNumberPagination
+from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
 # from order_app.tasks import create_verify_payment
 from . import serializers
@@ -192,11 +192,13 @@ class ShippingMethodViewSet(viewsets.ModelViewSet):
 class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     """
     filter query --> is_complete --> true or false /n
-    status --> pending, paid, processing, shipped, delivered, cancelled
+    status --> pending, paid, processing, shipped, delivered, cancelled \n
+    pagination --> max data in page = 100 // default data in page --> 20 \n
+    use pagination --> ?limit=20&offset=10
     """
     serializer_class = serializers.ResultOrderSerializer
     permission_classes = (permissions.IsAdminUser,)
-    pagination_class = TwentyPageNumberPagination
+    pagination_class = FlexiblePagination
     filterset_class = ResultOrderFilter
 
     def get_queryset(self):
