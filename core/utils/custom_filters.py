@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django_filters import DateTimeFromToRangeFilter
+from django_filters import DateTimeFromToRangeFilter, DateFilter
 from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter, BooleanFilter
 from django_filters.widgets import RangeWidget
 
@@ -14,10 +14,10 @@ from product_app.models import Category, ProductBrand, ProductImages, Attribute,
 class AdminUserInformationFilter(FilterSet):
     class Meta:
         model = User
-        fields = (
-            "mobile_phone",
-            "is_active"
-        )
+        fields = {
+            "mobile_phone": ["contains",],
+            "is_active": ['exact',],
+        }
 
     def filter_queryset(self, queryset):
         if self.request.user.is_staff:
@@ -198,6 +198,9 @@ class AdminCouponFilter(FilterSet):
 
 
 class ResultOrderFilter(FilterSet):
+    start_date_created_at = DateFilter(lookup_expr="gte", field_name="created_at")
+    end_date_created_at = DateFilter(lookup_expr="lte", field_name="created_at")
+
     class Meta:
         model = Order
         fields = {
