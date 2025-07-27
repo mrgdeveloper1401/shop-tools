@@ -67,6 +67,15 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return total
 
     @property
+    def sub_total_without_quantity(self):
+        total = sum(
+            item.price for item in self.order_items.filter(is_active=True).only(
+                "order_id", "price"
+            )
+        )
+        return total
+
+    @property
     def shipping_cost(self):
         return self.shipping.price if self.shipping else None
 
@@ -89,38 +98,47 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             return False
         return coupon
 
-    # @property
-    # def calc_price_coupon(self, valid_coupon, price):
-    #     get_valid_coupon = valid_coupon[0]
-    #     coupon_price = 0
-    #     if get_valid_coupon.coupon_type == "percent":
-    #         coupon_price = price - (price * get_valid_coupon.amount / 100)
-    #     else:
-    #         coupon_price = price - get_valid_coupon.amount
-    #     return coupon_price
-
     def total_price(self, valid_coupon=None, product_discounts=None):
-        final_price_sub_total =  self.sub_total
-        final_price_sub_total = int(final_price_sub_total) # convert decimal to int
+        # محاسبه جمع کل بدون در نظر گرفتن تخفیف‌ها
+        base_total = self.sub_total
 
-        if valid_coupon:
-            get_valid_coupon = valid_coupon[0]
-            if get_valid_coupon.coupon_type == "percent":
-                final_price_sub_total = final_price_sub_total - (final_price_sub_total * int(get_valid_coupon.amount) / 100)
-            else:
-                final_price_sub_total = final_price_sub_total - int(get_valid_coupon.amount)
-            get_valid_coupon.number_of_uses += 1
-            get_valid_coupon.save()
-
-        # check product variant coupon
+        # اعمال تخفیف‌های محصول (اگر وجود داشته باشد)
         if product_discounts:
-            for i in product_discounts:
-                if i.discount_type == "percent":
-                    final_price_sub_total = final_price_sub_total - (final_price_sub_total * int(i.amount) / 100)
-                else:
-                    final_price_sub_total = final_price_sub_total - int(i.amount)
-        final_price = final_price_sub_total + int(self.shipping_cost)
+            base_total = self._apply_product_discounts(base_total, product_discounts)
+
+        # اعمال کوپن تخفیف (اگر وجود داشته باشد)
+        if valid_coupon:
+            base_total = self._apply_coupon_discount(base_total, valid_coupon)
+
+        # افزودن هزینه حمل و نقل
+        shipping_cost = int(self.shipping_cost) if self.shipping_cost else 0
+        final_price = base_total + shipping_cost
+
         return final_price
+
+    def _apply_product_discounts(self, amount, product_discounts):
+        """اعمال تخفیف‌های محصول بر روی مبلغ"""
+        discounted_amount = amount
+        for discount in product_discounts:
+            if discount.discount_type == "percent":
+                discounted_amount -= (discounted_amount * int(discount.amount) / 100)
+            else:
+                discounted_amount -= int(discount.amount)
+        return max(discounted_amount, 0)  # اطمینان از عدم منفی شدن مبلغ
+
+    def _apply_coupon_discount(self, amount, valid_coupon):
+        """اعمال کوپن تخفیف بر روی مبلغ"""
+        coupon = valid_coupon[0]  # چون کوپن از قبل اعتبارسنجی شده
+        if coupon.coupon_type == "percent":
+            discounted_amount = amount - (amount * int(coupon.amount) / 100)
+        else:
+            discounted_amount = amount - int(coupon.amount)
+
+        # افزایش تعداد استفاده از کوپن
+        coupon.number_of_uses += 1
+        coupon.save()
+
+        return max(discounted_amount, 0)  # اطمینان از عدم منفی شد
 
     class Meta:
         ordering = ("-id",)

@@ -191,14 +191,17 @@ class CreateOrderSerializer(serializers.Serializer):
         # get coupon in validated data
         coupon = validated_data.get("valid_coupon")
 
-        # get product_variant on serializer
-        variant_ids = validated_data.get("existing_variants", None)
-        product_discounts = ProductDiscount.objects.filter(id__in=variant_ids).valid_discount().only(
-            "amount",
-            "discount_type"
+        # دریافت تخفیف‌های معتبر برای محصولات
+        variant_ids = [item['product_variant_id'] for item in validated_data['items']]
+        product_discounts = ProductDiscount.objects.filter(
+            product_variant_id__in=variant_ids
+        ).valid_discount().only("amount", "discount_type")
+
+        # محاسبه قیمت نهایی
+        calc_total_price = order.total_price(
+            coupon,
+            product_discounts if product_discounts.exists() else None
         )
-        # create gateway
-        calc_total_price = order.total_price(coupon, product_discounts)
         payment_gateway = request_gate_way(
             amount=calc_total_price,
             description=validated_data.get("description", None),
