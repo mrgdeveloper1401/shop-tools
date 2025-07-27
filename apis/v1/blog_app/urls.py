@@ -1,4 +1,5 @@
 from rest_framework import routers
+from django.urls import path
 
 from . import views
 
@@ -10,4 +11,6 @@ router.register("category_blog", views.CategoryBlogViewSet, basename="category_b
 router.register("post_blog", views.PostBlogViewSet, basename="post_blog")
 router.register("tag_blog", views.TagBlogViewSet, basename="tag_blog")
 
-urlpatterns = router.urls
+urlpatterns = [
+   path("tag_blog_without_pagination/", views.BlogTagWithOutPaginationView.as_view(), name='tag_blog_without_pagination'),
+] + router.urls

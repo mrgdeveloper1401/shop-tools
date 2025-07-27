@@ -116,3 +116,12 @@ class TagSerializer(serializers.ModelSerializer):
             field.pop("is_active", None)
 
         return field
+
+
+class BlogTagWithOutPagination(serializers.ModelSerializer):
+    class Meta:
+        model = TagBlog
+        fields = (
+            "id",
+            "tag_name",
+        )

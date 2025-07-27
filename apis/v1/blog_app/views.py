@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 
 from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
 from core.utils.pagination import TwentyPageNumberPagination
@@ -108,3 +108,8 @@ class TagBlogViewSet(viewsets.ModelViewSet):
             "is_active"
         )
         return query
+
+
+class BlogTagWithOutPaginationView(generics.ListAPIView):
+    queryset = TagBlog.objects.only("tag_name").filter(is_active=True)
+    serializer_class = serializers.BlogTagWithOutPagination
