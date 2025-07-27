@@ -7,7 +7,7 @@ from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 class CategoryBlog(MP_Node, CreateMixin, UpdateMixin):
     category_name = models.CharField(max_length=255, db_index=True)
-    category_slug = models.SlugField(max_length=500, allow_unicode=True)
+    category_slug = models.CharField(max_length=500)
     is_active = models.BooleanField(default=True)
     description_slug = models.TextField(blank=True, null=True)
 
