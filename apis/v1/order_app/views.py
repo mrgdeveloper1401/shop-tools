@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.db.models import Count, Q, Prefetch, Sum, F, DecimalField
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDate
+from django.utils.dateparse import parse_date
 from rest_framework import viewsets, permissions, generics, mixins, views, exceptions, response, decorators
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -379,28 +380,56 @@ class AnalyticsViewSet(viewsets.ViewSet):
 
     @decorators.action(detail=False, methods=["get"], url_path="daily-sale-summary")
     def daily_sale_summary(self, request):
-        start_date = request.query_params.get("start_date")
-        end_date = request.query_params.get("end_date")
+        start_date_str = request.query_params.get("start_date")
+        end_date_str = request.query_params.get("end_date")
 
+        # تبدیل string به date
+        try:
+            start_date = parse_date(start_date_str)
+            end_date = parse_date(end_date_str)
+            if not start_date or not end_date or start_date > end_date:
+                return response.Response({"detail": "تاریخ‌ها معتبر نیستند."}, status=400)
+        except Exception:
+            return response.Response({"detail": "فرمت تاریخ باید yyyy-mm-dd باشد."}, status=400)
+
+        # کوئری آیتم‌ها
         order_items = OrderItem.objects.filter(
             is_active=True,
             order__is_active=True,
             order__is_complete=True,
-            order__status="paid"
+            order__status="paid",
+            order__created_at__date__gte=start_date,
+            order__created_at__date__lte=end_date
         )
 
-        if start_date:
-            order_items = order_items.filter(order__created_at__gte=start_date)
-        if end_date:
-            order_items = order_items.filter(order__created_at__lte=end_date)
-
+        # فروش به تفکیک روز
         sales_by_day = order_items.annotate(
             sale_date=TruncDate("order__created_at")
-        ).values(
-            "sale_date"
-        ).annotate(
+        ).values("sale_date").annotate(
             total_quantity=Sum("quantity"),
             total_amount=Sum(F("price") * F("quantity"), output_field=DecimalField())
-        ).order_by("-sale_date")
+        )
 
-        return response.Response(sales_by_day)
+        # تبدیل به دیکشنری برای lookup سریع
+        sales_map = {sale["sale_date"]: sale for sale in sales_by_day}
+
+        # ساخت لیست نهایی با همه تاریخ‌ها حتی تاریخ‌هایی که داده ندارند
+        results = []
+        current_date = start_date
+        while current_date <= end_date:
+            sale = sales_map.get(current_date)
+            if sale:
+                results.append({
+                    "sale_date": current_date,
+                    "total_quantity": sale["total_quantity"],
+                    "total_amount": sale["total_amount"],
+                })
+            else:
+                results.append({
+                    "sale_date": current_date,
+                    "total_quantity": 0,
+                    "total_amount": 0,
+                })
+            current_date += timedelta(days=1)
+
+        return response.Response(results)
