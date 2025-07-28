@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from account_app.models import User
-from core_app.models import PublicNotification, Image, MainSite, Carousel
+from core_app.models import PublicNotification, Image, MainSite, Carousel, SitemapEntry
 
 
 class PublicNotificationSerializer(serializers.ModelSerializer):
@@ -79,3 +79,13 @@ class CarouselSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carousel
         fields = ("id", "image", "image_url", "name")
+
+
+
+class SiteMapSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SitemapEntry
+        exclude = (
+            "is_deleted",
+            "deleted_at"
+        )

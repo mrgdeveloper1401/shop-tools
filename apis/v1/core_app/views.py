@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions
 from core.utils.custom_filters import AdminImageFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
-from core_app.models import PublicNotification, Image, MainSite, Carousel
+from core_app.models import PublicNotification, Image, MainSite, Carousel, SitemapEntry
 
 
 class PublicNotificationViewSet(viewsets.ModelViewSet):
@@ -79,3 +79,13 @@ class CarouselViewSet(viewsets.ModelViewSet):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
+
+
+class SiteMapViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.SiteMapSerializer
+    queryset = SitemapEntry.objects.defer("is_deleted", "deleted_at")
+
+    def get_permissions(self):
+        if self.action in ("create", "partial_update", "update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()

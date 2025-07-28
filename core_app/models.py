@@ -122,3 +122,20 @@ class Carousel(CreateMixin, UpdateMixin, SoftDeleteMixin):
     class Meta:
         db_table = "carousel"
         ordering = ("-id",)
+
+
+class SitemapEntry(CreateMixin, SoftDeleteMixin):
+    slug_text = models.TextField()
+    last_modified = models.CharField(blank=True)
+    changefreq = models.CharField(
+        max_length=255,
+    )
+    priority = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=0.5,
+        help_text='A value between 0.00 and 1.00'
+    )
+
+    class Meta:
+        db_table = "site_map"
