@@ -1,8 +1,11 @@
 from datetime import timedelta
 
+import openpyxl
 from django.db.models import Count, Q, Prefetch, Sum, F, DecimalField
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDate
+from django.http import HttpResponse
 from django.utils.dateparse import parse_date
+from openpyxl.styles import Font
 from rest_framework import viewsets, permissions, generics, mixins, views, exceptions, response, decorators
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -431,5 +434,69 @@ class AnalyticsViewSet(viewsets.ViewSet):
                     "total_amount": 0,
                 })
             current_date += timedelta(days=1)
-
         return response.Response(results)
+    @decorators.action(detail=False, methods=["get"], url_path="daily-sale-summary-export")
+    def export_daily_sale_summary(self, request):
+        start_date_str = request.query_params.get("start_date")
+        end_date_str = request.query_params.get("end_date")
+
+        try:
+            start_date = parse_date(start_date_str)
+            end_date = parse_date(end_date_str)
+            if not start_date or not end_date or start_date > end_date:
+                return response.Response({"detail": "تاریخ‌ها معتبر نیستند."}, status=400)
+        except Exception:
+            return response.Response({"detail": "فرمت تاریخ باید yyyy-mm-dd باشد."}, status=400)
+
+        order_items = OrderItem.objects.filter(
+            is_active=True,
+            order__is_active=True,
+            order__is_complete=True,
+            order__status="paid",
+            order__created_at__date__gte=start_date,
+            order__created_at__date__lte=end_date
+        )
+
+        sales_by_day = order_items.annotate(
+            sale_date=TruncDate("order__created_at")
+        ).values("sale_date").annotate(
+            total_quantity=Sum("quantity"),
+            total_amount=Sum(F("price") * F("quantity"), output_field=DecimalField())
+        )
+
+        sales_map = {sale["sale_date"]: sale for sale in sales_by_day}
+
+        # ساخت داده‌های خروجی
+        results = []
+        current_date = start_date
+        while current_date <= end_date:
+            sale = sales_map.get(current_date)
+            results.append({
+                "sale_date": current_date.strftime("%Y-%m-%d"),
+                "total_quantity": sale["total_quantity"] if sale else 0,
+                "total_amount": float(sale["total_amount"]) if sale else 0.0,
+            })
+            current_date += timedelta(days=1)
+
+        # ایجاد فایل اکسل
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Daily Sales"
+
+        # عنوان ستون‌ها
+        ws.append(["Sale Date", "Total Quantity", "Total Amount"])
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+
+        # داده‌ها
+        for row in results:
+            ws.append([row["sale_date"], row["total_quantity"], row["total_amount"]])
+
+        # خروجی به صورت فایل
+        response_excel = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response_excel[
+            "Content-Disposition"] = f'attachment; filename="daily_sales_{start_date_str}_to_{end_date_str}.xlsx"'
+        wb.save(response_excel)
+
+        return response_excel
