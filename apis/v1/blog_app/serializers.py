@@ -67,37 +67,39 @@ class SimpleAuthorNameSerializer(serializers.ModelSerializer):
         )
 
 
+class SimplePostCoverImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ("id", "image")
+
+
 class ListPostBlogSerializer(serializers.ModelSerializer):
-    post_cover_image_url = serializers.SerializerMethodField()
+    author = SimpleAuthorNameSerializer(many=True)
+    post_cover_image = SimplePostCoverImageSerializer()
 
     class Meta:
         model = PostBlog
         fields = (
             "id",
             "author",
-            "post_cover_image_url",
+            "post_cover_image",
             "created_at",
             "post_introduction",
             "post_slug",
             "description_slug",
             "post_title",
-            "category"
+            "category",
+            "read_time",
+            "likes",
+            "tags"
         )
-
-    def get_post_cover_image_url(self, obj):
-        return obj.post_cover_image.image.url if obj.post_cover_image else None
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['category'] = SimpleCategoryNameSerializer(instance.category, read_only=True).data
+        data['tags'] = SimpleBlogTagSerializer(instance.tags, many=True).data
         data['author'] = SimpleAuthorNameSerializer(instance.author, read_only=True, many=True).data
         return data
-
-
-class SimplePostCoverImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = ("id", "image")
 
 
 class SimpleBlogTagSerializer(serializers.ModelSerializer):

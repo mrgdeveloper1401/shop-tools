@@ -139,14 +139,32 @@ class LatestTenPostBlogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ListPostBlogSerializer
 
     def get_queryset(self):
-        query = PostBlog.objects.only(
-            "created_at",
-            "post_cover_image__image",
-            "author",
-            "post_introduction",
-            "post_slug",
-            "description_slug"
-        ).filter(
+        query = PostBlog.objects.filter(
             is_active=True
-        ).order_by("-id")[:3]
+        ).select_related(
+            "category",
+            "post_cover_image"
+        ).prefetch_related(
+            Prefetch(
+                "author__profile", queryset=Profile.objects.only(
+                    "first_name",
+                    "last_name",
+                    "user_id"
+                )
+            ),
+            Prefetch(
+                "tags", queryset=TagBlog.objects.only("tag_name").filter(is_active=True)
+            )
+        ).only(
+            "category__category_name",
+            "post_cover_image__image",
+            "post_title",
+            "post_introduction",
+            "description_slug",
+            "read_time",
+            "likes",
+            "post_slug",
+            "created_at",
+            "author"
+        ).order_by("-id")[:10]
         return query
