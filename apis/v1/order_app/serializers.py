@@ -157,7 +157,7 @@ class CreateOrderSerializer(serializers.Serializer):
                     },
                 )
             data['valid_coupon'] = res
-        data['existing_variants'] = existing_variants
+        # data['existing_variants'] = existing_variants
         return data
 
     def create(self, validated_data):
@@ -193,14 +193,16 @@ class CreateOrderSerializer(serializers.Serializer):
 
         # دریافت تخفیف‌های معتبر برای محصولات
         variant_ids = [item['product_variant_id'] for item in validated_data['items']]
-        product_discounts = ProductDiscount.objects.filter(
-            product_variant_id__in=variant_ids
-        ).valid_discount().only("amount", "discount_type")
+        # product_discounts = ProductDiscount.objects.filter(
+        #     product_variant_id__in=variant_ids
+        # ).valid_discount().only("amount", "discount_type")
 
+        # ورینت های معتبر
+        variants = [i for i in validated_data['items']]
         # محاسبه قیمت نهایی
         calc_total_price = order.total_price(
-            coupon,
-            product_discounts if product_discounts.exists() else None
+            coupon_code=coupon,
+            variants=variants
         )
         payment_gateway = request_gate_way(
             amount=calc_total_price,

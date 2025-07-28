@@ -9,8 +9,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from discount_app.models import Coupon
+from discount_app.models import Coupon, ProductDiscount
 from order_app.tasks import send_notification_order_complete
+from product_app.models import ProductVariant
 
 
 # Create your models here.
@@ -98,24 +99,40 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             return False
         return coupon
 
-    def total_price(self, valid_coupon=None, product_discounts=None):
-        # محاسبه جمع کل بدون در نظر گرفتن تخفیف‌ها
-        base_total = self.sub_total
+    def total_price(self, variants, coupon_code=None):
+        final_price = 0
+        for i in variants:
+            have_discount = ProductDiscount.objects.filter(product_variant_id=i['product_variant_id']).valid_discount().only("id")
+            get_price = ProductVariant.objects.filter(id=i['product_variant_id']).only("price")[0].price
+            if have_discount:
+                final_price = self._apply_product_discounts(get_price, have_discount)
+                final_price *= i['quantity']
+            else:
+                final_price += i['quantity'] * get_price
+        if coupon_code:
+            final_price = self._apply_coupon_discount(final_price, coupon_code)
 
-        # اعمال تخفیف‌های محصول (اگر وجود داشته باشد)
-        if product_discounts:
-            base_total = self._apply_product_discounts(base_total, product_discounts)
-
-        # اعمال کوپن تخفیف (اگر وجود داشته باشد)
-        if valid_coupon:
-            base_total = self._apply_coupon_discount(base_total, valid_coupon)
-
-        # افزودن هزینه حمل و نقل
-        shipping_cost = int(self.shipping_cost) if self.shipping_cost else 0
-        final_price = base_total + shipping_cost
-
+        final_price += self.shipping_cost
         return final_price
 
+    # def total_price(self, valid_coupon=None, product_discounts=None, variants=None):
+    #     base_total = 0
+    #
+    #     # اعمال تخفیف‌های محصول (اگر وجود داشته باشد)
+    #     if product_discounts:
+    #         base_total = self._apply_product_discounts(base_total, product_discounts, variants)
+    #
+    #     # اعمال کوپن تخفیف (اگر وجود داشته باشد)
+    #     if valid_coupon:
+    #         base_total = self._apply_coupon_discount(base_total, valid_coupon)
+    #
+    #     # محاسبه تعداد محصولات
+    #     # افزودن هزینه حمل و نقل
+    #     shipping_cost = int(self.shipping_cost) if self.shipping_cost else 0
+    #     final_price = base_total + shipping_cost
+    #
+    #     return final_price
+    #
     def _apply_product_discounts(self, amount, product_discounts):
         """اعمال تخفیف‌های محصول بر روی مبلغ"""
         discounted_amount = amount
