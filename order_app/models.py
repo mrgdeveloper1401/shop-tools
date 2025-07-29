@@ -105,7 +105,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             have_discount = ProductDiscount.objects.filter(product_variant_id=i['product_variant_id']).valid_discount().only("id")
             get_price = ProductVariant.objects.filter(id=i['product_variant_id']).only("price")[0].price
             if have_discount:
-                final_price = self._apply_product_discounts(get_price, have_discount)
+                final_price += self._apply_product_discounts(get_price, have_discount)
                 final_price *= i['quantity']
             else:
                 final_price += i['quantity'] * get_price
