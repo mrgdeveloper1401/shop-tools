@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate
 from django.core.cache import cache
+from django.db.models import Prefetch
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
 
-from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom
+from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
+    Ticket
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
@@ -435,3 +437,46 @@ class TicketRoomViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = (permissions.IsAuthenticated,)
         return super().get_permissions()
+
+
+class TicketViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.TicketSerializer
+
+    def get_permissions(self):
+        if self.action == "destroy":
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()
+
+    def get_queryset(self):
+        base_query = Ticket.objects.filter(room_id=self.kwargs["room_pk"]).select_related("sender").prefetch_related(
+            Prefetch(
+                "sender__profile", queryset=Profile.objects.only(
+                    "user_id",
+                    "first_name",
+                    "last_name"
+                )
+            )
+        ).only(
+            "sender__is_staff",
+            "path",
+            "depth",
+            "numchild",
+            "created_at",
+            "updated_at",
+            "ticket_body",
+            "ticket_file",
+            "is_active",
+            "room_id",
+        )
+
+        if self.request.user.is_staff:
+            return base_query.all()
+        else:
+            return base_query.filter(is_active=True)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['room_pk'] = self.kwargs["room_pk"]
+        return context

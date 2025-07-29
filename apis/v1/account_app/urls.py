@@ -19,6 +19,9 @@ router.register("ticket_room", views.TicketRoomViewSet, basename="ticket_room")
 state_router = routers.NestedSimpleRouter(router, "state", lookup="state")
 state_router.register("city", views.CityViewSet, basename="city")
 
+ticket_room_router = routers.NestedSimpleRouter(router, "ticket_room", lookup="room")
+ticket_room_router.register("ticket", views.TicketViewSet, basename="ticket")
+
 urlpatterns = [
     path("request-otp/", views.RequestOtpView.as_view(), name="request-otp"),
     path("verify-otp/", views.RequestPhoneVerifyOtpView.as_view(), name="verify_otp"),
@@ -27,5 +30,6 @@ urlpatterns = [
     path("admin_user_list/", views.AdminUserListview.as_view(), name="admin_user_list"),
     path("login_by_phone_password/", views.LoginByPhonePasswordView.as_view(), name="login_phone_password"),
     path("", include(state_router.urls)),
-    path("admin_profile_list/", views.AdminListProfileView.as_view(), name="admin_profile_list")
+    path("admin_profile_list/", views.AdminListProfileView.as_view(), name="admin_profile_list"),
+    path("", include(ticket_room_router.urls)),
 ] + router.urls

@@ -1,8 +1,9 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
+from rest_framework.generics import get_object_or_404
 
-from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom
+from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, Ticket
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
 from core_app.models import Image
@@ -296,5 +297,62 @@ class TicketRoomSerializer(serializers.ModelSerializer):
             )
         else:
             self.instance = TicketRoom.objects.create(**validated_data)
+
+        return self.instance
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    parent = serializers.IntegerField(required=False)
+    sender_is_staff = serializers.SerializerMethodField()
+    sender_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Ticket
+        exclude = (
+            "is_deleted",
+            "deleted_at"
+        )
+        read_only_fields = (
+            "depth",
+            "path",
+            "numchild",
+            "room",
+            "sender"
+        )
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_sender_is_staff(self, obj):
+        return obj.sender.is_staff
+
+    def get_sender_name(self, obj):
+        return obj.sender.full_name
+
+    def get_fields(self):
+        fields = super().get_fields()
+
+        user = self.context['request'].user
+
+        if not user.is_staff:
+            fields.pop("is_active", None)
+        return fields
+
+    def create(self, validated_data):
+        room_id = self.context['room_pk']
+        parent = validated_data.pop("parent", None)
+        user_id = self.context['request'].user.id
+
+        if not parent:
+            self.instance = Ticket.add_root(
+                room_id=int(room_id),
+                sender_id=user_id,
+                **validated_data
+            )
+        else:
+            ticket = get_object_or_404(Ticket, id=parent)
+            self.instance = ticket.add_child(
+                room_id=int(room_id),
+                sender_id=user_id,
+                **validated_data
+            )
 
         return self.instance
