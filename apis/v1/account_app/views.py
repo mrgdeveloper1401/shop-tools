@@ -474,7 +474,10 @@ class TicketViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return base_query.all()
         else:
-            return base_query.filter(is_active=True)
+            return base_query.filter(
+                is_active=True,
+                room__user_id=self.request.user.id,
+            )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
