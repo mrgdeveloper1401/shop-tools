@@ -356,3 +356,17 @@ class TicketSerializer(serializers.ModelSerializer):
             )
 
         return self.instance
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+
+        if not user.is_staff:
+            room = TicketRoom.objects.filter(
+                user_id=user.id,
+                id=int(self.context['room_pk']),
+            ).only("id")
+
+            if not room.exists():
+                raise exceptions.NotFound()
+
+        return attrs
