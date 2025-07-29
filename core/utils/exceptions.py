@@ -39,7 +39,7 @@ def http_error(func):
         except httpx.HTTPStatusError as se:
             raise HTTPStatusError("status error", se)
         except ValueError as ve:
-            raise InvalidDataError("invalid data error", ve)
+            raise InvalidDataError(ve)
         except Exception as e:
-            raise InvalidDataError("invalid data error", e)
+            raise InvalidDataError(e)
     return wrapper
