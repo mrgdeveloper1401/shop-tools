@@ -100,7 +100,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return coupon
 
     def total_price(self, variants, coupon_code=None):
-        final_price = 0
+        final_price = Decimal(0)
         for i in variants:
             have_discount = ProductDiscount.objects.filter(product_variant_id=i['product_variant_id']).valid_discount().only("id")
             get_price = ProductVariant.objects.filter(id=i['product_variant_id']).only("price")[0].price

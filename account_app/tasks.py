@@ -10,7 +10,7 @@ def send_otp_code_by_celery(phone: str, code: str):
     asyncio.run(send_otp_sms(phone, code))
 
 
-@shared_task()
+@shared_task(max_retries=3)
 def send_notification_after_create_ticket(room_id):
     users = User.objects.filter(
         is_active=True,
