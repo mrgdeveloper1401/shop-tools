@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from treebeard.mp_tree import MP_Node
 
 from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
 
@@ -166,3 +167,46 @@ class OtpService:
     def delete_otp(key):
         """Delete OTP from Redis"""
         cache.delete(key)
+
+
+class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    """
+    create ticket room
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name="ticker_room",
+        limit_choices_to={'is_active': True}
+    )
+    title_room = models.CharField(max_length=100, help_text=_("عنوان چت روم تیکت"))
+    subject_room = models.CharField(max_length=50, help_text=_("موضوع تیکت"))
+    is_active = models.BooleanField(default=True)
+    is_close = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "ticker_room"
+        ordering = ("-id",)
+
+
+class Ticket(MP_Node, CreateMixin, UpdateMixin, SoftDeleteMixin):
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='ticket_sender',
+        limit_choices_to={"is_active": True}
+    )
+    room = models.ForeignKey(
+        TicketRoom,
+        on_delete=models.PROTECT,
+        related_name="tickets"
+    )
+    # reply = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="ticket_reply", blank=True, null=True,
+    #                           limit_choices_to={"is_staff": True, "is_active": True})
+    ticket_body = models.TextField(_("متن تیکت"))
+    ticket_file = models.FileField(upload_to="ticket/%Y/%m/%d", blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ("id",)
+        db_table = 'ticket'

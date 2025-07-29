@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from django.core.cache import cache
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
 
-from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City
+from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom
 from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
@@ -403,3 +403,29 @@ class ForgetPasswordConfirmView(views.APIView):
                 "is_staff": get_user.is_staff,
             }
         )
+
+
+class TicketRoomViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.TicketRoomSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return TicketRoom.objects.defer("is_deleted", "deleted_at")
+        else:
+            return TicketRoom.objects.filter(
+                is_active=True,
+                user_id=self.request.user.id
+            ).only(
+                "created_at",
+                "updated_at",
+                "title_room",
+                "subject_room",
+                "is_close"
+            )
+
+    def get_permissions(self):
+        if self.action == "destroy":
+            self.permission_classes = (permissions.IsAdminUser,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super().get_permissions()

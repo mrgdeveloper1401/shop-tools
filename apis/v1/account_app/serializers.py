@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
 
-from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City
+from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
 from core_app.models import Image
@@ -263,3 +263,38 @@ class ForgetPasswordChangeSerializer(serializers.Serializer):
             )
 
         return attrs
+
+
+class TicketRoomSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.only("mobile_phone").filter(is_active=True)
+    )
+
+    class Meta:
+        model = TicketRoom
+        exclude = (
+            "is_deleted",
+            "deleted_at",
+        )
+
+    def get_fields(self):
+        fields = super().get_fields()
+
+        user = self.context['request'].user
+        if not user.is_staff:
+            fields.pop("user", None)
+            fields.pop("is_active", None)
+        return fields
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+
+        if not user.is_staff:
+            self.instance = TicketRoom.objects.create(
+                user_id=user.id,
+                **validated_data
+            )
+        else:
+            self.instance = TicketRoom.objects.create(**validated_data)
+
+        return self.instance

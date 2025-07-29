@@ -14,6 +14,7 @@ router.register("profile", views.UserProfileViewSet, basename="profile")
 router.register("private_notification", views.UserPrivateNotificationViewSet, basename="private_notification")
 router.register("user_address", views.UserAddressViewSet, basename="user_address")
 router.register("state", views.StateViewSet, basename="state")
+router.register("ticket_room", views.TicketRoomViewSet, basename="ticket_room")
 
 state_router = routers.NestedSimpleRouter(router, "state", lookup="state")
 state_router.register("city", views.CityViewSet, basename="city")

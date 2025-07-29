@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import User, Profile, UserAddress, PrivateNotification, State, City
+from .models import (
+    User,
+    Profile,
+    UserAddress,
+    PrivateNotification,
+    State,
+    City,
+    TicketRoom,
+    Ticket
+)
 
 
 @admin.register(User)
@@ -30,4 +39,14 @@ class StateAdmin(admin.ModelAdmin):
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(TicketRoom)
+class TicketRoomAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Ticket)
+class TicketAdmin(admin.ModelAdmin):
     pass
