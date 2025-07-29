@@ -146,6 +146,7 @@ class ProductHomePageFilter(FilterSet):
             "product_name": ['contains'],
             "category__category_name": ['contains'],
             "tags__tag_name": ['contains'],
+            "product_brand": ['exact'],
         }
 
     def more_price_filter(self, queryset, name, value):

@@ -479,6 +479,9 @@ class ProductListHomePageView(generics.ListAPIView):
         "updated_at",
         "base_price",
         "sku",
+        "product_brand__brand_name"
+    ).select_related(
+        "product_brand"
     ).prefetch_related(
         Prefetch(
             "product_product_image", queryset=ProductImages.objects.filter(
