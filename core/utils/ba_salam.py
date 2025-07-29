@@ -11,7 +11,7 @@ def header(authorization=None):
         auth = config("BASALAM_ACCESS_TOKEN", cast=str)
         authorization = auth
     return {
-        # "Content-Type": "application/json",
+        "Content-Type": "application/json",
         "Authorization": f"Bearer {authorization}",
     }
 
@@ -32,6 +32,7 @@ def get_user_information():
             url=config("GET_USER_INFORMATION_URL", cast=str),
             headers=header(),
         )
+        response.raise_for_status()
         return response.json()
 
 
@@ -48,4 +49,32 @@ def upload_image_file(image_path):
         response.raise_for_status()
         return response.json()
 
-# print(get_user_information())
+
+@http_error
+def create_product(
+        title,
+        description,
+        price,
+        category_id,
+        images: list[int],
+        inventory,
+        vendor_id,
+        is_active=False,
+):
+    with httpx.Client() as client:
+        json_data = {
+            "title": title,
+            "description": description,
+            "price": price,
+            "category_id": category_id,
+            "images": images,
+            "inventory": inventory,
+            "is_active": is_active,
+        }
+        response = client.post(
+            url=config("BA_SALAM_CREATE_PRODUCT_URL", cast=str).format(vendor_id),
+            headers=header(),
+            json=json_data,
+        )
+        response.raise_for_status()
+        return response.json()
