@@ -7,7 +7,7 @@ from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
-    PrivateNotificationFilter
+    PrivateNotificationFilter, TicketFilter
 from core.utils.permissions import NotAuthenticated
 from . import serializers
 
@@ -406,7 +406,13 @@ class ForgetPasswordConfirmView(views.APIView):
 
 
 class TicketRoomViewSet(viewsets.ModelViewSet):
+    """
+    pagination --> 20 item \n
+    filter query --> is_close, title_room
+    """
     serializer_class = serializers.TicketRoomSerializer
+    filterset_class = TicketFilter
+    pagination_class = TwentyPageNumberPagination
 
     def get_queryset(self):
         if self.request.user.is_staff:

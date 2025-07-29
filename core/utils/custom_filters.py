@@ -3,7 +3,7 @@ from django_filters import DateTimeFromToRangeFilter, DateFilter, DateTimeFilter
 from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter, BooleanFilter
 from django_filters.widgets import RangeWidget
 
-from account_app.models import User, UserAddress, PrivateNotification
+from account_app.models import User, UserAddress, PrivateNotification, TicketRoom
 from blog_app.models import CategoryBlog, TagBlog
 from core_app.models import Image
 from discount_app.models import Coupon
@@ -228,3 +228,12 @@ class AnalyticsFilter(FilterSet):
     class Meta:
         model = Order
         fields = ["start_date", "end_date"]
+
+
+class TicketFilter(FilterSet):
+    class Meta:
+        model = TicketRoom
+        fields = {
+            "title_room": ['contains'],
+            "is_close": ['exact'],
+        }
