@@ -21,7 +21,8 @@ class GetUserInformation(views.APIView):
 class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     pagination --> limit&offset , default_limit = 20, max_limit = 100
-    ایجاد عکس برای محصول
+    ایجاد عکس برای محصول \n
+    file type is --> PRODUCT_PHOTO = 'product.photo'
     """
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = serializers.ImageUploadSerializer

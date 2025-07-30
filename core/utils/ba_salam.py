@@ -37,15 +37,15 @@ def get_user_information():
 
 
 @http_error
-def upload_image_file(in_memory_image):
+def upload_image_file(in_memory_image, file_type):
     with httpx.Client() as client:
-        files = {"file": in_memory_image.file, "file_type": (None, "product.photo")}
+        files = {"file": in_memory_image.file, "file_type": (None, file_type)}
         response = client.post(
             url=config("BA_SALAM_UPLOAD_IMAGE_URL", cast=str),
             files=files,
             headers=form_data_header(),
         )
-    response.raise_for_status()
+    # response.raise_for_status()
     return response.json()
 
 
