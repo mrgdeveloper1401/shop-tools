@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -74,7 +75,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+# WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 
 # Password validation
@@ -200,3 +202,14 @@ CELERY_RESULT_SERIALIZER=config("CELERY_RESULT_SERIALIZER", cast=str)
 CELERY_TIMEZONE=config("CELERY_TIMEZONE", cast=str)
 CELERY_ENABLE_UTC=config("CELERY_ENABLE_UTC", cast=bool)
 CELERY_WORKER_CONCURRENCY = config("CELERY_WORKER_CONCURRENCY", cast=int, default=1)
+
+STORAGES = {
+    'default':
+        {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage'
+        },
+    'staticfiles':
+        {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        }
+}

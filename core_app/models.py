@@ -44,39 +44,12 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
         upload_to='images/%Y/%m/%d/',
         help_text=_('Upload the original image file.')
     )
-    # thumbnail = models.ImageField(
-    #     upload_to='images/thumbnails/%Y/%m/%d/',
-    #     blank=True,
-    #     null=True,
-    #     help_text=_('Optional thumbnail (can be generated on save).')
-    # )
-    # title = models.CharField(
-    #     max_length=255,
-    #     blank=True,
-    #     null=True,
-    #     help_text=_('Short descriptive title.')
-    # )
-    # alt_text = models.CharField(
-    #     max_length=255,
-    #     blank=True,
-    #     null=True,
-    #     help_text=_('Alt text for accessibility and SEO.')
-    # )
-    # caption = models.TextField(
-    #     blank=True,
-    #     help_text=_('Optional longer caption or description.')
-    # )
-
-    # Optional relations
-    # For example: link image to a user or a gallery
-    # uploaded_by = models.ForeignKey(
-    #     'account_app.User',
-    #     on_delete=models.PROTECT,
-    #     null=True,
-    #     blank=True,
-    #     related_name='images',
-    #     help_text=_('User who uploaded this image (if any).')
-    # )
+    image_id_ba_salam = models.BigIntegerField(
+        blank=True,
+        null=True,
+        editable=False,
+        help_text=_('ID of the image in external storage')
+    )
 
     @cached_property
     def get_image_url(self):

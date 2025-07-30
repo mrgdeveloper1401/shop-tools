@@ -57,14 +57,3 @@ SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 CACHES['default']['LOCATION'] = "redis://127.0.0.1:6380/1"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-
-STORAGES = {
-    'default':
-        {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage'
-        },
-    'staticfiles':
-        {
-            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'
-        }
-}

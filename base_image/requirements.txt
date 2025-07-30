@@ -24,3 +24,4 @@ gunicorn
 colorlog
 django-extensions
 aiosmtpd
+Twisted[tls,http2]
