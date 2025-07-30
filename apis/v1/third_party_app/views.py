@@ -8,6 +8,9 @@ from core_app.models import Image
 
 
 class GetUserInformation(views.APIView):
+    """
+    دریافت اطلاعات کاربر غرفه
+    """
     permission_classes = (permissions.IsAdminUser,)
 
     def get(self, request):
@@ -18,6 +21,7 @@ class GetUserInformation(views.APIView):
 class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     pagination --> limit&offset , default_limit = 20, max_limit = 100
+    ایجاد عکس برای محصول
     """
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = serializers.ImageUploadSerializer
@@ -26,6 +30,9 @@ class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.G
 
 
 class CreateProductView(views.APIView):
+    """
+    ایجاد محصول یک غرفه
+    """
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = serializers.CreateProductBaSalamSerializer
 
@@ -38,6 +45,9 @@ class CreateProductView(views.APIView):
 
 
 class ListProductView(views.APIView):
+    """
+    نمایش لیست محصولات یک غرفه
+    """
     permission_classes = (permissions.IsAdminUser,)
 
     def get(self, request):
