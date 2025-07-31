@@ -61,8 +61,15 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         self.save()
         return self.activation_key
 
+    # def __str__(self):
+    #     if self.mobile_phone:
+    #         return self.mobile_phone
+    #     else:
+    #         return None
+
     def __str__(self):
         return self.email
+
 
 class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name="profile")

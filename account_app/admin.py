@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import (
     User,
@@ -13,8 +14,8 @@ from .models import (
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    pass
+class UserAdmin(BaseUserAdmin):
+    list_display = ("username", "mobile_phone", "email", "is_active")
 
 
 @admin.register(Profile)
