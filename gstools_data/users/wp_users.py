@@ -1,11 +1,16 @@
 import csv
-from pathlib import Path
+# from pathlib import Path
 import os
 import django
+import sys
 
-
-script_dir = Path(__file__).parent
+# script_dir = Path(__file__).parent
 # print(script_dir)
+
+os.chdir("../../")
+# print(os.getcwd())
+
+sys.path.append(os.getcwd())
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.envs.development")
 django.setup()
@@ -13,7 +18,7 @@ django.setup()
 from account_app.models import User, Profile
 from django.db import connection
 
-wp_users_csv = script_dir.joinpath('wp_users.csv')
+wp_users_csv = os.path.join(os.getcwd(), 'wp_users.csv')
 # print(wp_users_csv)
 # print(wp_users_csv.exists()) # return true ot false
 # print(wp_users_csv.resolve()) # return route file
@@ -33,5 +38,4 @@ with open(wp_users_csv, "r") as csvfile:
             full_name=row["user_nicename"],
             display_name=row['display_name']
         )
-        # break
     print(len(connection.queries))
