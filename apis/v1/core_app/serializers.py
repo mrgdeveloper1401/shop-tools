@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from account_app.models import User
-from core_app.models import PublicNotification, Image, MainSite, Carousel, SitemapEntry
+from core_app.models import PublicNotification, Image, MainSite, Carousel, SitemapEntry, UploadFile
 
 
 class PublicNotificationSerializer(serializers.ModelSerializer):

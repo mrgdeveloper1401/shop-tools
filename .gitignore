@@ -381,3 +381,4 @@ pyrightconfig.json
 ./base_image/gs_tools:1.0.0.tar.gz
 general_log_django
 staticfiles
+general_log_django

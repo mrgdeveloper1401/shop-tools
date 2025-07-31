@@ -3,8 +3,9 @@ from django.utils.translation import gettext_lazy as _
 
 from apis.v1.third_party_app import serializers
 from core.utils import ba_salam
+from core.utils.ba_salam import read_categories
 from core.utils.pagination import FlexiblePagination
-from core_app.models import Image
+from core_app.models import Image, UploadFile
 
 
 class GetUserInformation(views.APIView):
@@ -15,7 +16,11 @@ class GetUserInformation(views.APIView):
 
     def get(self, request):
         user_info = ba_salam.get_user_information()
-        return response.Response(user_info)
+        resp = response.Response(user_info)
+        resp.headers.pop('Pragma', None)
+        resp.headers.pop('Expires', None)
+        resp['Cache-Control'] = 'public, max-age=3600'
+        return resp
 
 
 class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -26,7 +31,12 @@ class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.G
     """
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = serializers.ImageUploadSerializer
-    queryset = Image.objects.only("image", "image_id_ba_salam").filter(image_id_ba_salam__isnull=False)
+    queryset = Image.objects.only(
+        "image",
+        "image_id_ba_salam"
+    ).filter(
+        image_id_ba_salam__isnull=False
+    )
     pagination_class = FlexiblePagination
 
 
@@ -62,3 +72,36 @@ class ListProductView(views.APIView):
             )
         res = ba_salam.list_product(vendor_id=vendor_id)
         return response.Response(res)
+
+
+class CreateListUploadFileViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    pagination --> limit&offset , default_limit = 20, max_limit = 100 \n
+    if you can upload video , max_duration=300 second, max_size = 120M / image --> max_size = 5M
+    """
+    permission_classes = (permissions.IsAdminUser,)
+    serializer_class = serializers.UploadFileSerializer
+    queryset = UploadFile.objects.only(
+        "file",
+        "file_id_ba_salam"
+    ).filter(
+        file_id_ba_salam__isnull=False
+    )
+    pagination_class = FlexiblePagination
+
+
+class ReadCategoryView(views.APIView):
+    """
+    detail_data --> send category id --> https://core.basalam.com/v3/categories/1/ \n
+    permission --> admin user
+    """
+    permission_classes = (permissions.IsAdminUser,)
+
+    def get(self, request, category_id=None):
+        res = read_categories(category_id)
+        resp = response.Response(res)
+        resp['Cache-Control'] = 'public, max-age=3600'
+        # حذف هدرهای مخرب کش (اگر وجود دارند)
+        resp.headers.pop('Pragma', None)
+        resp.headers.pop('Expires', None)
+        return resp

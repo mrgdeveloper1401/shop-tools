@@ -45,9 +45,39 @@ def upload_image_file(in_memory_image, file_type):
             files=files,
             headers=form_data_header(),
         )
-    # response.raise_for_status()
+    response.raise_for_status()
     return response.json()
 
+
+@http_error
+def upload_file(file_data, file_type):
+    with httpx.Client() as client:
+        file = {
+            "file": file_data.file,
+            "file_type": (None, file_type),
+        }
+        response = client.post(
+            url=config("BA_SALAM_UPLOAD_FILE_URL", cast=str),
+            files=file,
+            headers=form_data_header(),
+        )
+    response.raise_for_status()
+    return response.json()
+
+@http_error
+def read_categories(category_id=None):
+    url = None
+    if category_id is None:
+        url = config("BA_SALAM_READ_CATEGORIES_URL", cast=str)
+    else:
+        url = config("BA_SALAM_READ_CATEGORIES_DETAIL_URL", cast=str).format(category_id)
+    with httpx.Client() as client:
+        response = client.get(
+            url=url,
+            headers=header(),
+        )
+    response.raise_for_status()
+    return response.json()
 
 @http_error
 def create_product(

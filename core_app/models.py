@@ -60,6 +60,19 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = 'core_app_image'
 
 
+class UploadFile(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    file = models.FileField(upload_to='upload_file/%Y/%m/%d/')
+    file_id_ba_salam = models.BigIntegerField(
+        editable=False,
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        db_table = "upload_file"
+        ordering = ("-id",)
+
+
 class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     title = models.CharField(max_length=255)
     body = models.TextField()

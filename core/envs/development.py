@@ -32,6 +32,7 @@ CELERY_RESULT_BACKEND="redis://localhost:6380/3"
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -44,6 +45,17 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "mysql",
+#         "USER": "root",
+#         "PASSWORD": "password",
+#         "HOST": "localhost",
+#         "PORT": 3307,
+#         "CONN_MAX_AGE": 6000
+#     }
+# }
 
 
 MEDIA_ROOT = BASE_DIR / 'media'
