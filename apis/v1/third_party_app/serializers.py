@@ -3,7 +3,7 @@ from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
 
 from core.utils.ba_salam import upload_image_file, upload_file
-from core.utils.enums import ImageTypeChoices, FileTypeChoices
+from core.utils.enums import ImageTypeChoices, FileTypeChoices, ProductCreateStatus
 from core_app.models import Image, UploadFile
 
 
@@ -81,11 +81,19 @@ class UploadFileSerializer(serializers.ModelSerializer):
 
 
 class CreateProductBaSalamSerializer(serializers.Serializer):
-    title = serializers.CharField()
-    description = serializers.CharField()
-    price = serializers.IntegerField()
+    name = serializers.CharField()
     category_id = serializers.IntegerField()
-    images = serializers.ListField(child=serializers.IntegerField())
-    inventory = serializers.IntegerField()
-    is_active = serializers.BooleanField(default=False)
-    vendor_id = serializers.IntegerField()
+    status = serializers.IntegerField(default=3568)
+    preparation_days = serializers.IntegerField(help_text=_("مدت زمان اماده سازی"))
+    photo = serializers.IntegerField()
+    weight = serializers.IntegerField(help_text=_("وزن محصول"))
+    package_weight = serializers.IntegerField()
+    primary_price = serializers.IntegerField()
+    stock = serializers.IntegerField(help_text=_("موجودی محصول"))
+    description = serializers.CharField(help_text=_("توضحی در مورد محصول"))
+    # photos = serializers.ListField(
+    #     child=serializers.IntegerField(),
+    #     required=False,
+    #     help_text=_("ارسال عکس به صورت لیستی")
+    # )
+    # vendor_id = serializers.IntegerField(required=False)

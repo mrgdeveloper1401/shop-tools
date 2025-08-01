@@ -1,5 +1,6 @@
-import asyncio
+# import asyncio
 import httpx
+import json
 
 from decouple import config
 
@@ -80,28 +81,23 @@ def read_categories(category_id=None):
     return response.json()
 
 @http_error
-def create_product(
-        title,
-        description,
-        price,
-        category_id,
-        images: list[int],
-        inventory,
-        vendor_id,
-        is_active=False,
-):
+def create_product(*args, **kwargs):
     with httpx.Client() as client:
         json_data = {
-            "title": title,
-            "description": description,
-            "price": price,
-            "category_id": category_id,
-            "images": images,
-            "inventory": inventory,
-            "is_active": is_active,
+            "name": kwargs.get("name"),
+            "category_id": kwargs.get("category_id"),
+            "status": kwargs.get("status"),
+            "preparation_days": kwargs.get("preparation_days"),
+            "photo": kwargs.get("photo"),
+            "weight": kwargs.get("weight"),
+            "package_weight": kwargs.get("package_weight"),
+            "primary_price": kwargs.get("primary_price"),
+            "stock": kwargs.get("stock"),
+            "description": kwargs.get("description"),
+            # "photos": kwargs.get("photos", []),
         }
         response = client.post(
-            url=config("BA_SALAM_CREATE_PRODUCT_URL", cast=str).format(vendor_id),
+            url=config("BA_SALAM_CREATE_PRODUCT_URL", cast=str).format(1140147),
             headers=header(),
             json=json_data,
         )

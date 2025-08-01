@@ -1,4 +1,6 @@
 from enum import Enum
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class FileTypeChoices(Enum):
@@ -16,3 +18,10 @@ class FileTypeChoices(Enum):
 
 class ImageTypeChoices(Enum):
     PRODUCT_PHOTO = 'product.photo'
+
+
+class ProductCreateStatus(models.TextChoices):
+    published = "published", _("2976")
+    draft = "draft", _("3790")
+    illegal = "illegal", _("4184")
+    waiting = "waiting", _("3568")

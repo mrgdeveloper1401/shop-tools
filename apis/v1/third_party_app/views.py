@@ -42,7 +42,8 @@ class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.G
 
 class CreateProductView(views.APIView):
     """
-    ایجاد محصول یک غرفه
+    ایجاد محصول یک غرفه \n
+    status --> (published, 2976), (draft, 3970), (illegal, 4184), (waiting, 3568)
     """
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = serializers.CreateProductBaSalamSerializer
@@ -50,8 +51,8 @@ class CreateProductView(views.APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        vendor_id = serializer.validated_data.pop('vendor_id')
-        res = ba_salam.create_product(vendor_id=vendor_id, **serializer.validated_data)
+        # vendor_id = serializer.validated_data.pop('vendor_id', None)
+        res = ba_salam.create_product(**serializer.validated_data)
         return response.Response(res)
 
 

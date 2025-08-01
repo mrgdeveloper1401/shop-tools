@@ -1,5 +1,5 @@
 import random
-import uuid
+# import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
@@ -8,7 +8,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
-from django.utils import timezone
+# from django.utils import timezone
 
 from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
 
