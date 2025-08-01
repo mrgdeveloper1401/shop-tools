@@ -87,7 +87,7 @@ class CreateProductBaSalamSerializer(serializers.Serializer):
     preparation_days = serializers.IntegerField(help_text=_("مدت زمان اماده سازی"))
     photo = serializers.IntegerField()
     weight = serializers.IntegerField(help_text=_("وزن محصول"))
-    package_weight = serializers.IntegerField()
+    package_weight = serializers.IntegerField(help_text=_("وزن محصول با بسته بندی محصول"))
     primary_price = serializers.IntegerField()
     stock = serializers.IntegerField(help_text=_("موجودی محصول"))
     description = serializers.CharField(help_text=_("توضحی در مورد محصول"))
