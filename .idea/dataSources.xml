@@ -22,5 +22,12 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="send_filedb@localhost" uuid="e61c7392-3708-4942-a773-54ee7a6d2c18">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5433/send_filedb</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

@@ -24,9 +24,9 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         blank=True
     )
     username = models.CharField(
-        _("username"), 
+        _("username"),
         max_length=150,
-        blank=True, 
+        blank=True,
         null=True
     )
     email = models.EmailField(
@@ -38,8 +38,8 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    activation_key = models.CharField(max_length=100, blank=True, null=True)
-    key_expires = models.DateTimeField(blank=True, null=True)
+    # activation_key = models.CharField(max_length=100, blank=True, null=True)
+    # key_expires = models.DateTimeField(blank=True, null=True)
 
     USERNAME_FIELD = 'mobile_phone'
     REQUIRED_FIELDS = ('email', "username")
@@ -55,11 +55,11 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         name = self.profile.full_name
         return name if name else None
 
-    def generate_activation_key(self):
-        self.activation_key = str(uuid.uuid4())
-        self.key_expires = timezone.now() + timezone.timedelta(days=1)
-        self.save()
-        return self.activation_key
+    # def generate_activation_key(self):
+    #     self.activation_key = str(uuid.uuid4())
+    #     self.key_expires = timezone.now() + timezone.timedelta(days=1)
+    #     self.save()
+    #     return self.activation_key
 
     # def __str__(self):
     #     if self.mobile_phone:
@@ -67,16 +67,16 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
     #     else:
     #         return None
 
-    def __str__(self):
-        return self.email
+    # def __str__(self):
+    #     return self.email
 
 
 class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name="profile")
-    # first_name = models.CharField(_("first name"), max_length=150, blank=True, null=True)
-    # last_name = models.CharField(_("last name"), max_length=150, blank=True, null=True)
-    display_name = models.CharField(_("display name"), max_length=150, blank=True, null=True)
-    full_name = models.CharField(_("full name"), max_length=150, blank=True, null=True)
+    first_name = models.CharField(_("first name"), max_length=150, blank=True, null=True)
+    last_name = models.CharField(_("last name"), max_length=150, blank=True, null=True)
+    # display_name = models.CharField(_("display name"), max_length=150, blank=True, null=True)
+    # full_name = models.CharField(_("full name"), max_length=150, blank=True, null=True)
     profile_image = models.ForeignKey(
         "core_app.Image",
         on_delete=models.PROTECT,

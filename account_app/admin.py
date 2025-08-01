@@ -14,9 +14,8 @@ from .models import (
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
-    list_display = ("username", "mobile_phone", "email", "is_active")
-
+class UserAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
