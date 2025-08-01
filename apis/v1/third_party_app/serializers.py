@@ -91,6 +91,7 @@ class CreateProductBaSalamSerializer(serializers.Serializer):
     primary_price = serializers.IntegerField()
     stock = serializers.IntegerField(help_text=_("موجودی محصول"))
     description = serializers.CharField(help_text=_("توضحی در مورد محصول"))
+    is_wholesale = serializers.BooleanField(default=False, help_text=_("محصول من عمده فروشی هست یا خیر"))
     # photos = serializers.ListField(
     #     child=serializers.IntegerField(),
     #     required=False,

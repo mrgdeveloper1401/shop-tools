@@ -94,6 +94,7 @@ def create_product(*args, **kwargs):
             "primary_price": kwargs.get("primary_price"),
             "stock": kwargs.get("stock"),
             "description": kwargs.get("description"),
+            "is_wholesale": kwargs.get("is_wholesale")
             # "photos": kwargs.get("photos", []),
         }
         response = client.post(
