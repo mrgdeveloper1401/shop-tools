@@ -40,7 +40,7 @@ def get_user_information():
 @http_error
 def upload_image_file(in_memory_image, file_type):
     with httpx.Client() as client:
-        files = {"file": in_memory_image.file, "file_type": (None, file_type)}
+        files = {"file": in_memory_image, "file_type": (None, file_type)}
         response = client.post(
             url=config("BA_SALAM_UPLOAD_IMAGE_URL", cast=str),
             files=files,
