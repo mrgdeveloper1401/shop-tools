@@ -324,6 +324,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
             "order",
             "is_active",
             "image__image",
+            "image__image_id_ba_salam",
             "product_id"
         )
 

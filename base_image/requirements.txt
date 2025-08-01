@@ -25,3 +25,6 @@ colorlog
 django-extensions
 aiosmtpd
 Twisted[tls,http2]
+drf_spectacular_sidecar
+django-crispy-forms
+openpyxl
