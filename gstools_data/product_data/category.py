@@ -1,14 +1,20 @@
 import os
 import django
+from pathlib import Path
+import sys
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# print(BASE_DIR)
+
+sys.path.append(str(BASE_DIR))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.envs.development")
 django.setup()
 
 from product_app.models import Category
 import pandas as pd
-from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
 
 read_category_data_by_csv = pd.read_csv("category_data.csv")
 
