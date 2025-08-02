@@ -3,7 +3,8 @@ from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
 
 from core.utils.ba_salam import upload_image_file, upload_file
-from core.utils.enums import ImageTypeChoices, FileTypeChoices, ProductCreateStatus
+from core.utils.browsable_api_custom import TextInputListField
+from core.utils.enums import ImageTypeChoices, FileTypeChoices
 from core_app.models import Image, UploadFile
 
 
@@ -80,21 +81,26 @@ class UploadFileSerializer(serializers.ModelSerializer):
         return data
 
 
+class CreateProductAttributeSerializer(serializers.Serializer):
+    pass
+
+
 class CreateProductBaSalamSerializer(serializers.Serializer):
     name = serializers.CharField()
     category_id = serializers.IntegerField()
     status = serializers.IntegerField(default=3568)
     preparation_days = serializers.IntegerField(help_text=_("مدت زمان اماده سازی"))
-    photo = serializers.IntegerField()
+    # photo = serializers.IntegerField()
     weight = serializers.IntegerField(help_text=_("وزن محصول"))
     package_weight = serializers.IntegerField(help_text=_("وزن محصول با بسته بندی محصول"))
     primary_price = serializers.IntegerField()
     stock = serializers.IntegerField(help_text=_("موجودی محصول"))
     description = serializers.CharField(help_text=_("توضحی در مورد محصول"))
     is_wholesale = serializers.BooleanField(default=False, help_text=_("محصول من عمده فروشی هست یا خیر"))
-    # photos = serializers.ListField(
-    #     child=serializers.IntegerField(),
-    #     required=False,
-    #     help_text=_("ارسال عکس به صورت لیستی")
-    # )
-    # vendor_id = serializers.IntegerField(required=False)
+    photos = TextInputListField(
+        child=serializers.IntegerField(),
+        # required=False,
+        help_text=_("ارسال عکس به صورت لیستی")
+    )
+    sku = serializers.CharField()
+

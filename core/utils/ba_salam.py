@@ -88,14 +88,14 @@ def create_product(*args, **kwargs):
             "category_id": kwargs.get("category_id"),
             "status": kwargs.get("status"),
             "preparation_days": kwargs.get("preparation_days"),
-            "photo": kwargs.get("photo"),
             "weight": kwargs.get("weight"),
             "package_weight": kwargs.get("package_weight"),
             "primary_price": kwargs.get("primary_price"),
             "stock": kwargs.get("stock"),
             "description": kwargs.get("description"),
-            "is_wholesale": kwargs.get("is_wholesale")
-            # "photos": kwargs.get("photos", []),
+            "is_wholesale": kwargs.get("is_wholesale"),
+            "sku": kwargs.get("sku"),
+            "photos": kwargs.get("photos"),
         }
         response = client.post(
             url=config("BA_SALAM_CREATE_PRODUCT_URL", cast=str).format(1140147),

@@ -36,7 +36,7 @@ CELERY_RESULT_BACKEND="redis://localhost:6380/3"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "send_filedb",
+        "NAME": "shop_tools_db",
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",
