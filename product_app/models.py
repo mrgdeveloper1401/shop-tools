@@ -120,7 +120,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         max_length=400,
         db_index=True
     )
-    product_slug = models.CharField(max_length=500, blank=True)
+    product_slug = models.CharField(max_length=500, blank=True, null=True)
     description = models.TextField()
     description_slug = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
