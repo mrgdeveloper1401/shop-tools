@@ -104,7 +104,9 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     product_brand = models.ForeignKey(
         ProductBrand,
         on_delete=models.PROTECT,
-        related_name="product_brands"
+        related_name="product_brands",
+        blank=True,
+        null=True
     )
     category = models.ForeignKey(
         Category,
