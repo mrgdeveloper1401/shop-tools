@@ -451,7 +451,7 @@ class AdminProducttAttributeSerializer(serializers.ModelSerializer):
 class ProductListHomePageSerializer(serializers.ModelSerializer):
     product_product_image = NestedProductImageSerializer(many=True)
     variants = NestedProductVariantPriceAttributeSerializer(many=True)
-    product_brand_name = serializers.CharField(source="product_brand.brand_name")
+    product_brand_name = serializers.CharField(source="product_brand.brand_name", allow_null=True)
 
     class Meta:
         model = Product
