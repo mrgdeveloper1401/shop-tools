@@ -28,3 +28,9 @@ Twisted[tls,http2]
 drf_spectacular_sidecar
 django-crispy-forms
 openpyxl
+colorlog
+drf-spectacular[sidecar]
+django-extensions
+openpyxl
+ipython
+pandas
