@@ -1,6 +1,6 @@
 from django.db import models
-from django.utils.functional import cached_property
 from django.utils.text import slugify
+from django_ckeditor_5.fields import CKEditor5Field
 from treebeard.mp_tree import MP_Node
 from django.utils.functional import cached_property
 
@@ -123,7 +123,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_index=True
     )
     product_slug = models.CharField(max_length=500, blank=True, null=True)
-    description = models.TextField()
+    description = CKEditor5Field('Text', config_name='extends')
     description_slug = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     # social_links = models.JSONField(

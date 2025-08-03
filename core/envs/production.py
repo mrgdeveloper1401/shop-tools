@@ -110,3 +110,5 @@ LOGGING = {
         }
     }
 }
+
+CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']
