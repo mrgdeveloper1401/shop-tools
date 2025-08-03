@@ -17,12 +17,23 @@ import pandas as pd
 
 
 read_category_data_by_csv = pd.read_csv("category_data.csv")
+# print(read_category_data_by_csv)
+
+# category_list = [
+#     Category.add_root(
+#         category_name=i,
+#         category_slug=j
+#     )
+#     for i, j in read_category_data_by_csv.values
+# ]
+# Category.objects.bulk_create(category_list)
 
 category_list = [
     Category.add_root(
-        category_name=i,
-        category_slug=j
+        category_name=j,
+        category_slug=z,
+        id=i
     )
-    for i, j in read_category_data_by_csv.values
+    for i, j, z in read_category_data_by_csv.values
 ]
 Category.objects.bulk_create(category_list)
