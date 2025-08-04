@@ -17,6 +17,25 @@ from .models import (
 )
 
 
+# custom filter
+class ProductSku(admin.SimpleListFilter):
+    title = 'SKU'
+    parameter_name = 'sku'
+
+    def lookups(self, request, model_admin):
+        return (
+            ("has_sku", "دارای SKU"),
+            ("no_sku", "بدون SKU"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "has_sku":
+            return queryset.filter(sku__isnull=False)
+        elif self.value() == "no_sku":
+            return queryset.filter(sku__isnull=True)
+        return queryset
+
+
 @admin.register(Category)
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(Category)
@@ -24,7 +43,7 @@ class CategoryAdmin(TreeAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    pass
+    list_filter = (ProductSku, )
 
 
 @admin.register(Attribute)
