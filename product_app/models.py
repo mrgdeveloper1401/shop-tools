@@ -112,6 +112,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         Category,
         on_delete=models.PROTECT,
         related_name="products",
+        null=True,
     )
     tags = models.ManyToManyField(
         Tag,
