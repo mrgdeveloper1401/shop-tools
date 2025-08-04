@@ -2,11 +2,11 @@ from django.core.management.base import BaseCommand
 import pandas as pd
 from django.utils import timezone
 
-from product_app.models import Category
+from product_app.models import ProductBrand
 
 
 class Command(BaseCommand):
-    help = 'read data from csv file and insert into db'
+    help = "Insert brand data"
 
     def add_arguments(self, parser):
         # Define any arguments your command accepts
@@ -15,7 +15,7 @@ class Command(BaseCommand):
             '--file',
             type=str,
             required=True,
-            help='Path to the CSV file containing category data'
+            help='Path to the CSV file containing brand data'
         )
 
         # Example: Optional argument
@@ -36,21 +36,22 @@ class Command(BaseCommand):
             # خواندن فایل CSV
             data = pd.read_csv(file_path, delimiter=delimiter)
 
-            # ایجاد لیست دسته‌بندی‌ها
-            categories = []
+            # ایجاد لیست برندها
+            brands = []
             for item in data.values:
-                categories.append(
-                    Category.add_root(
+                brands.append(
+                    ProductBrand(
                         id=item[0],
-                        category_name=item[1],
-                        category_slug=item[2],
+                        brand_name=item[1],
                         created_at=timezone.now(),
                         updated_at=timezone.now()
                     )
                 )
+            if brands:
+                ProductBrand.objects.bulk_create(brands)
 
             self.stdout.write(self.style.SUCCESS(
-                f'Successfully imported {len(categories)} categories'
+                f'Successfully imported {len(brands)} brands'
             ))
 
         except FileNotFoundError:

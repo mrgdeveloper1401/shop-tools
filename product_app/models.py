@@ -89,7 +89,7 @@ class ProductBrand(CreateMixin, UpdateMixin, SoftDeleteMixin):
         blank=True,
         null=True
     )
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_default=True)
 
     @cached_property
     def brand_image_url(self):
