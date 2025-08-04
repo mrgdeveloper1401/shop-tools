@@ -79,7 +79,7 @@ class SimpleProductTagSerializer(serializers.ModelSerializer):
 class AdminSimpleProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('get_image_url', "image_id_ba_salam")
+        fields = ('get_image_url', "image_id_ba_salam", "wp_image_url")
 
 
 class NestedProductImageSerializer(serializers.ModelSerializer):
