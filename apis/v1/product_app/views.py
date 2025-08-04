@@ -493,6 +493,8 @@ class ProductListHomePageView(generics.ListAPIView):
                 "image"
             ).only(
                 "image__image",
+                "image__wp_image_url",
+                "image__image_id_ba_salam",
                 "order",
                 "product_id",
                 "alt_text_image"
