@@ -71,9 +71,9 @@ class ProductImages(CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="image_product_image"
     )
-    alt_text_image = models.CharField(max_length=255, blank=True)
-    is_active = models.BooleanField(default=True)
-    order = models.PositiveSmallIntegerField(default=0)
+    alt_text_image = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True, db_default=True)
+    order = models.PositiveSmallIntegerField(default=0, db_default=0)
 
     class Meta:
         ordering = ('-id',)
