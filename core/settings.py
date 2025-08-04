@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "django_filters",
     "django_extensions",
+    "treebeard",
 
     "account_app.apps.AccountAppConfig",
     "product_app.apps.ProductAppConfig",

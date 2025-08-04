@@ -9,14 +9,14 @@ from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 # Create your models here.
 class Category(MP_Node, CreateMixin, UpdateMixin):
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_default=True)
     category_name = models.CharField(max_length=255, db_index=True)
     category_slug = models.CharField(max_length=500, blank=True)
     category_image = models.ForeignKey(
         "core_app.Image",
         on_delete=models.PROTECT,
         related_name="category_images",
-        blank=True, #TODO, when clean migration we remove field blank and null
+        blank=True,
         null=True,
     )
 
@@ -126,11 +126,6 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     description = CKEditor5Field('Text', config_name='extends')
     description_slug = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
-    # social_links = models.JSONField(
-    #     blank=True,
-    #     null=True,
-    #     help_text=_("you can defined social link by json")
-    # )
     sku = models.CharField(max_length=50, db_index=True)
     base_price = models.DecimalField(
         max_digits=12,

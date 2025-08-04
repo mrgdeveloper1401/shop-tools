@@ -1,4 +1,6 @@
 from django.contrib import admin
+from treebeard.admin import TreeAdmin
+from treebeard.forms import movenodeform_factory
 
 from .models import (
     Category,
@@ -16,8 +18,8 @@ from .models import (
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    pass
+class CategoryAdmin(TreeAdmin):
+    form = movenodeform_factory(Category)
 
 
 @admin.register(Product)

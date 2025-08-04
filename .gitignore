@@ -384,3 +384,7 @@ staticfiles
 general_log_django
 gstools_data
 nginx/gstoolos
+console_3.sql
+category_data.csv
+csv_data
+console_3.sql
