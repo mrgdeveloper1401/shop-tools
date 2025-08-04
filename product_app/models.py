@@ -125,8 +125,8 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     product_slug = models.CharField(max_length=500, blank=True, null=True)
     description = CKEditor5Field('Text', config_name='extends')
     description_slug = models.TextField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    sku = models.CharField(max_length=50, db_index=True)
+    is_active = models.BooleanField(default=True, db_default=True)
+    sku = models.CharField(max_length=50, null=True) # TODO, remove null after insert database
     base_price = models.DecimalField(
         max_digits=12,
         decimal_places=3,
@@ -136,7 +136,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def save(self, *args, **kwargs):
         self.product_slug = slugify(self.product_name, allow_unicode=True)
-        self.description_slug = slugify(self.description, allow_unicode=True)
+        # self.description_slug = slugify(self.description, allow_unicode=True)
         return super().save(*args, **kwargs)
 
     class Meta:
@@ -150,22 +150,10 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="variants"
     )
-    # barcode = models.CharField(max_length=100, unique=True)
     price = models.DecimalField(max_digits=12, decimal_places=3)
     name = models.CharField(max_length=255, db_index=True, blank=True, null=True) # TODO when clean migration, remove field blank and null
     stock_number = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    # weight = models.DecimalField(
-    #     max_digits=10,
-    #     decimal_places=3,
-    #     null=True,
-    #     blank=True
-    # )
-    # dimensions = models.CharField(
-    #     max_length=100,
-    #     null=True,
-    #     blank=True
-    # )
 
     @cached_property
     def is_available(self):
