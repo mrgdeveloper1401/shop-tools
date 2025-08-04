@@ -42,7 +42,8 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
     # File & metadata
     image  = models.ImageField(
         upload_to='images/%Y/%m/%d/',
-        help_text=_('Upload the original image file.')
+        help_text=_('Upload the original image file.'),
+        null=True,
     )
     image_id_ba_salam = models.BigIntegerField(
         blank=True,
@@ -50,10 +51,11 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
         editable=False,
         help_text=_('ID of the image in external storage')
     )
+    wp_image_url = models.CharField(max_length=500, null=True, blank=True)
 
     @cached_property
     def get_image_url(self):
-        return self.image.url
+        return self.image.url if self.image else self.wp_image_url
 
     class Meta:
         ordering = ("-id",)
