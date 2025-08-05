@@ -19,3 +19,8 @@ def create_comment_notification_admin(category_id, product_id, comment_id):
 
     if lst:
         PrivateNotification.objects.bulk_create(lst)
+
+
+@shared_task
+def update_product_id_ba_salam(product, image_id_ba_salam):
+    product.update(product_id_ba_salam=image_id_ba_salam)

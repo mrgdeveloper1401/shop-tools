@@ -6,7 +6,8 @@ from core.utils import ba_salam
 from core.utils.ba_salam import read_categories, list_retrieve_product
 from core.utils.pagination import FlexiblePagination
 from core_app.models import Image, UploadFile
-
+from product_app.models import Product
+from product_app.tasks import update_product_id_ba_salam
 
 class GetUserInformation(views.APIView):
     """
@@ -50,11 +51,31 @@ class CreateProductView(views.APIView):
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = serializers.CreateProductBaSalamSerializer
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
+        product_id = kwargs.get("product_id")
+
+        if product_id is None:
+            raise exceptions.ValidationError(
+                {
+                    "message": _("product id is required")
+                }
+            )
+
+        product = Product.objects.filter(id=product_id).only("id", "product_id_ba_salam")
+
+        if not product.exists():
+            raise exceptions.ValidationError(
+                {
+                    "message": _("product id not found")
+                }
+            )
+
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # vendor_id = serializer.validated_data.pop('vendor_id', None)
         res = ba_salam.create_product(**serializer.validated_data)
+
+        update_product_id_ba_salam.delay(product, res['id'])
+
         return response.Response(res)
 
 
