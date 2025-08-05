@@ -21,6 +21,6 @@ def create_comment_notification_admin(category_id, product_id, comment_id):
         PrivateNotification.objects.bulk_create(lst)
 
 
-@shared_task
+@shared_task(serializer='pickle')
 def update_product_id_ba_salam(product, image_id_ba_salam):
     product.update(product_id_ba_salam=image_id_ba_salam)

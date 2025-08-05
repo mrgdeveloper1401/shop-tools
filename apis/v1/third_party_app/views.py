@@ -69,6 +69,12 @@ class CreateProductView(views.APIView):
                     "message": _("product id not found")
                 }
             )
+        if product[0].product_id_ba_salam:
+            raise exceptions.ValidationError(
+                {
+                    "message": _("product have product_id_ba_salam")
+                }
+            )
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
