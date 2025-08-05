@@ -24,6 +24,7 @@ def form_data_header(authorization=None):
         return {
             # "Content-Type": "multipart/form-data",
             "Authorization": f"Bearer {authorization}",
+            "Accept": "application/json"
         }
 
 @http_error

@@ -1,6 +1,14 @@
 from rest_framework import serializers
 
-from core_app.models import PublicNotification, Image, MainSite, Carousel, SitemapEntry, UploadFile
+from core_app.models import (
+    PublicNotification,
+    Image,
+    MainSite,
+    Carousel,
+    SitemapEntry,
+    UploadFile
+)
+from core_app.tasks import create_image_auto_into_ba_salam
 
 
 class PublicNotificationSerializer(serializers.ModelSerializer):
@@ -25,6 +33,16 @@ class AdminImageSerializer(serializers.ModelSerializer):
             "is_deleted",
             "deleted_at"
         )
+
+    def create(self, validated_data):
+        image = validated_data['image']
+        image_object = super().create(validated_data)
+        image.seek(0)
+        create_image_auto_into_ba_salam.delay(
+            image=image.read(),
+            image_id=image_object.id
+        )
+        return image_object
 
 
 class SimpleImageUrlSerializer(serializers.ModelSerializer):

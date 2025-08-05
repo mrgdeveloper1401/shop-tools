@@ -30,15 +30,15 @@ class ImageUploadSerializer(serializers.ModelSerializer):
     #         image_id_ba_salam=res.get("id")
     #     )
 
-    # def validate(self, data):
-    #     file_type = data.get("file_type", None)
-    #     if file_type is None:
-    #         raise exceptions.ValidationError(
-    #             {
-    #                 "message": _("File type is required"),
-    #             }
-    #         )
-    #     return data
+    def validate(self, data):
+        image = data.get("image", None)
+        if image is None:
+            raise exceptions.ValidationError(
+                {
+                    "message": _("image is required"),
+                }
+            )
+        return data
 
     def create(self, validated_data):
         image = validated_data.get("image", None)
