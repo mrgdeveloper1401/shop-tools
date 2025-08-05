@@ -326,7 +326,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
             "is_active",
             "image__image",
             "image__image_id_ba_salam",
-            "image__wp_image_url"
+            "image__wp_image_url",
             "product_id"
         )
 

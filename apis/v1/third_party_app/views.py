@@ -33,7 +33,9 @@ class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.G
     serializer_class = serializers.ImageUploadSerializer
     queryset = Image.objects.only(
         "image",
-        "image_id_ba_salam"
+        "image_id_ba_salam",
+        "wp_image_url",
+        "created_at"
     ).filter(
         image_id_ba_salam__isnull=False
     )

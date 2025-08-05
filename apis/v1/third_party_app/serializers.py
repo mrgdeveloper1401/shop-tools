@@ -4,18 +4,22 @@ from django.utils.translation import gettext_lazy as _
 
 from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.browsable_api_custom import TextInputListField
-from core.utils.enums import ImageTypeChoices, FileTypeChoices
+from core.utils.enums import FileTypeChoices
 from core_app.models import Image, UploadFile
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):
-    file_type = serializers.ChoiceField(
-        choices=[(tag.value, tag.name) for tag in ImageTypeChoices],
-        required=False,
-    )
+    # file_type = serializers.ChoiceField(
+    #     choices=[(tag.value, tag.name) for tag in ImageTypeChoices],
+    #     required=False,
+    # )
     class Meta:
         model = Image
-        fields = ("image", "image_id_ba_salam", "file_type")
+        fields = ("image", "image_id_ba_salam", 'wp_image_url', "created_at")
+
+        extra_kwargs = {
+            "wp_image_url": {'required': False},
+        }
 
     # async def create(self, validated_data):
     #     image = validated_data['image']
@@ -26,20 +30,20 @@ class ImageUploadSerializer(serializers.ModelSerializer):
     #         image_id_ba_salam=res.get("id")
     #     )
 
-    def validate(self, data):
-        file_type = data.get("file_type", None)
-        if file_type is None:
-            raise exceptions.ValidationError(
-                {
-                    "message": _("File type is required"),
-                }
-            )
-        return data
+    # def validate(self, data):
+    #     file_type = data.get("file_type", None)
+    #     if file_type is None:
+    #         raise exceptions.ValidationError(
+    #             {
+    #                 "message": _("File type is required"),
+    #             }
+    #         )
+    #     return data
 
     def create(self, validated_data):
         image = validated_data.get("image", None)
-        file_type = validated_data.pop("file_type")
-        res = upload_image_file(image, file_type)
+        # file_type = validated_data.pop("file_type")
+        res = upload_image_file(image, "product.photo")
         return Image.objects.create(
             image=image,
             image_id_ba_salam=res.get("id", None),

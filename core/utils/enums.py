@@ -16,8 +16,8 @@ class FileTypeChoices(Enum):
     CHAT_FILE = 'chat.file'
 
 
-class ImageTypeChoices(Enum):
-    PRODUCT_PHOTO = 'product.photo'
+# class ImageTypeChoices(Enum):
+#     PRODUCT_PHOTO = 'product.photo'
 
 
 class ProductCreateStatus(models.TextChoices):
