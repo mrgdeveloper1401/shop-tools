@@ -14,6 +14,7 @@ def header(authorization=None):
     return {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {authorization}",
+        "Accept": "application/json",
     }
 
 
@@ -96,8 +97,9 @@ def create_product(*args, **kwargs):
             "description": kwargs.get("description"),
             "is_wholesale": kwargs.get("is_wholesale"),
             "sku": kwargs.get("sku"),
-            "photos": kwargs.get("photos"),
+            "photo": kwargs.get("photo"),
         }
+        json_data = {k: v for k, v in json_data.items() if v is not None}
         response = client.post(
             url=config("BA_SALAM_CREATE_PRODUCT_URL", cast=str).format(1140147),
             headers=header(),

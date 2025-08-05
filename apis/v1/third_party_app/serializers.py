@@ -95,15 +95,12 @@ class CreateProductBaSalamSerializer(serializers.Serializer):
     status = serializers.IntegerField(default=3568)
     preparation_days = serializers.IntegerField(
         help_text=_("مدت زمان اماده سازی"),
-        required=False
     )
     weight = serializers.IntegerField(
         help_text=_("وزن محصول"),
-        required=False
     )
     package_weight = serializers.IntegerField(
         help_text=_("وزن محصول با بسته بندی محصول"),
-        required=False
     )
     primary_price = serializers.IntegerField()
     stock = serializers.IntegerField(help_text=_("موجودی محصول"))
@@ -113,10 +110,12 @@ class CreateProductBaSalamSerializer(serializers.Serializer):
         help_text=_("محصول من عمده فروشی هست یا خیر"),
         required=False
     )
-    photos = TextInputListField(
-        child=serializers.IntegerField(),
-        # required=False,
+    # photos = TextInputListField(
+    #     child=serializers.IntegerField(),
+    #     # required=False,
+    #     help_text=_("ارسال عکس به صورت لیستی")
+    # )
+    photo = serializers.IntegerField(
         help_text=_("ارسال عکس به صورت لیستی")
     )
     sku = serializers.CharField()
-
