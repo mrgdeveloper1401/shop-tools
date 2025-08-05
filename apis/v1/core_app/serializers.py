@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from rest_framework import serializers
 
 from core_app.models import (
@@ -37,9 +39,17 @@ class AdminImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         image = validated_data['image']
         image_object = super().create(validated_data)
-        image.seek(0)
+
+        image_io = BytesIO()
+
+        for chunk in image.chunks():
+            image_io.write(chunk)
+
+        image_io.seek(0)
+        file_content = image_io.getvalue() # read by binary
+
         create_image_auto_into_ba_salam.delay(
-            image=image.read(),
+            image=file_content,
             image_id=image_object.id
         )
         return image_object

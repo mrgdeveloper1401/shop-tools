@@ -74,11 +74,20 @@ class AdminImageFilter(FilterSet):
         field_name="created_at",
         widget=RangeWidget(attrs={'type': 'datetime-local'}),
     )
+    hase_image_id = BooleanFilter(
+        method="has_image_id_ba_salam",
+        label="Has Image ID",
+    )
 
     class Meta:
         model = Image
         fields = (
             "created_at",
+        )
+
+    def has_image_id_ba_salam(self, queryset, name, value):
+        return queryset.filter(
+            image_id_ba_salam__isnull=not value,
         )
 
 
