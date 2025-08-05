@@ -132,3 +132,15 @@ def list_retrieve_product(product_id=None):
         )
         response.raise_for_status()
         return response.json()
+
+
+@http_error
+def patch_update_product_ba_salam(product_id, **kwargs):
+    with httpx.Client() as client:
+        response = client.patch(
+            url=config("BA_SALAM_PATCH_UPDATE_PRODUCT", cast=str).format(product_id),
+            headers=header(),
+            json=kwargs
+        )
+        response.raise_for_status()
+        return response.json()

@@ -119,3 +119,17 @@ class CreateProductBaSalamSerializer(serializers.Serializer):
         help_text=_("ارسال عکس به صورت لیستی")
     )
     sku = serializers.CharField()
+
+
+class UpdateProductSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    category_id = serializers.IntegerField(required=False)
+    primary_price = serializers.IntegerField(required=False)
+    stock = serializers.IntegerField(required=False)
+    description = serializers.CharField(required=False, allow_blank=True)
+    photo = serializers.IntegerField(required=False)
+    sku = serializers.CharField(required=False)
+    preparation_days = serializers.IntegerField(required=False)
+    weight = serializers.IntegerField(required=False)
+    package_weight = serializers.IntegerField(required=False)
+    status = serializers.IntegerField(required=False)

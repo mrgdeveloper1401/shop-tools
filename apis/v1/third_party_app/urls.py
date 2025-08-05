@@ -20,5 +20,10 @@ urlpatterns = [
         "read_product/<int:product_id>/",
         views.ListRetrieveProductView.as_view(),
         name='list_retrieve_product_bs_salam'
+    ),
+    path(
+        "update_product_ba_salam/<int:product_id>/",
+        views.UpdateProductView.as_view(),
+        name="update_product_ba_salam"
     )
 ] + router.urls

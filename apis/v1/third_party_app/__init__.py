@@ -11,8 +11,9 @@
 #  'sku': 'p256521455fg',
 #  'photos': [246178859]}
 #
-# for i, j in dic.items():
-#     if j is None:
-#         continue
-#     print(i,j)
-
+#
+# def show(**kwargs):
+#     print(kwargs)
+#
+#
+# show(**dic)

@@ -119,3 +119,25 @@ class ListRetrieveProductView(views.APIView):
         if product_id:
             res = list_retrieve_product(product_id)
         return response.Response(res)
+
+
+class UpdateProductView(views.APIView):
+    """
+    status --> (published, 2976), (draft, 3970), (illegal, 4184), (waiting, 3568)
+    """
+    serializer_class = serializers.UpdateProductSerializer
+    permission_classes = (permissions.IsAdminUser,)
+
+    def patch(self, request, *args, **kwargs):
+        product_id = kwargs.get('product_id')
+
+        if product_id is None:
+            raise exceptions.ValidationError(
+                {
+                    "message": _("product_id is required")
+                }
+            )
+        serializer = self.serializer_class(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        res = ba_salam.patch_update_product_ba_salam(product_id, **serializer.validated_data)
+        return response.Response(res)
