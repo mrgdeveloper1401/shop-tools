@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 from treebeard.mp_tree import MP_Node
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
@@ -133,6 +134,11 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         decimal_places=3,
         null=True,
         blank=True
+    )
+    product_id_ba_salam = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text=_("BA Salam ID")
     )
 
     def save(self, *args, **kwargs):
