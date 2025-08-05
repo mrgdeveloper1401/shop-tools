@@ -115,3 +115,18 @@ def list_product(vendor_id):
         )
         response.raise_for_status()
         return response.json()
+
+
+@http_error
+def list_retrieve_product(product_id=None):
+    base_url = config("BA_SALAM_READ_PRODUCT_URL", cast=str)
+    if product_id:
+        base_url = config("BA_SALAM_READ_PRODUCT_DETAIL_URL", cast=str).format(product_id)
+
+    with httpx.Client() as client:
+        response = client.get(
+            url=base_url,
+            headers=header()
+        )
+        response.raise_for_status()
+        return response.json()

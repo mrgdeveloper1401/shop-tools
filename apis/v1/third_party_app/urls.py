@@ -15,4 +15,10 @@ urlpatterns = [
     path("product_list_ba_salam/", views.ListProductView.as_view(), name="product_list_ba_salam"),
     path("read_categories/", views.ReadCategoryView.as_view(), name="read_categories"),
     path("read_categories/<int:category_id>/", views.ReadCategoryView.as_view(), name="read_categories"),
+    path("read_product/", views.ListRetrieveProductView.as_view(), name='list_retrieve_product_bs_salam'),
+    path(
+        "read_product/<int:product_id>/",
+        views.ListRetrieveProductView.as_view(),
+        name='list_retrieve_product_bs_salam'
+    )
 ] + router.urls

@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apis.v1.third_party_app import serializers
 from core.utils import ba_salam
-from core.utils.ba_salam import read_categories
+from core.utils.ba_salam import read_categories, list_retrieve_product
 from core.utils.pagination import FlexiblePagination
 from core_app.models import Image, UploadFile
 
@@ -108,3 +108,14 @@ class ReadCategoryView(views.APIView):
         resp.headers.pop('Pragma', None)
         resp.headers.pop('Expires', None)
         return resp
+
+
+class ListRetrieveProductView(views.APIView):
+    permission_classes = (permissions.IsAdminUser,)
+
+    def get(self, request, *args, **kwargs):
+        product_id = kwargs.get('product_id', None)
+        res = list_retrieve_product()
+        if product_id:
+            res = list_retrieve_product(product_id)
+        return response.Response(res)
