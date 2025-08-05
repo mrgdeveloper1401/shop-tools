@@ -97,6 +97,7 @@ class CreateAdminProductView(generics.CreateAPIView):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
+    # TODO, better performance create product
     """
     search_filter --> (product_name, sku) \n
     pagination --> 20 item
@@ -129,6 +130,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_brand",
                 "category"
             ).only(
+                "product_id_ba_salam",
                 "tags__tag_name",
                 "product_brand__brand_name",
                 "category__category_name",

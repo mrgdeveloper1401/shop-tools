@@ -134,6 +134,16 @@ class AttributeFilter(FilterSet):
 
 
 class ProductFilter(FilterSet):
+    hase_product_image_id_ba_salam = BooleanFilter(
+        method="product_image_id_ba_salam",
+        label="Has Image ID",
+    )
+
+    def product_image_id_ba_salam(self, queryset, name, value):
+        return queryset.filter(
+            product_id_ba_salam__isnull= not value
+        )
+
     class Meta:
         model = Product
         fields = {
