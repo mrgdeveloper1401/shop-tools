@@ -95,7 +95,9 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 
 class State(models.Model):
-    state_name = models.CharField(_("state name"), max_length=150)
+    name = models.CharField(_("state name"), max_length=150)
+    slug = models.SlugField(max_length=150, allow_unicode=True, null=True)
+    tel_prefix = models.CharField(max_length=3, null=True)
 
     class Meta:
         db_table = "state"

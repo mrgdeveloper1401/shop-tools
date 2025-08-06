@@ -129,8 +129,8 @@ class PrivateNotificationAdmin(admin.ModelAdmin):
 
 @admin.register(State)
 class StateAdmin(admin.ModelAdmin):
-    list_display = ("state_name",)
-    search_fields = ("state_name",)
+    list_display = ("name", "id", "slug", "tel_prefix")
+    search_fields = ("state",)
     search_help_text = _("برای جست و جو میتوانید از نام استان استفاده کنید")
 
 
