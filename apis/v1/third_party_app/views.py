@@ -183,7 +183,24 @@ class UpdateProductView(views.APIView):
                     "message": _("product_id is required")
                 }
             )
+        else:
+            product = Product.objects.filter(id=product_id).only("id", "product_id_ba_salam")
+            if not product.exists():
+                raise exceptions.ValidationError(
+                    {
+                        "message": _("product_id is invalid")
+                    }
+                )
+            else:
+                if product[0].product_id_ba_salam is None:
+                    raise exceptions.ValidationError(
+                        {
+                            "message": _("this product doesn't have product_id_ba_salam")
+                        }
+                    )
+
+        product_id_ba_salam = product[0].product_id_ba_salam
         serializer = self.serializer_class(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        res = ba_salam.patch_update_product_ba_salam(product_id, **serializer.validated_data)
+        res = ba_salam.patch_update_product_ba_salam(product_id_ba_salam, **serializer.validated_data)
         return response.Response(res)
