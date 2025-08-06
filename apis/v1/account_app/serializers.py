@@ -195,7 +195,7 @@ class StateSerializer(serializers.ModelSerializer):
         model = State
         fields = (
             "id",
-            "state_name"
+            "name"
         )
 
 
@@ -204,7 +204,8 @@ class CitySerializer(serializers.ModelSerializer):
         model = City
         fields = (
             "id",
-            "name"
+            "name",
+            "state_id"
         )
 
 

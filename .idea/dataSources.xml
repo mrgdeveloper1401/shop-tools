@@ -29,11 +29,11 @@
       <jdbc-url>jdbc:mysql://localhost:3307/gstools</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="shop_tools_db1@localhost" uuid="292ebcc5-fd11-475a-a6a8-585a1beb7778">
+    <data-source source="LOCAL" name="shop_tools_db2@localhost" uuid="b1c8e5f5-61b5-4bff-95ed-eedf009d50bb">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5433/shop_tools_db1</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5433/shop_tools_db2</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
