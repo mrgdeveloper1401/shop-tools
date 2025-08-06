@@ -46,7 +46,8 @@ class CreateListImage(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.G
 class CreateProductView(views.APIView):
     """
     ایجاد محصول یک غرفه \n
-    status --> (published, 2976), (draft, 3970), (illegal, 4184), (waiting, 3568)
+    status --> (published, 2976), (draft, 3790), (illegal, 4184), (waiting, 3568) \n
+    product_id --> product_id our one system
     """
     permission_classes = (permissions.IsAdminUser,)
     serializer_class = serializers.CreateProductBaSalamSerializer
@@ -135,6 +136,14 @@ class ReadCategoryView(views.APIView):
         resp.headers.pop('Pragma', None)
         resp.headers.pop('Expires', None)
         return resp
+
+
+class ReadCategoryAttributes(views.APIView):
+    permission_classes = (permissions.IsAdminUser,)
+
+    def get(self, request, category_id=None):
+        res = ba_salam.read_category_attribute(category_id)
+        return response.Response(res)
 
 
 class ListRetrieveProductView(views.APIView):

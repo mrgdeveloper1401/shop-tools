@@ -83,6 +83,17 @@ def read_categories(category_id=None):
     return response.json()
 
 @http_error
+def read_category_attribute(category_id=None):
+    url = config("BA_SALAM_READ_CATEGORY_ATTRIBUTE", cast=str).format(category_id)
+    with httpx.Client() as client:
+        response = client.get(
+            url=url,
+            headers=header(),
+        )
+    response.raise_for_status()
+    return response.json()
+
+@http_error
 def create_product(*args, **kwargs):
     with httpx.Client() as client:
         json_data = {
