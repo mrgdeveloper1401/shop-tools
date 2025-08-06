@@ -138,13 +138,23 @@ class ReadCategoryView(views.APIView):
 
 
 class ListRetrieveProductView(views.APIView):
+    """
+    pagination --> ?page=number
+    """
     permission_classes = (permissions.IsAdminUser,)
 
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get('product_id', None)
-        res = list_retrieve_product()
+        page_id = request.query_params.get('page', None)
+
+        res = None
+
+        if page_id:
+            res = list_retrieve_product(page_id=page_id)
         if product_id:
-            res = list_retrieve_product(product_id)
+            res = list_retrieve_product(product_id=product_id)
+        if product_id is None and page_id is None:
+            res = list_retrieve_product()
         return response.Response(res)
 
 

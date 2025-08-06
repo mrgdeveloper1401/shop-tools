@@ -133,3 +133,7 @@ class UpdateProductSerializer(serializers.Serializer):
     weight = serializers.IntegerField(required=False)
     package_weight = serializers.IntegerField(required=False)
     status = serializers.IntegerField(required=False)
+
+
+class CreateProductTorob(serializers.Serializer):
+    pass
