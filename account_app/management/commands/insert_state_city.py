@@ -29,7 +29,10 @@ class Command(BaseCommand):
                         state_name=i[1]
                     )
                 )
+            if lst:
+                State.objects.bulk_create(lst)
+                self.stdout.write("successfully create", len(lst), "states")
         except FileNotFoundError as e:
             raise CommandError(e)
-        else:
-            print(lst)
+        # else:
+        #     print(lst)
