@@ -204,13 +204,25 @@ class CreateOrderSerializer(serializers.Serializer):
             coupon_code=coupon,
             variants=variants
         )
-        payment_gateway = request_gate_way(
-            amount=calc_total_price,
-            description=validated_data.get("description", None),
-            order_id=order.id,
-            mobile=validated_data.get("mobile_phone", None)
-        )
-        create_gateway_payment.delay(order.id, payment_gateway)
+
+        if calc_total_price == 0: # check final price is zero
+            order.status = 'paid'
+            order.is_complete = True
+            order.save()
+            json_data = {"message": "success", "result": 100}
+            create_gateway_payment.delay(
+                order_id=order.id,
+                json_data=json_data
+            )
+            return json_data
+        else:
+            payment_gateway = request_gate_way(
+                amount=calc_total_price,
+                description=validated_data.get("description", None),
+                order_id=order.id,
+                mobile=validated_data.get("mobile_phone", None)
+            )
+            create_gateway_payment.delay(order.id, payment_gateway)
         return {
             "items": items,
             "shipping": shipping,
