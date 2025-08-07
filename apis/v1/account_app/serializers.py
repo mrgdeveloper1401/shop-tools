@@ -153,7 +153,7 @@ class UserAddressSerializer(serializers.ModelSerializer):
         queryset=City.objects.only("name")
     )
     state = serializers.PrimaryKeyRelatedField(
-        queryset=State.objects.only("state_name")
+        queryset=State.objects.only("state")
     )
 
     class Meta:
