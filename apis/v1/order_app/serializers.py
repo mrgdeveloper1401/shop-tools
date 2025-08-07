@@ -191,11 +191,18 @@ class CreateOrderSerializer(serializers.Serializer):
         # get coupon in validated data
         coupon = validated_data.get("valid_coupon")
 
-        # دریافت تخفیف‌های معتبر برای محصولات
+        # validate stock number
         variant_ids = [item['product_variant_id'] for item in validated_data['items']]
-        # product_discounts = ProductDiscount.objects.filter(
-        #     product_variant_id__in=variant_ids
-        # ).valid_discount().only("amount", "discount_type")
+        validate_product_variant = ProductVariant.objects.filter(
+            id__in=variant_ids,
+            stock_number__gt=0
+        ).only("id")
+        if not validate_product_variant.exists():
+            raise serializers.ValidationError(
+                {
+                    "message": _("product variant not available")
+                }
+            )
 
         # ورینت های معتبر
         variants = [i for i in validated_data['items']]
