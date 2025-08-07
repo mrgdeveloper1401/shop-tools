@@ -214,6 +214,9 @@ class CreateOrderSerializer(serializers.Serializer):
                 order_id=order.id,
                 json_data=json_data
             )
+            json_data['items'] = items
+            json_data['shipping'] = shipping
+            json_data['address_id'] = address_id
             return json_data
         else:
             payment_gateway = request_gate_way(
