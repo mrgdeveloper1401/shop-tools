@@ -2,20 +2,19 @@ from datetime import timedelta
 
 import openpyxl
 from django.db.models import Count, Q, Prefetch, Sum, F, DecimalField
-from django.db.models.functions import TruncMonth, TruncWeek, TruncDate
+from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.utils.dateparse import parse_date
 from openpyxl.styles import Font
 from rest_framework import viewsets, permissions, generics, mixins, views, exceptions, response, decorators
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
 from core.utils.exceptions import PaymentBaseError
 from core.utils.gate_way import verify_payment
 from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
-# from order_app.tasks import create_verify_payment
+from order_app.tasks import send_sms_to_user_after_complete_order
 from . import serializers
 
 
@@ -270,7 +269,7 @@ class VerifyPaymentGatewayView(views.APIView):
                 get_payment = payment.last()
 
                 # create instance of model VerifyPaymentGateWay
-                verify = VerifyPaymentGateWay.objects.create(
+                VerifyPaymentGateWay.objects.create(
                     payment_gateway_id=get_payment.id,
                     result=verify_req
                 )
@@ -283,6 +282,7 @@ class VerifyPaymentGatewayView(views.APIView):
                         is_complete=True,
                         status="paid"
                     )
+                    send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
                     return verify_req
                 else:
                     raise exceptions.ValidationError(

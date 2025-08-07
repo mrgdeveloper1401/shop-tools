@@ -27,15 +27,12 @@ def create_gateway_payment(order_id, json_data):
     )
 
 
-# @shared_task()
-# def create_verify_payment(json_data, track_id):
-#     from order_app.models import VerifyPaymentGateWay, PaymentGateWay
-#
-#     # filter query payment
-#     payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id).only("id", "order_id")
-#
-#     if payment:
-#         VerifyPaymentGateWay.objects.create(
-#             payment_gateway_id=payment[0].id,
-#             result=json_data
-#         )
+@shared_task()
+def send_sms_to_user_after_complete_order(mobile_phone):
+    user = User.objects.filter(mobile_phone=mobile_phone).only("mobile_phone").first()
+    PrivateNotification.objects.create(
+        user_id = user.id,
+        title = "ثبت سفارش موفق",
+        body = "کاربر محترم سفارش شما با موفقیت پرداخت و ثبت شده است",
+        notif_type="accept_order"
+    )

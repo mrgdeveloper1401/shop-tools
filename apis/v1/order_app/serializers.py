@@ -7,7 +7,7 @@ from account_app.validators import MobileRegexValidator
 from core.utils.gate_way import request_gate_way
 from discount_app.models import ProductDiscount
 from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany, PaymentGateWay
-from order_app.tasks import create_gateway_payment
+from order_app.tasks import create_gateway_payment, send_sms_to_user_after_complete_order
 from product_app.models import ProductVariant
 
 
@@ -161,6 +161,8 @@ class CreateOrderSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        user = self.context['request'].user # get user by context
+
         # create order
         profile = Profile.objects.filter(
             user_id=self.context["request"].user.id
@@ -224,6 +226,7 @@ class CreateOrderSerializer(serializers.Serializer):
             json_data['items'] = items
             json_data['shipping'] = shipping
             json_data['address_id'] = address_id
+            send_sms_to_user_after_complete_order.delay(mobile_phone=user.mobile_phone)
             return json_data
         else:
             payment_gateway = request_gate_way(
