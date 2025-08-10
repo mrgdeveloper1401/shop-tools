@@ -110,7 +110,7 @@ class NestedProductDiscountSerializer(serializers.ModelSerializer):
 
 
 class NestedProductVariantPriceStockSerializer(serializers.ModelSerializer):
-    product_variant_discounts = NestedProductDiscountSerializer(read_only=True)
+    product_variant_discounts = NestedProductDiscountSerializer(read_only=True, many=True)
 
     class Meta:
         model = ProductVariant
@@ -220,6 +220,7 @@ class SimpleUserProductVariantDiscountSerializer(serializers.ModelSerializer):
         model = ProductDiscount
         fields = (
             "amount",
+            "discount_type"
         )
 
 

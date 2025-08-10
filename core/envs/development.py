@@ -36,7 +36,7 @@ CELERY_RESULT_BACKEND="redis://localhost:6380/3"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "backup_gs6",
+        "NAME": "backup_gs_66",
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",

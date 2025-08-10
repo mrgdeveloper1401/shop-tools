@@ -125,12 +125,17 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         base_query = Product.objects.filter(category_id=self.kwargs["category_pk"]).prefetch_related(
             Prefetch(
-                "variants__product_variant_discounts", queryset=ProductDiscount.objects.only(
+                "variants__product_variant_discounts", queryset=ProductDiscount.objects.select_related(
+                    "product_variant__product"
+                ).only(
                     "amount",
+                    "discount_type",
                     "product_variant_id",
                     "product_variant__product_id",
-                    "discount_type"
-                ).valid_discount()
+                    "product_variant__stock_number",
+                    "product_variant__name",
+                    "product_variant__price"
+                )
             )
         )
 
@@ -146,7 +151,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "is_active",
                 "product_slug",
                 "description",
-                # "social_links",
                 "product_name",
                 "description_slug",
                 "sku",
@@ -155,7 +159,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                     Prefetch(
                 "product_product_image", queryset=ProductImages.objects.select_related("image").only(
                     "image__image",
-                    # "image__alt_text",
+                    "image__image_id_ba_salam",
+                    "alt_text_image",
                     "order",
                     "product_id"
                         )
@@ -169,17 +174,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                         "product_id",
                         "value"
                     )
-                ),
-                Prefetch(
-                    "variants", queryset=ProductVariant.objects.only(
-                        "price",
-                        "product_id",
-                        "stock_number",
-                        "name"
-                    )
                 )
             )
-            # print(base_query)
             return base_query
 
         else:
@@ -188,7 +184,9 @@ class ProductViewSet(viewsets.ModelViewSet):
                         "product_product_image", queryset=ProductImages.objects.select_related("image").only(
                             "image__image",
                             "order",
-                            "product_id"
+                            "product_id",
+                            "alt_text_image",
+                            "image__image_id_ba_salam"
                         ).filter(
                             is_active=True
                         )
@@ -202,32 +200,11 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "description_slug",
                     "product_slug",
                     "category_id"
-                ).prefetch_related(
-                    Prefetch(
-                        "variants", queryset=ProductVariant.objects.filter(
-                            is_active=True
-                        ).only(
-                            "name",
-                            "product_id",
-                            "price"
-                        )
-                    )
-
                 )
             else:
                 return query.prefetch_related(
                     Prefetch(
                         "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
-                    ),
-                    Prefetch(
-                        "variants", queryset=ProductVariant.objects.filter(
-                            is_active=True
-                        ).only(
-                            "price",
-                            "product_id",
-                            "stock_number",
-                            "name"
-                        )
                     ),
                     Prefetch(
                         "attributes", queryset=ProductAttributeValues.objects.select_related(
@@ -244,7 +221,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "base_price",
                     "product_name",
                     "description",
-                    # "social_links",
                     "product_brand__brand_name",
                     "tags",
                     "product_slug",
