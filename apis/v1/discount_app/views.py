@@ -26,7 +26,7 @@ class DiscountViewSet(viewsets.ModelViewSet):
     pagination_class = TwentyPageNumberPagination
 
     def get_queryset(self):
-        return ProductDiscount.objects.defer("deleted_at", "is_deleted").filter(
+        return ProductDiscount.objects.filter(
             product_variant_id=self.kwargs["variant_pk"],
         )
 

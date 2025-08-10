@@ -17,21 +17,17 @@ class AdminCouponSerializer(serializers.ModelSerializer):
 
 class AdminDiscountSerializer(serializers.ModelSerializer):
     product_variant = serializers.PrimaryKeyRelatedField(
-        queryset=ProductVariant.objects.only('id'),
-        required=False
+        queryset=ProductVariant.objects.only('id')
     )
     is_valid_discount = serializers.SerializerMethodField()
-    product = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.only('id'),
-        required=False
-    )
+    # product = serializers.PrimaryKeyRelatedField(
+    #     queryset=Product.objects.only('id'),
+    #     required=False
+    # )
 
     class Meta:
         model = ProductDiscount
-        exclude = (
-            "deleted_at",
-            "is_deleted"
-        )
+        fields = "__all__"
 
     @extend_schema_field(serializers.BooleanField())
     def get_is_valid_discount(self, obj):
