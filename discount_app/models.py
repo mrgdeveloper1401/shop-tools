@@ -69,7 +69,7 @@ class Discount(CreateMixin, UpdateMixin, SoftDeleteMixin):
 class ProductDiscount(CreateMixin, UpdateMixin):
     product_variant = models.ForeignKey(
         ProductVariant,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         related_name="product_variant_discounts"
     )
     # product = models.ForeignKey(
@@ -91,10 +91,9 @@ class ProductDiscount(CreateMixin, UpdateMixin):
 
     @cached_property
     def is_valid_discount(self):
-        if self.product_variant_id:
-            if self.is_active and (self.start_date <= timezone.now() <= self.end_date):
-                return True
-            return False
+        if self.is_active and (self.start_date <= timezone.now() <= self.end_date):
+            return True
+        return False
 
     objects = managers.ProductDiscountManager()
     # valid_discount = ProductDiscountManager()
