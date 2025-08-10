@@ -157,7 +157,7 @@ class ProductHomePageFilter(FilterSet):
     more_price = NumberFilter(method='more_price_filter')
     min_price = NumberFilter(method="min_price_filter")
     price = RangeFilter(field_name='variants__price', label='Price range')
-    # has_discount = BooleanFilter(method='filter_has_discount', label="Has discount")
+    has_discount = BooleanFilter(method='filter_has_discount', label="Has discount")
 
     class Meta:
         model = Product
@@ -180,17 +180,15 @@ class ProductHomePageFilter(FilterSet):
             variants__is_active=True
         ).distinct()
 
-    # def filter_has_discount(self, queryset, name, value):
-    #     query = queryset
-    #
-    #     if value:
-    #         query = query.filter(
-    #             variants__product_variant_discounts__is_active=True,
-    #             variants__product_variant_discounts__start_date__gte=timezone.now(),
-    #             variants__product_variant_discounts__end_date__lte=timezone.now()
-    #         ).distinct()
-    #
-    #     return query
+    def filter_has_discount(self, queryset, name, value):
+        if value:
+            return queryset.filter(
+                variants__product_variant_discounts__is_active=True,
+                variants__product_variant_discounts__start_date__lte=timezone.now(),
+                variants__product_variant_discounts__end_date__gte=timezone.now()
+            ).distinct()
+
+        return queryset
 
 class ProductTagFilter(FilterSet):
     class Meta:
