@@ -14,9 +14,7 @@ class ProductDiscountQuerySet(models.QuerySet):
 
 class ProductDiscountManager(models.Manager):
     def get_queryset(self):
-        return ProductDiscountQuerySet(self.model, using=self._db).filter(
-        Q(is_deleted=False) | Q(is_deleted__isnull=True)
-    )
+        return ProductDiscountQuerySet(self.model, using=self._db)
 
 
 class ValidCouponManager(models.Manager):
