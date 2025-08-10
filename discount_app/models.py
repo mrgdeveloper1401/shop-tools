@@ -66,7 +66,7 @@ class Discount(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = "discount_content_type"
 
 
-class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
+class ProductDiscount(CreateMixin, UpdateMixin):
     product_variant = models.ForeignKey(
         ProductVariant,
         on_delete=models.DO_NOTHING,
