@@ -128,7 +128,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "variants__product_variant_discounts", queryset=ProductDiscount.objects.only(
                     "amount",
                     "product_variant_id",
-                    "product_variant__product_id"
+                    "product_variant__product_id",
                     "discount_type"
                 ).valid_discount()
             )
