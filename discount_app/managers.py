@@ -5,7 +5,7 @@ from django.utils import timezone
 
 class ProductDiscountQuerySet(models.QuerySet):
     def valid_discount(self):
-        return self.filter(
+        return super.filter(
             is_active=True,
             start_date__lte=timezone.now(),
             end_date__gte=timezone.now(),
