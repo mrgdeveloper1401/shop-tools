@@ -155,7 +155,7 @@ class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ("price", "variant_id", "product_variant_discounts", "is_available", "stock_number", "name")
+        fields = ("id", "price", "variant_id", "product_variant_discounts", "is_available", "stock_number", "name")
 
 
 class NestedProductAttributeSerializer(serializers.ModelSerializer):

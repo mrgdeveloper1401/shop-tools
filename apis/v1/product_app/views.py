@@ -492,13 +492,6 @@ class ProductListHomePageView(generics.ListAPIView):
                 )
             )
         ),
-        # Prefetch(
-        #     "product_discounts", queryset=ProductDiscount.objects.only(
-        #         "product_id",
-        #         "amount",
-        #         "discount_type"
-        #     ).valid_discount()
-        # )
     )
     serializer_class = serializers.ProductListHomePageSerializer
     pagination_class = TwentyPageNumberPagination

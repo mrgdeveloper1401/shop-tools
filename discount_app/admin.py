@@ -15,4 +15,4 @@ class DiscountAdmin(admin.ModelAdmin):
 
 @admin.register(ProductDiscount)
 class ProductDiscountAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "product_variant_id", "is_valid_discount")

@@ -74,13 +74,13 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
         blank=True,
         null=True
     )
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.PROTECT,
-        related_name="product_discounts",
-        blank=True,
-        null=True,
-    )
+    # product = models.ForeignKey(
+    #     Product,
+    #     on_delete=models.PROTECT,
+    #     related_name="product_discounts",
+    #     blank=True,
+    #     null=True,
+    # )
     discount_type = models.CharField(
         choices=CouponEnums.choices,
         default=CouponEnums.percent,
@@ -93,11 +93,9 @@ class ProductDiscount(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     @cached_property
     def is_valid_discount(self):
-        if self.start_date and self.end_date:
-            if self.start_date > timezone.now() > self.end_date:
-                return True
-            return False
-        return None
+        if self.is_active and (self.start_date <= timezone.now() <= self.end_date):
+            return True
+        return False
 
     objects = managers.ProductDiscountManager()
     # valid_discount = ProductDiscountManager()
