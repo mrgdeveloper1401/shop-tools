@@ -123,7 +123,16 @@ class ProductViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        base_query = Product.objects.filter(category_id=self.kwargs["category_pk"])
+        base_query = Product.objects.filter(category_id=self.kwargs["category_pk"]).prefetch_related(
+            Prefetch(
+                "variants__product_variant_discounts", queryset=ProductDiscount.objects.only(
+                    "amount",
+                    "product_variant_id",
+                    "product_variant__product_id"
+                    "discount_type"
+                ).valid_discount()
+            )
+        )
 
         if self.request.user.is_staff:
             base_query = base_query.select_related(
@@ -202,13 +211,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                             "product_id",
                             "price"
                         )
-                    ),
-                    Prefetch(
-                        "variants__product_variant_discounts", queryset=ProductDiscount.objects.only(
-                            "amount",
-                            "product_variant_id"
-                        ).valid_discount()
                     )
+
                 )
             else:
                 return query.prefetch_related(
@@ -223,14 +227,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                             "product_id",
                             "stock_number",
                             "name"
-                        ).prefetch_related(
-                            Prefetch(
-                                "product_variant_discounts", queryset=ProductDiscount.objects.only(
-                                    "amount",
-                                    "discount_type",
-                                    "product_variant_id"
-                                ).valid_discount()
-                            )
                         )
                     ),
                     Prefetch(

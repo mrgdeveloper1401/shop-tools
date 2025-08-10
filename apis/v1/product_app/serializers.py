@@ -103,10 +103,18 @@ class SimpleProductCategorySerializer(serializers.ModelSerializer):
         )
 
 
+class NestedProductDiscountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductDiscount
+        fields = ("amount", "discount_type")
+
+
 class NestedProductVariantPriceStockSerializer(serializers.ModelSerializer):
+    product_variant_discounts = NestedProductDiscountSerializer(read_only=True)
+
     class Meta:
         model = ProductVariant
-        fields = ("price", "stock_number", "name")
+        fields = ("price", "stock_number", "name", "product_variant_discounts")
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -138,12 +146,6 @@ class ProductSerializer(serializers.ModelSerializer):
         data['tags'] = SimpleProductTagSerializer(instance.tags.all(), many=True).data
         data['category'] = SimpleProductCategorySerializer(instance.category).data
         return data
-
-
-class NestedProductDiscountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductDiscount
-        fields = ("amount", "discount_type")
 
 
 class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
