@@ -184,8 +184,8 @@ class ProductHomePageFilter(FilterSet):
         if value:
             return queryset.filter(
                 variants__product_variant_discounts__is_active=True,
-                variants__product_variant_discounts__start_date__lte=timezone.now(),
-                variants__product_variant_discounts__end_date__gte=timezone.now()
+                variants__product_variant_discounts__start_date__gte=timezone.now(),
+                variants__product_variant_discounts__end_date__lte=timezone.now()
             ).distinct()
         return queryset
 
