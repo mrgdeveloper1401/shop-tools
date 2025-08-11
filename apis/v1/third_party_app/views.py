@@ -70,7 +70,7 @@ class CreateProductView(views.APIView):
                     "message": _("product id not found")
                 }
             )
-        if product[0].product_id_ba_salam:
+        if product.first().product_id_ba_salam:
             raise exceptions.ValidationError(
                 {
                     "message": _("product have product_id_ba_salam")

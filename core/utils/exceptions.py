@@ -36,10 +36,6 @@ def http_error(func):
             raise HttpConnectionError("connect error", ce)
         except httpx.TimeoutException as te:
             raise TimeOutError("timeout error", te)
-        # except httpx.HTTPStatusError as se:
-        #     raise HTTPStatusError("status error", se)
-        except ValueError as ve:
-            raise InvalidDataError(ve)
         except Exception as e:
             raise InvalidDataError(e)
     return wrapper

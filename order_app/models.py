@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import F, Sum
+from django.db.models import F
 from django.utils.functional import cached_property
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -99,6 +99,11 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             return False
         return coupon
 
+    @cached_property
+    def calc_price_preposition_wight(self):
+        amount = 20_000
+        return amount
+
     def total_price(self, variants, coupon_code=None):
         final_price = Decimal(0)
         for i in variants:
@@ -113,6 +118,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             final_price = self._apply_coupon_discount(final_price, coupon_code)
 
         final_price += self.shipping_cost
+        final_price += self.calc_price_preposition_wight
         return final_price
 
     # def total_price(self, valid_coupon=None, product_discounts=None, variants=None):

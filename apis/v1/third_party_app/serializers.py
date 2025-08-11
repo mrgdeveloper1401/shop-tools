@@ -110,11 +110,11 @@ class CreateProductBaSalamSerializer(serializers.Serializer):
         help_text=_("محصول من عمده فروشی هست یا خیر"),
         required=False
     )
-    # photos = TextInputListField(
-    #     child=serializers.IntegerField(),
-    #     # required=False,
-    #     help_text=_("ارسال عکس به صورت لیستی")
-    # )
+    photos = serializers.ListSerializer(
+        child=serializers.IntegerField(),
+        required=False,
+        help_text=_("برای ارسال عکس های اضافی")
+    )
     photo = serializers.IntegerField(
         help_text=_("ارسال عکس به صورت لیستی")
     )
