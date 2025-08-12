@@ -54,7 +54,7 @@ CSRF_COOKIE_AGE = 3600
 
 STORAGES['default']['BACKEND'] = "storages.backends.s3.S3Storage"
 
-AWS_S3_REGION_NAME = 'default'
+AWS_S3_REGION_NAME = 'eu-west-1'
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
 AWS_ACCESS_KEY_ID = config('ARVAN_AWS_ACCESS_KEY_ID', cast=str)
