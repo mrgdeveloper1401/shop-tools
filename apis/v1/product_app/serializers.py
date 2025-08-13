@@ -476,6 +476,13 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
         )
 
 
+class AdminProductListHomePageSerializer(ProductListHomePageSerializer):
+    total_sale = serializers.IntegerField()
+
+    class Meta(ProductListHomePageSerializer.Meta):
+        fields = ProductListHomePageSerializer.Meta.fields + ('total_sale',)
+
+
 class AdminTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag

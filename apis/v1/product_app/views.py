@@ -463,7 +463,8 @@ class ProductListHomePageView(generics.ListAPIView):
         "updated_at",
         "base_price",
         "sku",
-        "product_brand__brand_name"
+        "product_brand__brand_name",
+        "total_sale",
     ).select_related(
         "product_brand"
     ).prefetch_related(
@@ -500,9 +501,14 @@ class ProductListHomePageView(generics.ListAPIView):
             )
         ),
     )
-    serializer_class = serializers.ProductListHomePageSerializer
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductHomePageFilter
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return serializers.AdminProductListHomePageSerializer
+        else:
+            return serializers.ProductListHomePageSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
