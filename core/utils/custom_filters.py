@@ -149,7 +149,7 @@ class ProductFilter(FilterSet):
         fields = {
             "product_name": ['contains'],
             "sku": ['contains'],
-            "is_active": ['exact']
+            "is_active": ['exact'],
         }
 
 

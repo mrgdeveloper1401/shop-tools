@@ -105,6 +105,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductFilter
+    ordering_fields = ("total_sale",)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
@@ -145,6 +147,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_brand",
                 "category"
             ).only(
+                "total_sale",
                 "product_id_ba_salam",
                 "tags__tag_name",
                 "product_brand__brand_name",
@@ -448,7 +451,7 @@ class ProductListHomePageView(generics.ListAPIView):
     pagination --> 20 item \n
     filter query --> product_name, tag, min_price, max_price, category_name, price_range
     """
-    ordering_fields = ("id", "variants__price")
+    ordering_fields = ("id", "variants__price", "total_sale")
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     queryset = Product.objects.filter(is_active=True).only(
         "product_name",

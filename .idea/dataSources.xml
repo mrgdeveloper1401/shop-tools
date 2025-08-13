@@ -29,7 +29,7 @@
       <jdbc-url>jdbc:mysql://localhost:3307/gstools</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="backup_gs_66@localhost" uuid="94c55c45-5f14-4969-8e19-6735fd11b527">
+    <data-source source="LOCAL" name="backup_gs_66@localhost" uuid="94945dd7-742c-455c-87c7-24f9cc137b74">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
