@@ -44,6 +44,11 @@ class CategoryAdmin(TreeAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_filter = (ProductSku, )
+    list_display = (
+        "product_name",
+        "total_sale",
+        "is_active"
+    )
 
 
 @admin.register(Attribute)
