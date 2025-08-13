@@ -155,7 +155,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_name",
                 "description_slug",
                 "sku",
-                "base_price"
+                "base_price",
+                "updated_at"
             ).prefetch_related(
                     Prefetch(
                 "product_product_image", queryset=ProductImages.objects.select_related("image").only(
@@ -196,6 +197,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
             if self.action == "list":
                 return query.only(
+                    "updated_at",
                     "product_name",
                     "base_price",
                     "description_slug",
@@ -226,7 +228,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "tags",
                     "product_slug",
                     "description_slug",
-                    "sku"
+                    "sku",
+                    "updated_at"
                 )
 
 

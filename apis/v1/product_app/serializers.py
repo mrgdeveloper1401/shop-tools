@@ -137,7 +137,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_deleted",
             "deleted_at",
             "created_at",
-            "updated_at",
         )
 
     def to_representation(self, instance):
@@ -247,7 +246,8 @@ class UserListProductSerializer(serializers.ModelSerializer):
             "variants",
             "product_slug",
             "description_slug",
-            "category_id"
+            "category_id",
+            "updated_at"
             # "product_discounts",
         )
 
@@ -279,7 +279,8 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "variants",
             "product_slug",
             "description_slug",
-            "sku"
+            "sku",
+            "updated_at"
         )
 
 
