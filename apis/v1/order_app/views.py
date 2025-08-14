@@ -224,7 +224,7 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             "profile__user__email",
             "profile__user__mobile_phone",
             "address__city__name",
-            "address__state__state_name",
+            "address__state__name",
             "is_complete",
             "shipping_id",
             "created_at",
