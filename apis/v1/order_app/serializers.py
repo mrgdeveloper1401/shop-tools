@@ -326,7 +326,7 @@ class NestedOrderProfileUserSerializer(serializers.ModelSerializer):
 
 
 class ResultOrderCityStateNameSerializer(serializers.ModelSerializer):
-    state_name = serializers.CharField(source="state.state_name")
+    state_name = serializers.CharField(source="state.name")
     city = serializers.CharField(source="city.name")
 
     class Meta:
