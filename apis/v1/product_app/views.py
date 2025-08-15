@@ -1,4 +1,4 @@
-from django.db.models import Prefetch, Min, Max
+from django.db.models import Prefetch, Min, Max, OuterRef, Subquery
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, generics, filters
@@ -412,17 +412,6 @@ class AttributeValueViewSet(viewsets.ModelViewSet):
             return base_query
 
 
-# class AdminCreateProductAttributeView(generics.CreateAPIView):
-#     serializer_class = serializers.AdminProductAttributeSerializer
-#     permission_classes = (permissions.IsAdminUser,)
-#     queryset = ProductAttributeValues.objects.defer(
-#         "is_deleted",
-#         "deleted_at",
-#         "created_at",
-#         "updated_at"
-#     )
-
-
 class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProductAttributeSerializer
 
@@ -450,7 +439,7 @@ class ProductListHomePageView(generics.ListAPIView):
     pagination --> 20 item \n
     filter query --> product_name, tag, min_price, max_price, category_name, price_range
     """
-    ordering_fields = ("id", "variants__price", "total_sale")
+    ordering_fields = ("id", "total_sale")
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     queryset = Product.objects.filter(is_active=True).only(
         "product_name",
@@ -507,6 +496,29 @@ class ProductListHomePageView(generics.ListAPIView):
             return serializers.AdminProductListHomePageSerializer
         else:
             return serializers.ProductListHomePageSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Subquery برای گرفتن قیمت اولین variant فعال هر محصول
+        first_variant_price = ProductVariant.objects.filter(
+            product_id=OuterRef('pk'),
+            is_active=True
+        ).order_by('id').values('price')[:1]  # مرتب کردن بر اساس ID (می‌توانید به price تغییر دهید)
+
+        # اضافه کردن annotation به کوئری اصلی
+        queryset = queryset.annotate(
+            first_variant_price=Subquery(first_variant_price)
+        )
+
+        # اگر پارامتر ordering وجود داشت، از آن استفاده می‌کنیم
+        ordering = self.request.query_params.get('ordering', '')
+        if ordering == 'first_variant_price':
+            queryset = queryset.order_by('first_variant_price')
+        elif ordering == '-first_variant_price':
+            queryset = queryset.order_by('-first_variant_price')
+
+        return queryset
 
 
 class TagViewSet(viewsets.ModelViewSet):
