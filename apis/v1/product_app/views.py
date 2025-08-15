@@ -490,16 +490,15 @@ class ProductListHomePageView(generics.ListAPIView):
                 "product_id",
                 "stock_number",
                 "name"
-            ).prefetch_related(
-                Prefetch(
-                    "product_variant_discounts", queryset=ProductDiscount.objects.only(
-                        "amount",
-                        "discount_type",
-                        "product_variant_id"
-                    ).valid_discount()
-                )
             )
         ),
+        Prefetch(
+            "variants__product_variant_discounts", queryset=ProductDiscount.objects.only(
+                "amount",
+                "discount_type",
+                "product_variant_id"
+            ).valid_discount()
+        )
     )
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductHomePageFilter
