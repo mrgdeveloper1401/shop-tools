@@ -389,7 +389,20 @@ class SimpleAttribute(serializers.ModelSerializer):
         fields = ("id", "attribute_name")
 
 
-class AdminProductAttributeSerializer(serializers.ModelSerializer):
+# class UserProductAttributeValue(serializers.ModelSerializer):
+#     attribute_name = serializers.CharField(source="attribute.attribute_name")
+#
+#     class Meta:
+#         model = ProductAttributeValues
+#         fields = (
+#             "id",
+#             "product_id",
+#             "attribute_name",
+#             "value"
+#         )
+
+
+class ProductAttributeSerializer(serializers.ModelSerializer):
     # attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.only("id")
@@ -397,9 +410,6 @@ class AdminProductAttributeSerializer(serializers.ModelSerializer):
     attribute = serializers.PrimaryKeyRelatedField(
         queryset=Attribute.objects.only("id")
     )
-    # value = serializers.PrimaryKeyRelatedField(
-    #     queryset=AttributeValue.objects.only("id")
-    # )
 
     class Meta:
         model = ProductAttributeValues

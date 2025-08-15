@@ -334,6 +334,7 @@ class ResultOrderCityStateNameSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "city",
+
             "state_name"
         )
 

@@ -424,26 +424,25 @@ class AttributeValueViewSet(viewsets.ModelViewSet):
 
 
 class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.ProductAttributeSerializer
+
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            return serializers.AdminProductAttributeSerializer
-
     def get_queryset(self):
-        base_query = ProductAttributeValues.objects.filter(
+        return ProductAttributeValues.objects.filter(
             product_id=self.kwargs['product_pk']
-        ).defer(
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at"
+        ).select_related(
+                "attribute"
+            ).only(
+                "attribute__attribute_name",
+                "value",
+                "product_id"
         )
-        if self.request.user.is_staff:
-            return base_query
+
+
 
 
 class ProductListHomePageView(generics.ListAPIView):
