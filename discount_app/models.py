@@ -70,7 +70,8 @@ class ProductDiscount(CreateMixin, UpdateMixin):
     product_variant = models.ForeignKey(
         ProductVariant,
         on_delete=models.PROTECT,
-        related_name="product_variant_discounts"
+        related_name="product_variant_discounts",
+        limit_choices_to={"is_active": True}
     )
     # product = models.ForeignKey(
     #     Product,

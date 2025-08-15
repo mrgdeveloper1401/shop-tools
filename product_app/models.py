@@ -52,7 +52,9 @@ class AttributeValue(CreateMixin, UpdateMixin, SoftDeleteMixin):
     attribute = models.ForeignKey(
         Attribute,
         on_delete=models.PROTECT,
-        related_name="attribute_values")
+        related_name="attribute_values",
+        limit_choices_to={"is_active": True}
+    )
     attribute_value = models.CharField(max_length=255, db_index=True)
     is_active = models.BooleanField(default=True)
 
@@ -65,7 +67,8 @@ class ProductImages(CreateMixin, UpdateMixin, SoftDeleteMixin):
     product = models.ForeignKey(
         "Product",
         on_delete=models.PROTECT,
-        related_name="product_product_image"
+        related_name="product_product_image",
+        limit_choices_to={"is_active": True}
     )
     image = models.ForeignKey(
         "core_app.Image",
@@ -108,7 +111,8 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="product_brands",
         blank=True,
-        null=True
+        null=True,
+        limit_choices_to={"is_active": True}
     )
     category = models.ForeignKey(
         Category,
@@ -156,7 +160,8 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
     product = models.ForeignKey(
         Product,
         on_delete=models.PROTECT,
-        related_name="variants"
+        related_name="variants",
+        limit_choices_to={"is_active": True}
     )
     price = models.DecimalField(max_digits=12, decimal_places=3)
     name = models.CharField(max_length=255, db_index=True, blank=True, null=True) # TODO when clean migration, remove field blank and null
@@ -177,11 +182,13 @@ class ProductAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin):
         "Product",
         on_delete=models.PROTECT,
         related_name="attributes",
+        limit_choices_to={"is_active": True}
     )
     attribute = models.ForeignKey(
         Attribute,
         on_delete=models.PROTECT,
-        related_name="variant_attributes"
+        related_name="variant_attributes",
+        limit_choices_to={"is_active": True}
     )
     value = models.CharField(max_length=255)
 
@@ -195,11 +202,13 @@ class ProductComment(MP_Node, CreateMixin, UpdateMixin):
         "account_app.User",
         on_delete=models.DO_NOTHING,
         related_name="user_product_comments",
+        limit_choices_to={"is_active": True}
     )
     product = models.ForeignKey(
         "Product",
         on_delete=models.DO_NOTHING,
         related_name="product_product_comments",
+        limit_choices_to={"is_active": True}
     )
     comment_body = models.TextField()
     is_active = models.BooleanField(default=True)
@@ -213,12 +222,14 @@ class FavoriteProduct(CreateMixin, UpdateMixin, SoftDeleteMixin):
     product = models.ForeignKey(
         Product,
         on_delete=models.DO_NOTHING,
-        related_name='product_favorite_product'
+        related_name='product_favorite_product',
+        limit_choices_to={"is_active": True}
     )
     user = models.ForeignKey(
         "account_app.User",
         on_delete=models.DO_NOTHING,
-        related_name="user_favorite_product"
+        related_name="user_favorite_product",
+        limit_choices_to={"is_active": True}
     )
     is_active = models.BooleanField(default=True)
 
