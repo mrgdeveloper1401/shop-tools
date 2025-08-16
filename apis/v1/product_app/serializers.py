@@ -90,7 +90,8 @@ class NestedProductImageSerializer(serializers.ModelSerializer):
         fields = (
             "image",
             "order",
-            "alt_text_image"
+            "alt_text_image",
+            "updated_at"
         )
 
 

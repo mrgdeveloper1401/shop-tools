@@ -163,11 +163,12 @@ class ProductViewSet(viewsets.ModelViewSet):
             ).prefetch_related(
                     Prefetch(
                 "product_product_image", queryset=ProductImages.objects.select_related("image").only(
-                    "image__image",
-                    "image__image_id_ba_salam",
-                    "alt_text_image",
-                    "order",
-                    "product_id"
+                        "image__image",
+                        "image__image_id_ba_salam",
+                        "alt_text_image",
+                        "order",
+                        "product_id",
+                        "updated_at"
                         )
                 ),
                 Prefetch(
@@ -467,7 +468,8 @@ class ProductListHomePageView(generics.ListAPIView):
                 "image__image_id_ba_salam",
                 "order",
                 "product_id",
-                "alt_text_image"
+                "alt_text_image",
+                "updated_at"
             )
         ),
         Prefetch(
