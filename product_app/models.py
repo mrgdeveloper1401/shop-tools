@@ -26,7 +26,7 @@ class Category(MP_Node, CreateMixin, UpdateMixin):
         return self.category_image.get_image_url if self.category_image else None
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = 'category'
 
 

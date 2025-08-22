@@ -36,7 +36,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     filter query --> (category_name, is_active) --> only user admin have filter
     """
     filterset_class = AdminProductCategoryFilter
-    pagination_class = FlexiblePagination
+    pagination_class = TwentyPageNumberPagination
 
     def get_queryset(self):
         base_query = Category.objects.select_related("category_image")
@@ -242,7 +242,7 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
     pagination --> 20 item for normal user and admin user \n
     filter query --> (category_name, is_active)
     """
-    pagination_class = FlexiblePagination
+    pagination_class = TwentyPageNumberPagination
     filterset_class = ProductBrandFilter
 
     def get_permissions(self):
