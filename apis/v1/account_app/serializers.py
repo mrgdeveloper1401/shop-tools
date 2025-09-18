@@ -136,6 +136,7 @@ class UserPrivateNotification(serializers.ModelSerializer):
             "notif_type",
             "user",
             "is_read",
+            "is_active",
             "notifi_redirect_url"
         )
 
@@ -146,6 +147,7 @@ class UserPrivateNotification(serializers.ModelSerializer):
         if not user_admin:
             field.pop("user", None)
             field.pop("is_read", None)
+            field.pop("is_active", None)
             field.pop("notifi_redirect_url", None)
 
         return field

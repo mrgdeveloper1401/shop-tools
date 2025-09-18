@@ -197,6 +197,7 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
             "created_at",
             "notif_type",
             "is_read",
+            "is_active",
             "notifi_redirect_url"
         )
 
