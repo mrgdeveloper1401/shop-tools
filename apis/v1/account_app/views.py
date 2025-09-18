@@ -181,7 +181,10 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if not self.request.user.is_staff:
-            return PrivateNotification.objects.filter(user_id=self.request.user.id).only(
+            return PrivateNotification.objects.filter(
+                user_id=self.request.user.id,
+                is_active=True
+            ).only(
                 "title",
                 "body",
                 "created_at",
