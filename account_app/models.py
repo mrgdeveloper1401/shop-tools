@@ -52,21 +52,6 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         name = self.profile.full_name
         return name if name else None
 
-    # def generate_activation_key(self):
-    #     self.activation_key = str(uuid.uuid4())
-    #     self.key_expires = timezone.now() + timezone.timedelta(days=1)
-    #     self.save()
-    #     return self.activation_key
-
-    # def __str__(self):
-    #     if self.mobile_phone:
-    #         return self.mobile_phone
-    #     else:
-    #         return None
-
-    # def __str__(self):
-    #     return self.email
-
 
 class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name="profile")
@@ -87,6 +72,10 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     @cached_property
     def profile_image_url(self):
         return self.profile_image.image.url if self.profile_image else None
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class State(models.Model):

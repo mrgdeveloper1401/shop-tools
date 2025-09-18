@@ -357,7 +357,7 @@ class TicketSerializer(serializers.ModelSerializer):
                 **validated_data
             )
         else:
-            ticket = get_object_or_404(Ticket, id=parent)
+            ticket = get_object_or_404(Ticket, id=parent, is_active=True)
             self.instance = ticket.add_child(
                 room_id=int(room_id),
                 sender_id=user_id,
