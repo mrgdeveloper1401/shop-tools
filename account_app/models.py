@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
 
+from core.utils.validators import PhoneNumberValidator
 from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
 
 
@@ -18,7 +19,8 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         max_length=15,
         unique=True,
         null=True,
-        blank=True
+        blank=True,
+        validators=(PhoneNumberValidator,)
     )
     username = models.CharField(
         _("username"),

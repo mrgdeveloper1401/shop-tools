@@ -6,6 +6,7 @@ from rest_framework.generics import get_object_or_404
 from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, Ticket
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
+from core.utils.validators import PhoneNumberValidator
 from core_app.models import Image
 
 
@@ -74,6 +75,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserCreateSerializer(serializers.ModelSerializer):
     access_token = serializers.SerializerMethodField()
+
+    def validate_mobile_phone(self, value):
+        validator = PhoneNumberValidator()
+        validator(value)
+        return value
 
     class Meta:
         model = User

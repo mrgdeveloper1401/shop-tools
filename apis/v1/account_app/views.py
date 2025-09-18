@@ -16,7 +16,6 @@ from . import serializers
 
 class UserCreateViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     """mobile phone and password is required"""
-
     queryset = User.objects.only("id")
     serializer_class = serializers.UserCreateSerializer
     permission_classes = (NotAuthenticated,)
