@@ -254,7 +254,7 @@ class StateViewSet(
     def get_queryset(self):
         return State.objects.only(
             "name"
-        )
+        ).filter(is_active=True)
 
 
 class CityViewSet(
@@ -266,7 +266,9 @@ class CityViewSet(
 
     def get_queryset(self):
         return City.objects.filter(
-            state_id=self.kwargs['state_pk']
+            state_id=self.kwargs['state_pk'],
+            state__is_active=True,
+            is_active=True
         ).only(
             "name",
             "state_id"

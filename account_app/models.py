@@ -93,6 +93,7 @@ class State(models.Model):
     name = models.CharField(_("state name"), max_length=150)
     slug = models.SlugField(max_length=150, allow_unicode=True, null=True)
     tel_prefix = models.CharField(max_length=3, null=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "state"
@@ -101,6 +102,7 @@ class State(models.Model):
 class City(models.Model):
     name = models.CharField(_("city name"), max_length=150)
     state = models.ForeignKey(State, on_delete=models.PROTECT, related_name="cities")
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "city"

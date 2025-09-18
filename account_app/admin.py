@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
@@ -129,21 +130,44 @@ class PrivateNotificationAdmin(admin.ModelAdmin):
 
 @admin.register(State)
 class StateAdmin(admin.ModelAdmin):
-    list_display = ("name", "id", "slug", "tel_prefix")
-    search_fields = ("state",)
+    list_display = ("name", "id", "slug", "tel_prefix", "is_active")
+    search_fields = ("name",)
+    list_filter = ("is_active",)
+    list_editable = ("is_active",)
     search_help_text = _("برای جست و جو میتوانید از نام استان استفاده کنید")
+    actions = ("disable_is_active", "enable_is_active")
+
+    @admin.action(description=_("disable show state"))
+    def disable_is_active(self, request, queryset):
+        queryset.update(is_active=False)
+
+    @admin.action(description=_("enable show state"))
+    def enable_is_active(self, request, queryset):
+        queryset.update(is_active=True)
 
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
-    list_display = ("name", "state_id")
+    list_display = ("name", "state_id", "is_active")
     search_fields = ("name",)
+    list_filter = ('is_active',)
+    list_editable = ('is_active',)
     search_help_text = _("برای جست و جو میتوانید از نام شهر استفاده کنید")
+    actions = ("disable_is_active", "enable_is_active")
+
+    @admin.action(description=_("disable show city"))
+    def disable_is_active(self, request, queryset):
+        queryset.update(is_active=False)
+
+    @admin.action(description=_("enable show city"))
+    def enable_is_active(self, request, queryset):
+        queryset.update(is_active=True)
 
     def get_queryset(self, request):
         return super().get_queryset(request).only(
             "name",
-            "state_id"
+            "state_id",
+            "is_active"
         )
 
 
