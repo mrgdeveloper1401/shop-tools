@@ -41,9 +41,9 @@ class AdminUserAddressFilter(FilterSet):
 class UserMobilePhoneFilter(FilterSet):
     class Meta:
         model = User
-        fields = (
-            "mobile_phone",
-        )
+        fields = {
+            "mobile_phone": ['contains'],
+        }
 
 
 class ProductBrandFilter(FilterSet):

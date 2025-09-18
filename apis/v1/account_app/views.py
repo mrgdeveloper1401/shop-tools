@@ -223,6 +223,7 @@ class UserAddressViewSet(viewsets.ModelViewSet):
 
 class AdminUserListview(generics.ListAPIView):
     """
+    show list use phone \n
     you can show list user \n
     permission --> admin user \n
     filter query --> mobile_phone

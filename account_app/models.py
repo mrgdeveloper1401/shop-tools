@@ -1,5 +1,4 @@
 import random
-# import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
@@ -8,13 +7,11 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
-# from django.utils import timezone
 
 from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
 
 
 # Create your models here.
-
 class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, CreateMixin):
     mobile_phone = models.CharField(
         _("mobile phone"), 
@@ -38,8 +35,6 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    # activation_key = models.CharField(max_length=100, blank=True, null=True)
-    # key_expires = models.DateTimeField(blank=True, null=True)
 
     USERNAME_FIELD = 'mobile_phone'
     REQUIRED_FIELDS = ('email', "username")
@@ -75,8 +70,6 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name="profile")
     first_name = models.CharField(_("first name"), max_length=150, blank=True, null=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True, null=True)
-    # display_name = models.CharField(_("display name"), max_length=150, blank=True, null=True)
-    # full_name = models.CharField(_("full name"), max_length=150, blank=True, null=True)
     profile_image = models.ForeignKey(
         "core_app.Image",
         on_delete=models.PROTECT,
