@@ -21,3 +21,4 @@ pillow
 django-ckeditor-5
 django-debug-toolbar
 gunicorn
+ipython
