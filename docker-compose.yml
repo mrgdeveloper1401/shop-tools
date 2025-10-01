@@ -12,6 +12,7 @@ services:
     restart: always
     depends_on:
       - db
+      - nginx
 
   db:
     container_name: gs_db
@@ -51,6 +52,8 @@ services:
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
       CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
+    depends_on:
+      - app
 
 volumes:
   gs_postgres_data:
