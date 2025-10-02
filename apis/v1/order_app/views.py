@@ -284,7 +284,9 @@ class VerifyPaymentGatewayView(views.APIView):
         verify_req = verify_payment(int(track_id))
 
         message_verify_success = verify_req.get("message")
+        print(message_verify_success)
         status_verify_req = verify_req.get('status')
+        print(status_verify_req)
 
         if message_verify_success == "success" and int(status_verify_req) == 1:
             # filter query PaymentGateway
