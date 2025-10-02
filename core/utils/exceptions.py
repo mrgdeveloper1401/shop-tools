@@ -5,10 +5,10 @@ from rest_framework import exceptions
 from django.utils.translation import gettext_lazy as _
 
 
-# class PaymentBaseError(exceptions.APIException):
-#     """Base class for payment gateway exceptions"""
-#     status_code = 400
-#     default_detail = _("A request error occurred.")
+class PaymentBaseError(exceptions.APIException):
+    """Base class for payment gateway exceptions"""
+    status_code = 400
+    default_detail = _("A request error occurred.")
 
 
 class HttpConnectionError(exceptions.APIException):
