@@ -284,13 +284,11 @@ class VerifyPaymentGatewayView(views.APIView):
         verify_req = verify_payment(int(track_id))
 
         message_verify_success = verify_req.get("message")
-        print(message_verify_success)
         status_verify_req = verify_req.get('status')
-        print(status_verify_req)
 
         if message_verify_success == "success" and int(status_verify_req) == 1:
             # filter query PaymentGateway
-            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id).only("id", "order_id")
+            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id)
             if payment:
                 # get obj payment
                 get_payment = payment.last()
@@ -300,7 +298,7 @@ class VerifyPaymentGatewayView(views.APIView):
                     payment_gateway_id=get_payment.id,
                     result=verify_req
                     )
-                Order.objects.filter(id=get_payment.id).update(
+                Order.objects.filter(id=get_payment.order_id).update(
                         is_complete=True,
                         status="paid"
                     )
