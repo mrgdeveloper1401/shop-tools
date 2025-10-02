@@ -250,12 +250,38 @@ class VerifyPaymentGatewayView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        status = request.query_params.get("status")
-        track_id = int(request.query_params.get("trackId"))
-        order_id = request.query_params.get("orderId")
+        status = request.query_params.get("status", None)
+        track_id = request.query_params.get("trackId", None)
+        order_id = request.query_params.get("orderId", None)
+
+        if not status:
+            raise exceptions.ValidationError(
+                {
+                    "status": False,
+                    "message": "status params is required"
+                },
+                code="required"
+            )
+
+        if not track_id:
+            raise exceptions.ValidationError(
+                {
+                    status: "false",
+                    message: "trackId is required"
+                },
+                code="required"
+            )
+
+        if not order_id:
+            raise exceptions.ValidationError(
+                {
+                    "status": "false",
+                    "message": "orderId is required"
+                }
+            )
 
         # send request into gateway
-        verify_req = verify_payment(track_id)
+        verify_req = verify_payment(int(track_id))
 
         if verify_req:
             # create instance of model by celery
