@@ -121,24 +121,6 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         final_price += self.calc_price_preposition_wight
         return final_price
 
-    # def total_price(self, valid_coupon=None, product_discounts=None, variants=None):
-    #     base_total = 0
-    #
-    #     # اعمال تخفیف‌های محصول (اگر وجود داشته باشد)
-    #     if product_discounts:
-    #         base_total = self._apply_product_discounts(base_total, product_discounts, variants)
-    #
-    #     # اعمال کوپن تخفیف (اگر وجود داشته باشد)
-    #     if valid_coupon:
-    #         base_total = self._apply_coupon_discount(base_total, valid_coupon)
-    #
-    #     # محاسبه تعداد محصولات
-    #     # افزودن هزینه حمل و نقل
-    #     shipping_cost = int(self.shipping_cost) if self.shipping_cost else 0
-    #     final_price = base_total + shipping_cost
-    #
-    #     return final_price
-    #
     def _apply_product_discounts(self, amount, product_discounts):
         """اعمال تخفیف‌های محصول بر روی مبلغ"""
         discounted_amount = amount

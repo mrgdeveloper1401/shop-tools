@@ -8,6 +8,7 @@ from django.utils.dateparse import parse_date
 from openpyxl.styles import Font
 from rest_framework import viewsets, permissions, generics, mixins, views, exceptions, response, decorators
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
 from core.utils.exceptions import PaymentBaseError
@@ -266,7 +267,7 @@ class VerifyPaymentGatewayView(views.APIView):
         if not track_id:
             raise exceptions.ValidationError(
                 {
-                    status: "false",
+                    status: False,
                     message: "trackId is required"
                 },
                 code="required"
@@ -275,7 +276,7 @@ class VerifyPaymentGatewayView(views.APIView):
         if not order_id:
             raise exceptions.ValidationError(
                 {
-                    "status": "false",
+                    "status": False,
                     "message": "orderId is required"
                 }
             )
@@ -289,21 +290,34 @@ class VerifyPaymentGatewayView(views.APIView):
         if message_verify_success == "success" and int(status_verify_req) == 1:
             # filter query PaymentGateway
             payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id)
-            if payment:
-                # get obj payment
-                get_payment = payment.last()
+            if not payment.exists():
+                    raise exceptions.NotFound({
+                        "status": False,
+                        "message": f"Payment with track id {track_id} not found"
+                    })
+            # get obj payment
+            get_payment = payment.last()
 
-                 # create instance of model VerifyPaymentGateWay
-                VerifyPaymentGateWay.objects.create(
-                    payment_gateway_id=get_payment.id,
-                    result=verify_req
+            # create instance of model VerifyPaymentGateWay
+            VerifyPaymentGateWay.objects.create(
+                payment_gateway_id=get_payment.id,
+                result=verify_req
+                )
+            Order.objects.filter(id=order_id).update(
+                    is_complete=True,
+                    status="paid",
+                    profile__user_id=request.user.id,
+                    payment_date=timezone.now()
                     )
-                Order.objects.filter(id=get_payment.order_id).update(
-                        is_complete=True,
-                        status="paid"
-                    )
-                send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
-        return response.Response(verify_req)
+            send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
+        return response.Response(
+            data={
+                "status": True,
+                "message": "Payment verified successfully",
+                "payment_data": verify_req,
+                "order_id": order_id
+            }
+        )
         # if verify_req:
 
             # filter query PaymentGateway
