@@ -19,9 +19,9 @@ from core.utils.ck_editor import CKEDITOR_5_CONFIGS, customColorPalette
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEBUG = config("DEBUG", cast=bool, default=False)
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # third party package
     "rest_framework",
     "django_ckeditor_5",
     "drf_spectacular",
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "treebeard",
 
+    # third party app
     "account_app.apps.AccountAppConfig",
     "product_app.apps.ProductAppConfig",
     "blog_app.apps.BlogAppConfig",
@@ -125,6 +127,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'account_app.User'
 
+# swagger settings
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Your API',
     'DESCRIPTION': 'API description',
@@ -137,6 +140,7 @@ SPECTACULAR_SETTINGS = {
 # Define a constant in settings.py to specify file upload permissions
 CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff"  # Possible values: "staff", "authenticated", "any"
 
+# drf framework settings
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -148,7 +152,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-
+# config JWT settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
@@ -188,6 +192,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
+# config cache
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -197,6 +202,9 @@ CACHES = {
     }
 }
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+# config celery
 CELERY_ACCEPT_CONTENT = config("CELERY_ACCEPT_CONTENT", default="json", cast=Csv())
 # print(CELERY_ACCEPT_CONTENT)
 CELERY_TASK_SERIALIZER=config("CELERY_TASK_SERIALIZER", cast=str)
@@ -206,13 +214,14 @@ CELERY_TIMEZONE=config("CELERY_TIMEZONE", cast=str)
 CELERY_ENABLE_UTC=config("CELERY_ENABLE_UTC", cast=bool)
 CELERY_WORKER_CONCURRENCY = config("CELERY_WORKER_CONCURRENCY", cast=int, default=1)
 
-STORAGES = {
-    'default':
-        {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage'
-        },
-    'staticfiles':
-        {
-            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-        }
-}
+# condig storage
+# STORAGES = {
+#     'default':
+#         {
+#             'BACKEND': 'django.core.files.storage.FileSystemStorage'
+#         },
+#     'staticfiles':
+#         {
+#             'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#         }
+# }

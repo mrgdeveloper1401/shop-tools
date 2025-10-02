@@ -2,8 +2,6 @@ from core.settings import *
 
 SECRET_KEY = 'django-insecure-bpg-62bxjk+m1fotiez1b#oi295y!r!)k!*&er0lj3b1h_cw_e'
 
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS += [
@@ -40,23 +38,10 @@ DATABASES = {
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",
-        "PORT": 5433,
+        "PORT": 5434,
         "CONN_MAX_AGE": 6000
     }
 }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "mysql",
-#         "USER": "root",
-#         "PASSWORD": "password",
-#         "HOST": "localhost",
-#         "PORT": 3307,
-#         "CONN_MAX_AGE": 6000
-#     }
-# }
-
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
@@ -66,6 +51,4 @@ CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
 
-CACHES['default']['LOCATION'] = "redis://127.0.0.1:6380/1"
-
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+CACHES['default']['LOCATION'] = "redis://127.0.0.1:6381/1"

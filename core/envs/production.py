@@ -3,6 +3,7 @@ import os
 
 from core.settings import *
 
+
 ALLOWED_HOSTS = config("PRODUCTION_ALLOWED_HOSTS", cast=Csv())
 
 SECRET_KEY = config("PRODUCTION_SECRET_KEY", cast=str)
@@ -50,9 +51,6 @@ SECURE_REFERRER_POLICY = "strict-origin"
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_COOKIE_AGE = 3600
-
-
-STORAGES['default']['BACKEND'] = "storages.backends.s3.S3Storage"
 
 AWS_S3_REGION_NAME = 'eu-west-1'
 AWS_DEFAULT_ACL = 'public-read'
@@ -109,3 +107,7 @@ CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']
 
 # FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 2
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 2
+
+# config storage
+STORAGES['default']['BACKEND'] = "storages.backends.s3.S3Storage"
+STORAGES['staticfiles']['BACKEND'] = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
