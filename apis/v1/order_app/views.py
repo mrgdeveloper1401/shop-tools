@@ -282,42 +282,40 @@ class VerifyPaymentGatewayView(views.APIView):
 
         # send request into gateway
         verify_req = verify_payment(int(track_id))
-
-        if verify_req:
-            # create instance of model by celery
-            # create_verify_payment.delay(verify, track_id)
+        return response.Response(verify_req)
+        # if verify_req:
 
             # filter query PaymentGateway
-            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id).only("id", "order_id")
+            # payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id).only("id", "order_id")
 
-            if payment:
+            # if payment:
                 # get obj payment
-                get_payment = payment.last()
+                # get_payment = payment.last()
 
                 # create instance of model VerifyPaymentGateWay
-                VerifyPaymentGateWay.objects.create(
-                    payment_gateway_id=get_payment.id,
-                    result=verify_req
-                )
+                # VerifyPaymentGateWay.objects.create(
+                    # payment_gateway_id=get_payment.id,
+                    # result=verify_req
+                # )
 
-                verify_status = verify_req.get("status")
+                # verify_status = verify_req.get("status")
 
-                if verify_status == 1:
+                # if verify_status == 1:
                     # update payment after response successfully
-                    Order.objects.filter(id=get_payment.id).update(
-                        is_complete=True,
-                        status="paid"
-                    )
-                    send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
-                    return verify_req
-                else:
-                    raise exceptions.ValidationError(
-                        {
-                            "message": _("Your payment encountered an error.")
-                        }
-                    )
-            else:
-                raise PaymentBaseError
+                    # Order.objects.filter(id=get_payment.id).update(
+                        # is_complete=True,
+                        # status="paid"
+                    # )
+                    # send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
+                    # return verify_req
+                # else:
+                    # raise exceptions.ValidationError(
+                        # {
+                            # "message": _("Your payment encountered an error.")
+                        # }
+                    # )
+            # else:
+                # raise PaymentBaseError
 
 
 # class AnalyticsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
