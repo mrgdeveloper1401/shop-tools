@@ -5,25 +5,25 @@ from rest_framework import exceptions
 from django.utils.translation import gettext_lazy as _
 
 
-class PaymentBaseError(exceptions.APIException):
-    """Base class for payment gateway exceptions"""
-    status_code = 400
-    default_detail = _("A request error occurred.")
+# class PaymentBaseError(exceptions.APIException):
+#     """Base class for payment gateway exceptions"""
+#     status_code = 400
+#     default_detail = _("A request error occurred.")
 
 
-class HttpConnectionError(PaymentBaseError):
+class HttpConnectionError(exceptions.APIException):
     pass
 
 
-class TimeOutError(PaymentBaseError):
+class TimeOutError(exceptions.APIException):
     pass
 
 
-class HTTPStatusError(PaymentBaseError):
+class HTTPStatusError(exceptions.APIException):
     pass
 
 
-class InvalidDataError(PaymentBaseError):
+class InvalidDataError(exceptions.APIException):
     pass
 
 
@@ -33,9 +33,9 @@ def http_error(func):
         try:
             return func(*args, **kwargs)
         except httpx.ConnectError as ce:
-            raise HttpConnectionError("connect error", ce)
+            raise HttpConnectionError(detail=str(ce))
         except httpx.TimeoutException as te:
-            raise TimeOutError("timeout error", te)
+            raise TimeOutError(detail=str(te))
         except Exception as e:
-            raise InvalidDataError(e)
+            raise InvalidDataError(detail=str(e))
     return wrapper
