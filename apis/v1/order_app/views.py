@@ -282,6 +282,27 @@ class VerifyPaymentGatewayView(views.APIView):
 
         # send request into gateway
         verify_req = verify_payment(int(track_id))
+
+        message_verify_success = verify_req.get("message")
+        status_verify_req = verify_req.get('status')
+
+        if message_verify_success == "success" and int(status_verify_req) == 1:
+            # filter query PaymentGateway
+            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id).only("id", "order_id")
+            if payment:
+                # get obj payment
+                get_payment = payment.last()
+
+                 # create instance of model VerifyPaymentGateWay
+                VerifyPaymentGateWay.objects.create(
+                    payment_gateway_id=get_payment.id,
+                    result=verify_req
+                    )
+                Order.objects.filter(id=get_payment.id).update(
+                        is_complete=True,
+                        status="paid"
+                    )
+                send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
         return response.Response(verify_req)
         # if verify_req:
 
