@@ -101,7 +101,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     @cached_property
     def calc_price_preposition_wight(self):
-        amount = 40_000
+        amount = 4_000
         return amount
 
     def total_price(self, variants, coupon_code=None):
