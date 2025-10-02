@@ -103,8 +103,6 @@ LOGGING = {
     }
 }
 
-CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']
-
 # FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 2
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 2
 
@@ -112,10 +110,12 @@ CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']
 STORAGES = {
     'default':
         {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage'
+            'BACKEND': 'storages.backends.s3.S3Storage'
         },
     'staticfiles':
         {
             'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
         }
 }
+
+CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']
