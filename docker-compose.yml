@@ -10,6 +10,8 @@ services:
     env_file: ".env"
     entrypoint: ["/home/app/scripts/start.sh"]
     restart: always
+    volumes:
+      - static_files:/home/app/staticfiles
     depends_on:
       - db
       - nginx
@@ -57,3 +59,4 @@ services:
 
 volumes:
   gs_postgres_data:
+  static_files:
