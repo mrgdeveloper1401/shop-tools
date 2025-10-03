@@ -120,7 +120,7 @@ def create_product(*args, **kwargs):
             )
             
             # بررسی وضعیت پاسخ
-            if response.status_code != 200:
+            if response.status_code != 201:
                 error_detail = response.json() if response.content else response.text
                 raise exceptions.ValidationError({
                     "status": False,
