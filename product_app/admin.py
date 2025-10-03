@@ -26,6 +26,8 @@ class ProductSku(admin.SimpleListFilter):
         return (
             ("has_sku", "دارای SKU"),
             ("no_sku", "بدون SKU"),
+            ('has_ba_salam', "درون با سلام"),
+            ("not_in_ba_salam", "درون با سلام نیست")
         )
 
     def queryset(self, request, queryset):
@@ -33,6 +35,10 @@ class ProductSku(admin.SimpleListFilter):
             return queryset.filter(sku__isnull=False)
         elif self.value() == "no_sku":
             return queryset.filter(sku__isnull=True)
+        elif self.value() == "has_ba_salam":
+            return queryset.filter(product_id_ba_salam__isnull=False)
+        elif self.value() == "not_in_ba_salam":
+            return queryset.filter(product_id_ba_salam__isnull=True)
         return queryset
 
 
@@ -53,7 +59,7 @@ class ProductAdmin(admin.ModelAdmin):
         "base_price",
         "product_id_ba_salam"
     )
-    list_filter = ("is_active",)
+    list_filter = ("is_active", ProductSku)
     list_editable = ("is_active",)
     list_per_page = 30
 
