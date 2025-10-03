@@ -310,14 +310,15 @@ class VerifyPaymentGatewayView(views.APIView):
                     payment_date=timezone.now()
                     )
             send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
-        return response.Response(
-            data={
-                "status": True,
-                "message": "Payment verified successfully",
-                "payment_data": verify_req,
-                "order_id": order_id
-            }
-        )
+        return response.Response(verify_req)
+        # return response.Response(
+        #     data={
+        #         "status": True,
+        #         "message": "Payment verified successfully",
+        #         "payment_data": verify_req,
+        #         "order_id": order_id
+        #     }
+        # )
         # if verify_req:
 
             # filter query PaymentGateway
