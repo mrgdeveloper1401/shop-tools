@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from account_app.models import Profile, UserAddress
 from account_app.validators import MobileRegexValidator
@@ -217,6 +218,7 @@ class CreateOrderSerializer(serializers.Serializer):
         if calc_total_price == 0: # check final price is zero
             order.status = 'paid'
             order.is_complete = True
+            order.payment_date = timezone.now()
             order.save()
             json_data = {"message": "success", "result": 100}
             create_gateway_payment.delay(
@@ -236,7 +238,7 @@ class CreateOrderSerializer(serializers.Serializer):
                 order_id=order.id,
                 mobile=validated_data.get("mobile_phone", None)
             )
-            create_gateway_payment.delay(order.id, payment_gateway)
+            create_gateway_payment.delay(order.id, payment_gateway, user.id)
         return {
             "items": items,
             "shipping": shipping,
