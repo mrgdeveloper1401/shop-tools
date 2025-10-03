@@ -221,7 +221,8 @@ class CreateOrderSerializer(serializers.Serializer):
             json_data = {"message": "success", "result": 100}
             create_gateway_payment.delay(
                 order_id=order.id,
-                json_data=json_data
+                json_data=json_data,
+                user_id = user.id
             )
             json_data['items'] = items
             json_data['shipping'] = shipping

@@ -248,6 +248,9 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
 
 
 class VerifyPaymentGatewayView(views.APIView):
+    """
+    example --> ?success=1&status=2&trackId=4281457157&orderId=121
+    """
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):

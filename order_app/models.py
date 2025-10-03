@@ -225,6 +225,7 @@ class PaymentGateWay(CreateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="payment_gateways",
     )
+    user = models.ForeignKey("account_app.User", on_delete=models.PROTECT, related_name="gateways", blank=True, null=True)
     payment_gateway = models.JSONField()
 
     class Meta:

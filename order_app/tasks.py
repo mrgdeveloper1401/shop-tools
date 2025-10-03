@@ -18,7 +18,7 @@ def send_notification_order_complete():
 
 
 @shared_task()
-def create_gateway_payment(order_id, json_data):
+def create_gateway_payment(order_id, json_data, user_id):
     from order_app.models import PaymentGateWay
 
     PaymentGateWay.objects.create(
