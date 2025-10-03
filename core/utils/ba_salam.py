@@ -129,9 +129,6 @@ def create_product(*args, **kwargs):
                 })
                 
             return response.json()
-            
-    except exceptions.ValidationError:
-        raise  # اگر از قبل ValidationError بوده، دوباره raise کن
     except Exception as e:
         raise exceptions.ValidationError({
             "status": False,
