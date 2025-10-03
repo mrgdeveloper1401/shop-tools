@@ -156,7 +156,6 @@ class TrobSerializer(serializers.ModelSerializer):
     date_added = serializers.CharField(source="created_at")
     date_updated = serializers.CharField(source="updated_at")
     current_price = serializers.CharField(source="price")
-    api_version = serializers.CharField(default="torob_api_v3")
     guarantee = serializers.CharField(default=None)
 
     class Meta:
@@ -172,7 +171,6 @@ class TrobSerializer(serializers.ModelSerializer):
             "subtitle",
             "old_price",
             "short_desc",
-            "api_version",
             "guarantee"
         )
 
