@@ -306,10 +306,9 @@ class VerifyPaymentGatewayView(views.APIView):
                 payment_gateway_id=get_payment.id,
                 result=verify_req
                 )
-            Order.objects.filter(id=int(order_id)).update(
+            Order.objects.filter(id=int(order_id), profile__user_id=request.user.id).update(
                     is_complete=True,
                     status="paid",
-                    profile__user_id=request.user.id,
                     payment_date=timezone.now()
                     )
             send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
