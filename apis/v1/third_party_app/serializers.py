@@ -105,7 +105,7 @@ class CreateProductBaSalamSerializer(serializers.Serializer):
         help_text=_("وزن محصول با بسته بندی محصول"),
     )
     primary_price = serializers.IntegerField()
-    stock = serializers.IntegerField(help_text=_("موجودی محصول"))
+    stock = serializers.IntegerField(help_text=_("موجودی محصول"), default=10)
     description = serializers.CharField(help_text=_("توضحی در مورد محصول"))
     is_wholesale = serializers.BooleanField(
         default=False,
