@@ -76,14 +76,18 @@ class AdminOrderSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(source="product_variant.product.category_id")
     product_id = serializers.IntegerField(source="product_variant.product_id")
+    variant_name = serializers.CharField(source="product_variant.name")
+    product_name = serializers.CharField(source="product_variant.product.product_name")
 
     class Meta:
         model = OrderItem
         fields = (
             "id",
             "product_variant_id",
+            "variant_name",
             "category_id",
             "product_id",
+            "product_name",
             "quantity",
             "price",
             "calc_price_quantity",

@@ -113,12 +113,14 @@ class OrderItemViewSet(viewsets.ModelViewSet):
                 "order"
             ).only(
                 "order__is_active",
+                "product_variant__name",
                 "price",
                 "created_at",
                 "quantity",
                 "product_variant_id",
                 "product_variant__product_id",
                 "product_variant__product__category_id",
+                "product_variant__product__product_name"
             )
 
 
