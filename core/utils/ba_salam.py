@@ -124,7 +124,7 @@ def create_product(*args, **kwargs):
         raise exceptions.ValidationError(
             {
                 "status": False,
-                "message": str(e)
+                "message": e['message']
             }
         )
 
