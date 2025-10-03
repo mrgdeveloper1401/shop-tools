@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.db.models import JSONField
+from django_json_widget.widgets import JSONEditorWidget
 
 from .models import (
     Order,
@@ -70,7 +72,11 @@ class PaymentGateWayAdmin(admin.ModelAdmin):
     list_display = (
         "order",
         "id",
-        "created_at"    )
+        "created_at",
+        )
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
 
 
 @admin.register(VerifyPaymentGateWay)
@@ -80,3 +86,6 @@ class ResultPaymentGateWayAdmin(admin.ModelAdmin):
         "id",
         "created_at"    
         )
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
