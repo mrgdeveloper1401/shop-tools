@@ -123,8 +123,8 @@ def create_product(*args, **kwargs):
     except Exception as e:
         raise exceptions.ValidationError(
             {
-                status: False,
-                message: str(e)
+                "status": False,
+                "message": str(e)
             }
         )
 
