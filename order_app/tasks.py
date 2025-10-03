@@ -23,6 +23,7 @@ def create_gateway_payment(order_id, json_data, user_id):
 
     PaymentGateWay.objects.create(
         order_id=order_id,
+        user_id=user_id,
         payment_gateway=json_data
     )
 
