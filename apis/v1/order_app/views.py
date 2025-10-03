@@ -292,7 +292,7 @@ class VerifyPaymentGatewayView(views.APIView):
 
         if message_verify_success == "success" and int(status_verify_req) == 1:
             # filter query PaymentGateway
-            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=int(track_id))
+            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=int(track_id), user_id=request.user.id)
             if not payment.exists():
                     raise exceptions.NotFound({
                         "status": False,
@@ -306,7 +306,7 @@ class VerifyPaymentGatewayView(views.APIView):
                 payment_gateway_id=get_payment.id,
                 result=verify_req
                 )
-            Order.objects.filter(id=order_id).update(
+            Order.objects.filter(id=int(order_id)).update(
                     is_complete=True,
                     status="paid",
                     profile__user_id=request.user.id,
