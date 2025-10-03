@@ -270,8 +270,8 @@ class VerifyPaymentGatewayView(views.APIView):
         if not track_id:
             raise exceptions.ValidationError(
                 {
-                    status: False,
-                    message: "trackId is required"
+                    "status": False,
+                    "message": "trackId is required"
                 },
                 code="required"
             )
@@ -306,7 +306,7 @@ class VerifyPaymentGatewayView(views.APIView):
                 payment_gateway_id=get_payment.id,
                 result=verify_req
                 )
-            Order.objects.filter(id=int(order_id), profile__user_id=request.user.id).update(
+            Order.objects.filter(id=int(order_id), profile__user=request.user).update(
                     is_complete=True,
                     status="paid",
                     payment_date=timezone.now()
