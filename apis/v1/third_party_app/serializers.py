@@ -1,6 +1,7 @@
 from rest_framework import serializers, exceptions
 # from asgiref.sync import sync_to_async
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.browsable_api_custom import TextInputListField
@@ -157,10 +158,12 @@ class TrobSerializer(serializers.ModelSerializer):
     date_updated = serializers.CharField(source="updated_at")
     current_price = serializers.CharField(source="price")
     guarantee = serializers.CharField(default=None)
+    page_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductVariant
         fields = (
+            "page_url",
             "title",
             "availability",
             "category_name",
@@ -179,3 +182,11 @@ class TrobSerializer(serializers.ModelSerializer):
             str(product_image.image.image.url)
             for product_image in obj.product.product_product_image.all()
         ]
+
+    def get_page_url(self, obj):
+        product_category_id = obj.product.category_id
+        product_id = obj.product_id
+        product_variant_id = obj.id
+        base_url = "http://localhost:8000" if settings.DEBUG else "https://api.gs-tools.ir"
+        page_url = f"{base_url}/v1/product/product_category/{product_category_id}/products/{product_id}/product_variant/{product_variant_id}/"
+        return page_url
