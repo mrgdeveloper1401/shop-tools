@@ -44,11 +44,18 @@ class CategoryAdmin(TreeAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_filter = (ProductSku, )
+    search_fields = ("product_name",)
     list_display = (
         "product_name",
+        "id",
         "total_sale",
-        "is_active"
+        "is_active",
+        "base_price",
+        "product_id_ba_salam"
     )
+    list_filter = ("is_active",)
+    list_editable = ("is_active",)
+    list_per_page = 30
 
 
 @admin.register(Attribute)
