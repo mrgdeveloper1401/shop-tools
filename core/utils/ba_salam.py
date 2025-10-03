@@ -3,6 +3,7 @@ import httpx
 import json
 
 from decouple import config
+from rest_framework import exceptions
 
 from core.utils.exceptions import http_error
 
@@ -95,30 +96,47 @@ def read_category_attribute(category_id=None):
 
 # @http_error
 def create_product(*args, **kwargs):
-    with httpx.Client() as client:
-        json_data = {
-            "name": kwargs.get("name"),
-            "category_id": kwargs.get("category_id"),
-            "status": kwargs.get("status"),
-            "preparation_days": kwargs.get("preparation_days"),
-            "weight": kwargs.get("weight"),
-            "package_weight": kwargs.get("package_weight"),
-            "primary_price": kwargs.get("primary_price"),
-            "stock": kwargs.get("stock"),
-            "description": kwargs.get("description"),
-            "is_wholesale": kwargs.get("is_wholesale"),
-            "sku": kwargs.get("sku"),
-            "photo": kwargs.get("photo"),
-        }
-        json_data = {k: v for k, v in json_data.items() if v is not None}
-        response = client.post(
-            url=config("BA_SALAM_CREATE_PRODUCT_URL", cast=str).format(1140147),
-            headers=header(),
-            json=json_data,
-        )
-        res_status = response.raise_for_status()
-        return response.json()
-
+    try:
+        with httpx.Client() as client:
+            json_data = {
+                "name": kwargs.get("name"),
+                "category_id": kwargs.get("category_id"),
+                "status": kwargs.get("status"),
+                "preparation_days": kwargs.get("preparation_days"),
+                "weight": kwargs.get("weight"),
+                "package_weight": kwargs.get("package_weight"),
+                "primary_price": kwargs.get("primary_price"),
+                "stock": kwargs.get("stock"),
+                "description": kwargs.get("description"),
+                "is_wholesale": kwargs.get("is_wholesale"),
+                "sku": kwargs.get("sku"),
+                "photo": kwargs.get("photo"),
+            }
+            json_data = {k: v for k, v in json_data.items() if v is not None}
+            response = client.post(
+                url=config("BA_SALAM_CREATE_PRODUCT_URL", cast=str).format(1140147),
+                headers=header(),
+                json=json_data,
+            )
+            
+            # بررسی وضعیت پاسخ
+            if response.status_code != 200:
+                error_detail = response.json() if response.content else response.text
+                raise exceptions.ValidationError({
+                    "status": False,
+                    "http_status": response.status_code,
+                    "messages": error_detail
+                })
+                
+            return response.json()
+            
+    except exceptions.ValidationError:
+        raise  # اگر از قبل ValidationError بوده، دوباره raise کن
+    except Exception as e:
+        raise exceptions.ValidationError({
+            "status": False,
+            "message": str(e)
+        })
 
 @http_error
 def list_product(vendor_id):
