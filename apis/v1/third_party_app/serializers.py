@@ -6,6 +6,7 @@ from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.browsable_api_custom import TextInputListField
 from core.utils.enums import FileTypeChoices
 from core_app.models import Image, UploadFile
+from product_app.models import Product, ProductImages, ProductVariant
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):
@@ -137,3 +138,44 @@ class UpdateProductSerializer(serializers.Serializer):
 
 class CreateProductTorob(serializers.Serializer):
     pass
+
+
+class TorobProductImageSerializer(serializers.ModelSerializer):
+    image = serializers.CharField(source="image.image")
+
+    class Meta:
+        model = ProductImages
+        fields = ('image',)
+
+
+class TrobSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source="name")
+    availability = serializers.BooleanField(source="is_active")
+    category_name = serializers.CharField(source="product.category.category_name")
+    image_links = serializers.SerializerMethodField()
+    date_added = serializers.CharField(source="created_at")
+    date_updated = serializers.CharField(source="updated_at")
+    current_price = serializers.CharField(source="price")
+    api_version = serializers.CharField(default="torob_api_v3")
+
+    class Meta:
+        model = ProductVariant
+        fields = (
+            "title",
+            "availability",
+            "category_name",
+            "image_links",
+            "date_added",
+            "date_updated",
+            "current_price",
+            "subtitle",
+            "old_price",
+            "short_desc",
+            "api_version"
+        )
+
+    def get_image_links(self, obj):
+        return [
+            str(product_image.image.image)
+            for product_image in obj.product.product_product_image.all()
+        ]

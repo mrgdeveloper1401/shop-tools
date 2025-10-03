@@ -165,8 +165,11 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     price = models.DecimalField(max_digits=12, decimal_places=3)
     name = models.CharField(max_length=255, db_index=True, blank=True, null=True) # TODO when clean migration, remove field blank and null
+    subtitle = models.CharField(max_length=255, blank=True, null=True)
+    old_price = models.DecimalField(max_digits=12, decimal_places=3, blank=True, null=True)
     stock_number = models.PositiveIntegerField(default=0, db_default=0)
     is_active = models.BooleanField(default=True, db_default=True)
+    short_desc = models.CharField(max_length=255, blank=True, null=True)
 
     @cached_property
     def is_available(self):

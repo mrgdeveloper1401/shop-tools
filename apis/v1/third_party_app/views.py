@@ -1,4 +1,4 @@
-from rest_framework import views, permissions, response, mixins, viewsets, exceptions
+from rest_framework import views, permissions, response, mixins, viewsets, exceptions, generics
 from django.utils.translation import gettext_lazy as _
 
 from apis.v1.third_party_app import serializers
@@ -6,7 +6,7 @@ from core.utils import ba_salam
 from core.utils.ba_salam import read_categories, list_retrieve_product
 from core.utils.pagination import FlexiblePagination
 from core_app.models import Image, UploadFile
-from product_app.models import Product
+from product_app.models import ProductVariant
 from product_app.tasks import update_product_id_ba_salam
 
 class GetUserInformation(views.APIView):
@@ -204,3 +204,16 @@ class UpdateProductView(views.APIView):
         serializer.is_valid(raise_exception=True)
         res = ba_salam.patch_update_product_ba_salam(product_id_ba_salam, **serializer.validated_data)
         return response.Response(res)
+
+
+class TorobProductView(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    serializer_class = serializers.TrobSerializer
+
+    def get_queryset(self):
+        return ProductVariant.objects.filter(
+            is_active=True
+            ).select_related(
+                "product__category"
+            ).prefetch_related(
+                "product__product_product_image__image"
+            )

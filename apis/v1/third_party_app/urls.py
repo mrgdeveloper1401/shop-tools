@@ -8,6 +8,7 @@ app_name = 'v1_third_party_app'
 router = routers.SimpleRouter()
 router.register(r'create_list_image', views.CreateListImage, basename='create_liat_image')
 router.register("create_list_upload_file", views.CreateListUploadFileViewSet, basename='create_list_upload_file')
+router.register("torob_product", views.TorobProductView, basename="torob_product")
 
 urlpatterns = [
     path("user_info_ba_salam/", views.GetUserInformation.as_view(), name="user_info_ba_salam"),
