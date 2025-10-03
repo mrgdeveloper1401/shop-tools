@@ -58,6 +58,7 @@ class ShippingCompanyAdmin(admin.ModelAdmin):
 class ShippingMethodAdmin(admin.ModelAdmin):
     list_display = (
         "company_id",
+        "id",
         "name",
         "shipping_type",
         "price",
@@ -70,14 +71,25 @@ class ShippingMethodAdmin(admin.ModelAdmin):
 @admin.register(PaymentGateWay)
 class PaymentGateWayAdmin(admin.ModelAdmin):
     list_display = (
-        "order",
+        "order_id",
         "id",
+        "user_id",
+        "user",
         "created_at",
         )
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
+    search_fields = ("user__mobile_phone",)
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("user").only(
+            "order_id",
+            "id",
+            "user__mobile_phone",
+            "created_at",
+            "payment_gateway"
+        )
 
 @admin.register(VerifyPaymentGateWay)
 class ResultPaymentGateWayAdmin(admin.ModelAdmin):

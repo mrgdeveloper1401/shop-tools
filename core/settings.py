@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+import os
 
 from decouple import config, Csv
 
@@ -213,7 +214,7 @@ CELERY_TASK_SERIALIZER=config("CELERY_TASK_SERIALIZER", cast=str)
 CELERY_RESULT_SERIALIZER=config("CELERY_RESULT_SERIALIZER", cast=str)
 CELERY_TIMEZONE=config("CELERY_TIMEZONE", cast=str)
 CELERY_ENABLE_UTC=config("CELERY_ENABLE_UTC", cast=bool)
-CELERY_WORKER_CONCURRENCY = config("CELERY_WORKER_CONCURRENCY", cast=int, default=1)
+CELERY_WORKER_CONCURRENCY = config("CELERY_WORKER_CONCURRENCY", cast=int, default=os.cpu_count())
 
 # condig storage
 # STORAGES = {

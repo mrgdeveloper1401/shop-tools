@@ -318,16 +318,15 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
     permission --> only admin user
     """
     serializer_class = serializers.AdminProductVariantSerializer
-    permission_classes = (permissions.IsAdminUser,)
 
     # def get_serializer_class(self):
     #     if self.request.user.is_staff:
     #         return serializers.AdminProductVariantSerializer
 
-    # def get_permissions(self):
-    #     if self.action in ("create", "update", "partial_update", "destroy"):
-    #         self.permission_classes = (permissions.IsAdminUser,)
-    #     return super().get_permissions()
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.IsAdminUser,)
+        return super().get_permissions()
 
     def get_queryset(self):
          return ProductVariant.objects.select_related(

@@ -18,8 +18,8 @@ INTERNAL_IPS = [
     # ...
 ]
 
-CELERY_BROKER_URL="redis://localhost:6380/2"
-CELERY_RESULT_BACKEND="redis://localhost:6380/3"
+CELERY_BROKER_URL="redis://localhost:6381/2"
+CELERY_RESULT_BACKEND="redis://localhost:6381/3"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
