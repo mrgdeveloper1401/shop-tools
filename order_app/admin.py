@@ -25,7 +25,6 @@ class OrderAdmin(admin.ModelAdmin):
         "updated_at"
     )
     list_filter = ("is_complete",)
-    
 
 
 @admin.register(OrderItem)
