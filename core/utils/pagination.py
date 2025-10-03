@@ -25,13 +25,14 @@ class TorobPagination(pagination.PageNumberPagination):
     def max_page(self):
         total = self.page.paginator.count
         page_size = self.page_size
-        return round(total / page_size)
+        return (total + page_size - 1) // page_size
 
     def get_paginated_response(self, data):
         return response.Response({
             "api_version": "torob_api_v3",
             'total': self.page.paginator.count,
             "max_pages": self.max_page,
+            "current_page": self.page.number,
             'next': self.get_next_link(),
             'previous': self.get_previous_link(),
             'products': data,
