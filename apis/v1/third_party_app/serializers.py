@@ -176,6 +176,6 @@ class TrobSerializer(serializers.ModelSerializer):
 
     def get_image_links(self, obj):
         return [
-            str(product_image.image.image)
+            str(product_image.image.image.url)
             for product_image in obj.product.product_product_image.all()
         ]
