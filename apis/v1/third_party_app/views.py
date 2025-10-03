@@ -8,6 +8,7 @@ from core.utils.pagination import FlexiblePagination
 from core_app.models import Image, UploadFile
 from product_app.models import ProductVariant
 from product_app.tasks import update_product_id_ba_salam
+from core.utils.pagination import TwentyPageNumberPagination
 
 class GetUserInformation(views.APIView):
     """
@@ -208,6 +209,7 @@ class UpdateProductView(views.APIView):
 
 class TorobProductView(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.TrobSerializer
+    pagination_class = TwentyPageNumberPagination
 
     def get_queryset(self):
         return ProductVariant.objects.filter(

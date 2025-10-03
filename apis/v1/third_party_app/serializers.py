@@ -151,7 +151,7 @@ class TorobProductImageSerializer(serializers.ModelSerializer):
 class TrobSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source="name")
     availability = serializers.BooleanField(source="is_active")
-    category_name = serializers.CharField(source="product.category.category_name")
+    category_name = serializers.CharField(source="product.category.category_name", required=False)
     image_links = serializers.SerializerMethodField()
     date_added = serializers.CharField(source="created_at")
     date_updated = serializers.CharField(source="updated_at")
