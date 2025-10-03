@@ -167,7 +167,7 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
     name = models.CharField(max_length=255, db_index=True, blank=True, null=True) # TODO when clean migration, remove field blank and null
     subtitle = models.CharField(max_length=255, blank=True, null=True)
     old_price = models.DecimalField(max_digits=12, decimal_places=3, blank=True, null=True)
-    stock_number = models.PositiveIntegerField(default=0, db_default=0)
+    stock_number = models.PositiveIntegerField(default=10)
     is_active = models.BooleanField(default=True, db_default=True)
     short_desc = models.CharField(max_length=255, blank=True, null=True)
 
