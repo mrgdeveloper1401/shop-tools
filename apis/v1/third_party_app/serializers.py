@@ -2,12 +2,13 @@ from rest_framework import serializers, exceptions
 # from asgiref.sync import sync_to_async
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.utils.text import slugify
 
 from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.browsable_api_custom import TextInputListField
 from core.utils.enums import FileTypeChoices
 from core_app.models import Image, UploadFile
-from product_app.models import Product, ProductImages, ProductVariant
+from product_app.models import Product, ProductImages, ProductVariant, ProductAttributeValues
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):
@@ -149,6 +150,17 @@ class TorobProductImageSerializer(serializers.ModelSerializer):
         fields = ('image',)
 
 
+class TorobProductAttributeValue(serializers.ModelSerializer):
+    attribute_name = serializers.CharField(source="attribute.attribute_name")
+
+    class Meta:
+        model = ProductAttributeValues
+        fields = (
+            "attribute_name",
+            "value"
+        )
+
+
 class TrobSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source="name")
     availability = serializers.BooleanField(source="is_active")
@@ -159,10 +171,13 @@ class TrobSerializer(serializers.ModelSerializer):
     current_price = serializers.CharField(source="price")
     guarantee = serializers.CharField(default=None)
     page_url = serializers.SerializerMethodField()
+    page_unique = serializers.IntegerField(source="id")
+    spec = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductVariant
         fields = (
+            "page_unique",
             "page_url",
             "title",
             "availability",
@@ -174,7 +189,8 @@ class TrobSerializer(serializers.ModelSerializer):
             "subtitle",
             "old_price",
             "short_desc",
-            "guarantee"
+            "guarantee",
+            "spec"
         )
 
     def get_image_links(self, obj):
@@ -190,3 +206,14 @@ class TrobSerializer(serializers.ModelSerializer):
         base_url = "http://localhost:8000" if settings.DEBUG else "https://api.gs-tools.ir"
         page_url = f"{base_url}/v1/product/product_category/{product_category_id}/products/{product_id}/product_variant/{product_variant_id}/"
         return page_url
+
+    def get_spec(self, obj):
+        attributes = obj.product.attributes.all()
+        spec_dict = {}
+        
+        for attr in attributes:
+            # استفاده از slugify برای ایجاد کلیدهای استاندارد
+            key = slugify(attr.attribute.attribute_name, allow_unicode=False)
+            spec_dict[key] = attr.value
+        
+        return spec_dict
