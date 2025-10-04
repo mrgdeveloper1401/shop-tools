@@ -69,8 +69,6 @@ services:
     build:
       context: .
     env_file: ".env"
-    depends_on:
-      - celery
     entrypoint: "celery -A core.utils.dj_celery flower --port=5555"
 volumes:
   gs_postgres_data:
