@@ -2,7 +2,7 @@ from rest_framework import serializers, exceptions
 # from asgiref.sync import sync_to_async
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.utils.text import slugify
+# from django.utils.text import slugify
 
 from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.browsable_api_custom import TextInputListField
@@ -213,7 +213,7 @@ class TrobSerializer(serializers.ModelSerializer):
         
         for attr in attributes:
             # استفاده از slugify برای ایجاد کلیدهای استاندارد
-            key = slugify(attr.attribute.attribute_name, allow_unicode=False)
+            key = attr.attribute.attribute_name
             spec_dict[key] = attr.value
         
         return spec_dict
