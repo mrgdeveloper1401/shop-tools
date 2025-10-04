@@ -15,7 +15,7 @@ from core.utils.exceptions import PaymentBaseError
 from core.utils.gate_way import verify_payment
 from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
-from order_app.tasks import send_sms_to_user_after_complete_order
+from order_app.tasks import send_notification_to_user_after_complete_order
 from . import serializers
 
 
@@ -322,7 +322,7 @@ class VerifyPaymentGatewayView(views.APIView):
                     status="paid",
                     payment_date=timezone.now()
                     )
-            send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
+            send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
         return response.Response(verify_req)
         # return response.Response(
         #     data={

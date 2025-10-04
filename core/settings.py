@@ -12,9 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
-
+from kombu import Queue
 from decouple import config, Csv
-
 from core.utils.ck_editor import CKEDITOR_5_CONFIGS, customColorPalette
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -227,3 +226,10 @@ CELERY_WORKER_CONCURRENCY = os.cpu_count()
 #             'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 #         }
 # }
+
+CELERY_TASK_QUEUES = (
+    Queue("notifications"),
+    Queue("otp_sms"),
+    Queue("ba_salam"),
+    Queue("payment")
+)
