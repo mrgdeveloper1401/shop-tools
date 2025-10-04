@@ -42,5 +42,4 @@ def send_notification_to_user_after_complete_order(mobile_phone):
 
 @shared_task(queue="payment")
 def send_sms_after_complete_order(mobile_phone, tracking_code):
-    user = User.objects.filter(mobile_phone=mobile_phone).only("mobile_phone").first()
     asyncio.run(send_verify_payment(mobile_phone, tracking_code))
