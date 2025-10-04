@@ -1,12 +1,13 @@
 from rest_framework import views, permissions, response, mixins, viewsets, exceptions, generics
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Prefetch
 
 from apis.v1.third_party_app import serializers
 from core.utils import ba_salam
 from core.utils.ba_salam import read_categories, list_retrieve_product
 from core.utils.pagination import FlexiblePagination
 from core_app.models import Image, UploadFile
-from product_app.models import ProductVariant, Product
+from product_app.models import ProductVariant, Product, ProductImages, ProductAttributeValues
 from product_app.tasks import update_product_id_ba_salam
 from core.utils.pagination import TorobPagination
 
@@ -217,5 +218,19 @@ class TorobProductView(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
             ).select_related(
                 "product__category"
             ).prefetch_related(
-                "product__product_product_image__image"
+                Prefetch(
+                    "product__product_product_image",
+                    queryset=ProductImages.objects.filter(is_active=True).select_related("image").only(
+                        "image__image",
+                        "product_id"
+                    )
+                ),
+                Prefetch(
+                    "product__attributes",
+                    queryset=ProductAttributeValues.objects.select_related("attribute").only(
+                        "product_id",
+                        "attribute__attribute_name",
+                        "value"
+                    )
+                )
             )
