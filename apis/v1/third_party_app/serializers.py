@@ -215,5 +215,5 @@ class TrobSerializer(serializers.ModelSerializer):
             # استفاده از slugify برای ایجاد کلیدهای استاندارد
             key = slugify(attr.attribute.attribute_name, allow_unicode=True)
             spec_dict[key] = attr.value
-        
+
         return spec_dict

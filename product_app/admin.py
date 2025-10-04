@@ -66,12 +66,23 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Attribute)
 class AttributeAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "attribute_name",
+        "id",
+        "is_active",
+    )
+    search_fields = ("attribute_name",)
+    list_filter = ("is_active",)
 
 
 @admin.register(AttributeValue)
 class ProductAttributeValueAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "attribute_value",
+        "attribute_id",
+        "is_active",
+    )
+    list_filter = ("is_active",)
 
 
 @admin.register(FavoriteProduct)
