@@ -410,7 +410,10 @@ class ResultOrderSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "status",
-            "payment_gateways"
+            "payment_gateways",
+            "first_name",
+            "last_name",
+            "phone"
             # "total_price"
         )
 

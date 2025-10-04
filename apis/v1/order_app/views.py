@@ -238,7 +238,10 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             "shipping_id",
             "created_at",
             "updated_at",
-            "status"
+            "status",
+            "first_name",
+            "last_name",
+            "phone"
         ).annotate(
             user_order_count=Count(
                 "profile__orders",
