@@ -8,7 +8,7 @@ from account_app.validators import MobileRegexValidator
 from core.utils.gate_way import request_gate_way
 from discount_app.models import ProductDiscount
 from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany, PaymentGateWay
-from order_app.tasks import create_gateway_payment, send_notification_to_user_after_complete_order
+from order_app.tasks import create_gateway_payment, send_notification_to_user_after_complete_order, send_sms_after_complete_order
 from product_app.models import ProductVariant
 
 
@@ -253,6 +253,7 @@ class CreateOrderSerializer(serializers.Serializer):
             json_data['first_name'] = first_name
             json_data['last_name'] = last_name
             send_notification_to_user_after_complete_order.delay(mobile_phone=user.mobile_phone)
+            send_sms_after_complete_order.delay(user.mobile_phone, order.tracking_code)
             return json_data
         else:
             payment_gateway = request_gate_way(
