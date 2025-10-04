@@ -22,7 +22,10 @@ class OrderSerializer(serializers.ModelSerializer):
             "tracking_code",
             "payment_date",
             "address_id",
-            "status"
+            "status",
+            "first_name",
+            "last_name",
+            "phone"
         )
         read_only_fields = ("is_complete", "tracking_code", "address_id")
 
@@ -132,10 +135,12 @@ class CreateOrderSerializer(serializers.Serializer):
     description = serializers.CharField(required=False)
     payment_gateway = serializers.JSONField(read_only=True)
 
-    mobile_phone = serializers.CharField(
-        required=False,
+    phone = serializers.CharField(
         validators=(MobileRegexValidator,)
     )
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+
     def validate(self, data):
         coupon_code = data.get("coupon_code", None)
 
@@ -177,8 +182,19 @@ class CreateOrderSerializer(serializers.Serializer):
         address_id = validated_data.pop("address_id", None)
         # get shipping
         shipping = validated_data.pop("shipping", None)
+        # get information
+        first_name = validated_data.pop("first_name")
+        last_name = validated_data.pop("last_name")
+        phone = validated_data.pop("phone")
         # create order
-        order = Order.objects.create(profile_id=profile.id, address_id=address_id, shipping=shipping)
+        order = Order.objects.create(
+            profile_id=profile.id, 
+            address_id=address_id, 
+            shipping=shipping,
+            first_name=first_name,
+            last_name=last_name,
+            phone=phone
+            )
 
         # create order item
         order_items = []
@@ -233,6 +249,9 @@ class CreateOrderSerializer(serializers.Serializer):
             json_data['items'] = items
             json_data['shipping'] = shipping
             json_data['address_id'] = address_id
+            json_data['phone'] = phone
+            json_data['first_name'] = first_name
+            json_data['last_name'] = last_name
             send_sms_to_user_after_complete_order.delay(mobile_phone=user.mobile_phone)
             return json_data
         else:
@@ -248,7 +267,17 @@ class CreateOrderSerializer(serializers.Serializer):
             "shipping": shipping,
             "address_id": address_id,
             "payment_gateway": payment_gateway,
+            "phone": phone,
+            "first_name": first_name,
+            "last_name": last_name
         }
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop("first_name", None)
+        data.pop("last_name", None)
+        data.pop("phone", None)
+        return data
 
 
 class AdminShippingSerializer(serializers.ModelSerializer):

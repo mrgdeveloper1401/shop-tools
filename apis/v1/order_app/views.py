@@ -43,7 +43,10 @@ class OrderViewSet(viewsets.ModelViewSet):
                 "payment_date",
                 "address_id",
                 "shipping_id",
-                "is_active"
+                "is_active",
+                "first_name",
+                "last_name",
+                "phone"
             )
         else:
             return Order.objects.filter(
@@ -55,7 +58,10 @@ class OrderViewSet(viewsets.ModelViewSet):
                 "tracking_code",
                 "payment_date",
                 "address_id",
-                "status"
+                "status",
+                "first_name",
+                "last_name",
+                "phone"
             )
 
     def get_serializer_class(self):

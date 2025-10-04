@@ -16,6 +16,9 @@ from product_app.models import ProductVariant
 
 # Create your models here.
 class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    first_name = models.CharField(_("نام سفارش دهنده"), blank=True)
+    last_name = models.CharField(_("نام خوانوادگی سفارش دهنده"), blank=True)
+    phone = models.CharField(_("شماره تماس سفارش دهنده"), max_length=15, blank=True)
     STATUS_CHOICES = [
         ('pending', 'در انتظار پرداخت'),
         ('paid', 'پرداخت شده'),
