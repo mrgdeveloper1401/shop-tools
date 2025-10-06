@@ -30,6 +30,8 @@ class TorobPagination(pagination.PageNumberPagination):
     def get_paginated_response(self, data):
         return response.Response({
             "api_version": "torob_api_v3",
+            "sort": "date_added_desc",
+            "page": self.page.number,
             'total': self.page.paginator.count,
             "max_pages": self.max_page,
             "current_page": self.page.number,
