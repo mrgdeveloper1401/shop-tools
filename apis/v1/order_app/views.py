@@ -47,7 +47,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 "first_name",
                 "last_name",
                 "phone",
-                "descprtion"
+                "description"
             )
         else:
             return Order.objects.filter(
@@ -63,7 +63,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 "first_name",
                 "last_name",
                 "phone",
-                "descprtion"
+                "description"
             )
 
     def get_serializer_class(self):
@@ -244,7 +244,7 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
             "first_name",
             "last_name",
             "phone",
-            "descprtion"
+            "description"
         ).annotate(
             user_order_count=Count(
                 "profile__orders",

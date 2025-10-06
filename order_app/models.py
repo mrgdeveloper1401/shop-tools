@@ -19,7 +19,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     first_name = models.CharField(_("نام سفارش دهنده"), blank=True)
     last_name = models.CharField(_("نام خوانوادگی سفارش دهنده"), blank=True)
     phone = models.CharField(_("شماره تماس سفارش دهنده"), max_length=15, blank=True)
-    descprtion = models.CharField(max_length=500, blank=True, null=True)
+    description = models.CharField(max_length=500, blank=True, null=True)
     STATUS_CHOICES = [
         ('pending', 'در انتظار پرداخت'),
         ('paid', 'پرداخت شده'),
