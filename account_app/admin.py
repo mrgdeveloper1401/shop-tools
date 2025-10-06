@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
+from daterangefilter.filters import DateRangeFilter
 
 from .models import (
     User,
@@ -19,9 +20,15 @@ from .models import (
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ("username", "email", "mobile_phone", "is_staff", "is_active", "is_superuser")
+    list_display = ("username", "email", "mobile_phone", "is_staff", "is_active", "is_superuser", "created_at")
     search_fields = ("mobile_phone",)
     search_help_text = _("برای جست و جو میتوانید از شماره موبایل استفاده کنید")
+    list_filter = (
+        ("created_at", DateRangeFilter),
+        "is_active",
+        "is_staff",
+        "is_superuser"
+    )
 
     def get_queryset(self, request):
         return super().get_queryset(request).defer(

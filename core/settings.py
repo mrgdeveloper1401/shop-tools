@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "treebeard",
     "django_json_widget",
+    "daterangefilter",
 
     # third party app
     "account_app.apps.AccountAppConfig",

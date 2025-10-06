@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import JSONField
 from django_json_widget.widgets import JSONEditorWidget
-
+from daterangefilter.filters import DateRangeFilter
 from .models import (
     Order,
     OrderItem,
@@ -24,7 +24,10 @@ class OrderAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at"
     )
-    list_filter = ("is_complete",)
+    list_filter = (
+        "is_complete",
+        ("created_at", DateRangeFilter)
+        )
 
 
 @admin.register(OrderItem)

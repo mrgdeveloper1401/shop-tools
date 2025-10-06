@@ -25,7 +25,8 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "first_name",
             "last_name",
-            "phone"
+            "phone",
+            "descprtion"
         )
         read_only_fields = ("is_complete", "tracking_code", "address_id")
 
@@ -134,7 +135,7 @@ class CreateOrderSerializer(serializers.Serializer):
     coupon_code = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     payment_gateway = serializers.JSONField(read_only=True)
-
+    descprtion = serializers.CharField(required=False)
     phone = serializers.CharField(
         validators=(MobileRegexValidator,)
     )
@@ -186,6 +187,7 @@ class CreateOrderSerializer(serializers.Serializer):
         first_name = validated_data.pop("first_name")
         last_name = validated_data.pop("last_name")
         phone = validated_data.pop("phone")
+        descprtion = validated_data.pop("descprtion", None)
         # create order
         order = Order.objects.create(
             profile_id=profile.id, 
@@ -193,7 +195,8 @@ class CreateOrderSerializer(serializers.Serializer):
             shipping=shipping,
             first_name=first_name,
             last_name=last_name,
-            phone=phone
+            phone=phone,
+            descprtion=descprtion
             )
 
         # create order item
@@ -278,6 +281,7 @@ class CreateOrderSerializer(serializers.Serializer):
         data.pop("first_name", None)
         data.pop("last_name", None)
         data.pop("phone", None)
+        data.pop("descprtion", None)
         return data
 
 
@@ -414,7 +418,8 @@ class ResultOrderSerializer(serializers.ModelSerializer):
             "payment_gateways",
             "first_name",
             "last_name",
-            "phone"
+            "phone",
+            "descprtion"
             # "total_price"
         )
 
