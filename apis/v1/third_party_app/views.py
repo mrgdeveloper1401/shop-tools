@@ -208,8 +208,8 @@ class UpdateProductView(views.APIView):
         return response.Response(res)
 
 
-class TorobProductView(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    serializer_class = serializers.TrobSerializer
+class TorobProductView(views.APIView):
+    serializer_class = serializers.PostRequestTorobSerializer
     pagination_class = TorobPagination
 
     def get_queryset(self):
@@ -234,3 +234,20 @@ class TorobProductView(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
                     )
                 )
             )
+
+    
+    def post(self, request):
+        # import ipdb
+        # ipdb.set_trace()
+        serializer = self.serializer_class(data=request.data)
+        validated_data = serializer.is_valid(raise_exception=True)
+        page_unique = serializer.validated_data.get("page_uniques", None)
+
+        query = None
+        if page_unique:
+            query = self.get_queryset().filter(id__in=page_unique)
+            if not query:
+                return exceptions.NotFound()
+
+        serializer = serializers.TrobSerializer(query, many=True)
+        return response.Response(serializer.data)

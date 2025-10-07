@@ -217,3 +217,8 @@ class TrobSerializer(serializers.ModelSerializer):
             spec_dict[key] = attr.value
 
         return spec_dict
+
+
+class PostRequestTorobSerializer(serializers.Serializer):
+    # page_urls = serializers.ListField(required=False, allow_null=True)
+    page_uniques = serializers.ListField(required=False, child=serializers.IntegerField())
