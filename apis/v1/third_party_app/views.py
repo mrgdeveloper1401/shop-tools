@@ -249,12 +249,20 @@ class TorobProductView(views.APIView):
         serializer = self.serializer_class(data=request.data)
         validated_data = serializer.is_valid(raise_exception=True)
         page_unique = serializer.validated_data.get("page_uniques", None)
+        page = serializer.validated_data.get("page", None)
 
         query = None
+
         if page_unique:
             query = self.get_queryset().filter(id=page_unique).first()
             if not query:
                 return exceptions.NotFound()
+            serializer = serializers.TrobSerializer(query)
+            return response.Response(serializer.data)
 
-        serializer = serializers.TrobSerializer(query)
-        return response.Response(serializer.data)
+        if page:
+            queryset = self.get_queryset()
+            paginator = self.pagination_class()
+            p = paginator.paginate_queryset(queryset=queryset, request=request)
+            serializer = serializers.TrobSerializer(p, many=True)
+            return paginator.get_paginated_response(serializer.data)

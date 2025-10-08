@@ -19,7 +19,7 @@ class FlexiblePagination(pagination.LimitOffsetPagination):
 
 
 class TorobPagination(pagination.PageNumberPagination):
-    page_size = 20
+    page_size = 100
 
     @cached_property
     def max_page(self):
