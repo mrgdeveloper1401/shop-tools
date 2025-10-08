@@ -1,9 +1,8 @@
 from rest_framework import serializers, exceptions
-# from asgiref.sync import sync_to_async
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
-
+from django.core.validators import MinValueValidator
 from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.browsable_api_custom import TextInputListField
 from core.utils.enums import FileTypeChoices
@@ -221,4 +220,4 @@ class TrobSerializer(serializers.ModelSerializer):
 
 class PostRequestTorobSerializer(serializers.Serializer):
     # page_urls = serializers.ListField(required=False, allow_null=True)
-    page_uniques = serializers.IntegerField()
+    page_uniques = serializers.IntegerField(validators=(MinValueValidator(1),),)
