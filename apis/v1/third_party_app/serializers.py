@@ -170,7 +170,7 @@ class TrobSerializer(serializers.ModelSerializer):
     current_price = serializers.CharField(source="price")
     guarantee = serializers.CharField(default=None)
     page_url = serializers.SerializerMethodField()
-    page_unique = serializers.IntegerField(source="id")
+    page_unique = serializers.CharField(source="id")
     spec = serializers.SerializerMethodField()
 
     class Meta:
