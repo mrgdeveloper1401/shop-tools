@@ -10,6 +10,8 @@ from core_app.models import Image, UploadFile
 from product_app.models import ProductVariant, Product, ProductImages, ProductAttributeValues
 from product_app.tasks import update_product_id_ba_salam
 from core.utils.pagination import TorobPagination
+from drf_spectacular.utils import extend_schema
+
 
 class GetUserInformation(views.APIView):
     """
@@ -235,7 +237,12 @@ class TorobProductView(views.APIView):
                 )
             )
 
-    
+    @extend_schema(
+        methods=['POST'],
+        responses={
+            200: serializers.TrobSerializer
+        }
+    )
     def post(self, request):
         # import ipdb
         # ipdb.set_trace()
