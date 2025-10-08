@@ -145,6 +145,7 @@ CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff"  # Possible values: "staff", "authen
 # drf framework settings
 REST_FRAMEWORK = {
     # YOUR SETTINGS
+    "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',

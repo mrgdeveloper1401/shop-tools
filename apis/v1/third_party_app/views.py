@@ -1,7 +1,7 @@
+from urllib.parse import urlparse
 from rest_framework import views, permissions, response, mixins, viewsets, exceptions, generics
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Prefetch
-
 from apis.v1.third_party_app import serializers
 from core.utils import ba_salam
 from core.utils.ba_salam import read_categories, list_retrieve_product
@@ -214,6 +214,35 @@ class TorobProductView(views.APIView):
     serializer_class = serializers.PostRequestTorobSerializer
     pagination_class = TorobPagination
 
+    def parse_url(self, url):
+        parse = urlparse(url)
+        split_url = parse.path.split("/")
+        number = None
+        if isinstance(split_url[-1], int):
+            number = split_url[-1]
+        else:
+            number = split_url[-2]
+        return number
+
+    @property
+    def get_empty_response(self):
+        return {
+            "api_version": "torob_api_v3",
+            "current_page": 1,
+            "total": 0,
+            "max_pages": 1,
+            "products": [] 
+        }
+
+    def not_empty_reponse(self, data):
+        return {
+            "api_version": "torob_api_v3",
+            "current_page": 1,
+            "total": 0,
+            "max_pages": 1,
+            "products": [data] 
+        }
+
     def get_queryset(self):
         return ProductVariant.objects.filter(
             is_active=True
@@ -246,30 +275,48 @@ class TorobProductView(views.APIView):
     def post(self, request):
         # import ipdb
         # ipdb.set_trace()
-        serializer = self.serializer_class(data=request.data)
-        validated_data = serializer.is_valid(raise_exception=True)
-        page_unique = serializer.validated_data.get("page_uniques", None)
-        page = serializer.validated_data.get("page", None)
-        sort = serializer.validated_data.get("sort", None)
+        serializer = self.serializer_class(data=request.data) # data
+        validated_data = serializer.is_valid(raise_exception=True) # validate data
+
+        page_unique = serializer.validated_data.get("page_uniques", None) # get data
+        page = serializer.validated_data.get("page", None) # get data
+        sort = serializer.validated_data.get("sort", None) # get data
+        page_urls = serializer.validated_data.get("page_urls", None) # get data
 
         query = None
 
-        if page_unique:
-            query = self.get_queryset().filter(id=page_unique).first()
-            if not query:
-                return exceptions.NotFound()
+        if page_unique: # check data page_unique dose exists
+            query = self.get_queryset().filter(id=int(page_unique[0])).first()
+            if query is None:
+                return response.Response(data=self.get_empty_response)
             serializer = serializers.TrobSerializer(query)
-            return response.Response(serializer.data)
+            data = self.not_empty_reponse(serializer.data)
+            return response.Response(data)
 
         if page and sort:
             # import ipdb
             # ipdb.set_trace()
+            paginator = self.pagination_class()
             queryset = None
             if sort == "date_added_desc":
                 queryset = self.get_queryset()
-            else:
+            elif sort == "date_updated_desc":
                 queryset = self.get_queryset().order_by("-updated_at")
-            paginator = self.pagination_class()
+            else:
+                raise exceptions.ValidationError({"error": "sort must be (date_updated_desc) or (date_added_desc)"})
             p = paginator.paginate_queryset(queryset=queryset, request=request)
             serializer = serializers.TrobSerializer(p, many=True)
             return paginator.get_paginated_response(serializer.data)
+
+        if page_urls:
+            # import ipdb
+            # ipdb.set_trace()
+            get_url = page_urls[0]
+            get_number = self.parse_url(page_urls[0])
+            query = self.get_queryset().filter(id=int(get_number)).first()
+            if query is None:
+                return response.Response(self.get_empty_response)
+            else:
+                serializer = serializers.TrobSerializer(query)
+                data = self.not_empty_reponse(serializer.data)
+                return response.Response(data)

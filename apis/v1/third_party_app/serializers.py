@@ -2,7 +2,7 @@ from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MinLengthValidator
 from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.browsable_api_custom import TextInputListField
 from core.utils.enums import FileTypeChoices
@@ -219,7 +219,26 @@ class TrobSerializer(serializers.ModelSerializer):
 
 
 class PostRequestTorobSerializer(serializers.Serializer):
-    page_urls = serializers.ListField(child=serializers.CharField(), required=False)
-    page_uniques = serializers.ListField(child=serializers.CharField(), required=False)
-    page = serializers.IntegerField(allow_null=True, default=1)
-    sort = serializers.CharField(required=False, help_text=_("date_added_desc, date_updated_desc"), default="date_added_desc")
+    page_urls = serializers.ListField(child=serializers.CharField(), required=False, validators=(MinLengthValidator(1),))
+    page_uniques = serializers.ListField(child=serializers.CharField(), required=False, validators=(MinLengthValidator(1),))
+    page = serializers.IntegerField(required=False)
+    sort = serializers.CharField(required=False, help_text=_("date_added_desc, date_updated_desc"))
+
+    def validate(self, data):
+        # import ipdb
+        # ipdb.set_trace()
+        page = data.get('page', None)
+        sort = data.get("sort", None)
+        page_urls = data.get("page_urls", None)
+        page_uniques = data.get("page_uniques", None)
+
+        if page and sort is None:
+            raise serializers.ValidationError({"error": "sort parameter is not provided"})
+
+        if sort and page is None:
+            raise serializers.ValidationError({"error": "page parametrs is not provided"})
+
+        if page is None and sort is None and page_uniques is None and page_urls is None:
+            raise serializers.ValidationError({"error": "request body is required"})
+
+        return data
