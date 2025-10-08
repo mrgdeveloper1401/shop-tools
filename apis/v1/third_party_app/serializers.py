@@ -219,7 +219,7 @@ class TrobSerializer(serializers.ModelSerializer):
 
 
 class PostRequestTorobSerializer(serializers.Serializer):
-    page_urls = serializers.ListField(child=serializers.CharField(), allow_null=True, required=False)
-    page_uniques = serializers.ListField(child=serializers.CharField(), allow_null=True, required=False)
-    page = serializers.IntegerField(allow_null=True)
-
+    page_urls = serializers.ListField(child=serializers.CharField(), required=False)
+    page_uniques = serializers.ListField(child=serializers.CharField(), required=False)
+    page = serializers.IntegerField(allow_null=True, default=1)
+    sort = serializers.CharField(required=False, help_text=_("date_added_desc, date_updated_desc"), default="date_added_desc")

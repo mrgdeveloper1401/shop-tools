@@ -57,7 +57,9 @@ class ProductAdmin(admin.ModelAdmin):
         "total_sale",
         "is_active",
         "base_price",
-        "product_id_ba_salam"
+        "product_id_ba_salam",
+        "created_at",
+        "updated_at"
     )
     list_filter = ("is_active", ProductSku)
     list_editable = ("is_active",)

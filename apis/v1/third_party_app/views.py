@@ -250,6 +250,7 @@ class TorobProductView(views.APIView):
         validated_data = serializer.is_valid(raise_exception=True)
         page_unique = serializer.validated_data.get("page_uniques", None)
         page = serializer.validated_data.get("page", None)
+        sort = serializer.validated_data.get("sort", None)
 
         query = None
 
@@ -260,8 +261,14 @@ class TorobProductView(views.APIView):
             serializer = serializers.TrobSerializer(query)
             return response.Response(serializer.data)
 
-        if page:
-            queryset = self.get_queryset()
+        if page and sort:
+            # import ipdb
+            # ipdb.set_trace()
+            queryset = None
+            if sort == "date_added_desc":
+                queryset = self.get_queryset()
+            else:
+                queryset = self.get_queryset().order_by("-updated_at")
             paginator = self.pagination_class()
             p = paginator.paginate_queryset(queryset=queryset, request=request)
             serializer = serializers.TrobSerializer(p, many=True)
