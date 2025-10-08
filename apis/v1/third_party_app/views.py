@@ -245,9 +245,9 @@ class TorobProductView(views.APIView):
 
         query = None
         if page_unique:
-            query = self.get_queryset().filter(id__in=page_unique)
+            query = self.get_queryset().filter(id=page_unique).first()
             if not query:
                 return exceptions.NotFound()
 
-        serializer = serializers.TrobSerializer(query, many=True)
+        serializer = serializers.TrobSerializer(query)
         return response.Response(serializer.data)

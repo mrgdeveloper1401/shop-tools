@@ -221,4 +221,4 @@ class TrobSerializer(serializers.ModelSerializer):
 
 class PostRequestTorobSerializer(serializers.Serializer):
     # page_urls = serializers.ListField(required=False, allow_null=True)
-    page_uniques = serializers.ListField(required=False, child=serializers.IntegerField())
+    page_uniques = serializers.IntegerField()
