@@ -167,7 +167,7 @@ class TrobSerializer(serializers.ModelSerializer):
     image_links = serializers.SerializerMethodField()
     date_added = serializers.CharField(source="created_at")
     date_updated = serializers.CharField(source="updated_at")
-    current_price = serializers.CharField(source="price")
+    current_price = serializers.IntegerField(source="price")
     guarantee = serializers.CharField(default=None)
     page_url = serializers.SerializerMethodField()
     page_unique = serializers.CharField(source="id")
