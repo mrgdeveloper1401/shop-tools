@@ -1,6 +1,7 @@
 from django.contrib import admin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
+from django.utils.translation import gettext_lazy as _
 
 from .models import (
     Category,
@@ -42,6 +43,44 @@ class ProductSku(admin.SimpleListFilter):
         return queryset
 
 
+class ProductBasePriceIsNull(admin.SimpleListFilter):
+    title = "base_price",
+    parameter_name = "is_null_base_price"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("is_null", "بدون قیمت"),
+            ("not_null", "دارای قیمت")
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "is_null":
+            return queryset.filter(base_price__isnull=True)
+        elif self.value() == "not_null":
+            return queryset.filter(base_price__isnull=False)
+        else:
+            return queryset
+
+
+class ProductVariantPriceIsNull(admin.SimpleListFilter):
+    title = "base_price",
+    parameter_name = "is_null_base_price"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("is_null", "بدون قیمت"),
+            ("not_null", "دارای قیمت")
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "is_null":
+            return queryset.filter(price__isnull=True)
+        elif self.value() == "not_null":
+            return queryset.filter(price__isnull=False)
+        else:
+            return queryset
+
+
 @admin.register(Category)
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(Category)
@@ -49,7 +88,6 @@ class CategoryAdmin(TreeAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_filter = (ProductSku, )
     search_fields = ("product_name",)
     list_display = (
         "product_name",
@@ -61,7 +99,7 @@ class ProductAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at"
     )
-    list_filter = ("is_active", ProductSku)
+    list_filter = ("is_active", ProductSku, ProductBasePriceIsNull)
     list_editable = ("is_active",)
     list_per_page = 30
 
@@ -114,7 +152,33 @@ class ProductCommentAdmin(admin.ModelAdmin):
 
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "product_id",
+        "product_name",
+        "id",
+        "price",
+        "old_price",
+        "name",
+        "stock_number",
+        "is_active"
+    )
+    list_editable = ("is_active", "price", "old_price", "stock_number")
+    search_fields = ("name",)
+    search_help_text = _("برای جست و جو میتوانید از نام ورینت استفاده کنید")
+    list_filter = ("is_active", ProductVariantPriceIsNull)
+
+    def product_name(self, obj):
+        return obj.product.product_name
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("product").only(
+            "product__product_name",
+            "price",
+            "old_price",
+            "name",
+            "stock_number",
+            "is_active",
+        )
 
 
 @admin.register(ProductAttributeValues)
