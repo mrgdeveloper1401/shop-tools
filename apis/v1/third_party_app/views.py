@@ -248,6 +248,18 @@ class TorobProductView(views.APIView):
             is_active=True
             ).select_related(
                 "product__category"
+            ).only(
+                "product__product_slug",
+                "product__category__category_name",
+                "price",
+                "name",
+                "subtitle",
+                "short_desc",
+                "is_active",
+                "stock_number",
+                "old_price",
+                "created_at",
+                "updated_at"
             ).prefetch_related(
                 Prefetch(
                     "product__product_product_image",
