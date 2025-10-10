@@ -202,8 +202,9 @@ class TrobSerializer(serializers.ModelSerializer):
         product_category_id = obj.product.category_id
         product_id = obj.product_id
         product_variant_id = obj.id
-        base_url = "http://localhost:8000" if settings.DEBUG else "https://api.gs-tools.ir"
-        page_url = f"{base_url}/v1/product/product_category/{product_category_id}/products/{product_id}/product_variant/{product_variant_id}/"
+        # base_url = "http://localhost:8000" if settings.DEBUG else "https://gs-tools.ir"
+        base_url = "https://gs-tools.ir"
+        page_url = f"{base_url}/product/product_category/{product_category_id}/products/{product_id}/"
         return page_url
 
     def get_spec(self, obj):
