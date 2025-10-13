@@ -316,7 +316,7 @@ class TorobProductView(views.APIView):
                 queryset = self.get_queryset().order_by("-updated_at")
             else:
                 raise exceptions.ValidationError({"error": "sort must be (date_updated_desc) or (date_added_desc)"})
-            p = paginator.paginate_queryset(queryset=queryset, request=request)
+            p = paginator.paginate_queryset(queryset=queryset, request=request, view=self)
             serializer = serializers.TrobSerializer(p, many=True)
             return paginator.get_paginated_response(serializer.data)
 

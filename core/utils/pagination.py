@@ -21,6 +21,14 @@ class FlexiblePagination(pagination.LimitOffsetPagination):
 class TorobPagination(pagination.PageNumberPagination):
     page_size = 100
 
+    def get_page_number(self, request, paginator):
+        if request.method == 'POST' and 'page' in request.data:
+            try:
+                return int(request.data['page'])
+            except:
+                return 1
+        return super().get_page_number(request, paginator)
+
     @cached_property
     def max_page(self):
         total = self.page.paginator.count
