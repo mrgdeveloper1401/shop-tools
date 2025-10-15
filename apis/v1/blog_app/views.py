@@ -38,6 +38,7 @@ class PostBlogViewSet(viewsets.ModelViewSet):
     pagination --> 20 item
     """
     pagination_class = TwentyPageNumberPagination
+    lookup_field = "post_slug"
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -137,6 +138,7 @@ class BlogTagWithOutPaginationView(generics.ListAPIView):
 
 class LatestTenPostBlogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ListPostBlogSerializer
+    lookup_field = "post_slug"
 
     def get_queryset(self):
         query = PostBlog.objects.filter(
