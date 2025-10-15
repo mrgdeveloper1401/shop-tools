@@ -24,7 +24,7 @@ DATABASES = {
         'OPTIONS': {
             'pool': {
                 'min': os.cpu_count() * 2,       # Minimum number of connections in the pool
-                'max': os.cpu_count * 4,       # Maximum number of connections in the pool
+                'max': os.cpu_count() * 4,       # Maximum number of connections in the pool
                 # 'increment': 1,  # Number of new connections to create when needed
                 'timeout': config("POOL_TIMEOUT", cast=int, default=30),  # Connection lifetime in seconds (optional)
             }
