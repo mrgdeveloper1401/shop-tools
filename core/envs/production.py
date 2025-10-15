@@ -20,15 +20,15 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD", cast=str),
         "HOST": config("DB_HOST", cast=str),
         "PORT": config("DB_PORT", cast=int),
-        # "CONN_MAX_AGE": config("CON_MAX_AGE", cast=int, default=600),
-        'OPTIONS': {
-            'pool': {
-                'min_size': os.cpu_count() * 2,       # Minimum number of connections in the pool
-                'max_size': os.cpu_count() * 4,       # Maximum number of connections in the pool
-                # 'increment': 1,  # Number of new connections to create when needed
-                'timeout': config("POOL_TIMEOUT", cast=int, default=30),  # Connection lifetime in seconds (optional)
-            }
-        }
+        "CONN_MAX_AGE": config("CON_MAX_AGE", cast=int, default=600),
+        # 'OPTIONS': {
+        #     'pool': {
+        #         'min_size': os.cpu_count() * 2,       # Minimum number of connections in the pool
+        #         'max_size': os.cpu_count() * 4,       # Maximum number of connections in the pool
+        #         # 'increment': 1,  # Number of new connections to create when needed
+        #         'timeout': config("POOL_TIMEOUT", cast=int, default=30),  # Connection lifetime in seconds (optional)
+        #     }
+        # }
     }
 }
 
