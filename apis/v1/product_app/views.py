@@ -1,7 +1,8 @@
 from django.db.models import Prefetch, Min, Max, OuterRef, Subquery
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions, generics, filters
+from rest_framework import viewsets, permissions, generics, filters, mixins
+from django.core.cache import cache
 
 from account_app.models import Profile
 from core.utils.custom_filters import (
@@ -597,3 +598,27 @@ class BrandNameView(generics.ListAPIView):
         "brand_image__image",
         "brand_name"
     )
+
+
+class SeoProductViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = serializers.SeoProductSerializer
+
+    def get_queryset(self):
+        query = Product.objects.filter(
+            is_active=True
+        ).only(
+            "product_name",
+            "product_slug",
+            "created_at",
+            "updated_at"
+        )
+        cache_key = "seo_product_list_response"
+        cache_response = cache.get(cache_key)
+        if cache_response:
+            return cache_response
+        else:
+            cache_response = cache.set(cache_key, query, 60 * 60 * 24)
+            return query

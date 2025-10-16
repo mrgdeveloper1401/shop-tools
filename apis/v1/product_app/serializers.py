@@ -603,3 +603,14 @@ class ListBrandNameSerializer(serializers.ModelSerializer):
             "brand_name",
             "brand_image_url"
         )
+
+
+class SeoProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = (
+            "product_name",
+            "product_slug",
+            "created_at",
+            "updated_at"
+        )
