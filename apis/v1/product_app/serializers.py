@@ -609,6 +609,7 @@ class SeoProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
+            "category_id",
             "product_name",
             "product_slug",
             "created_at",

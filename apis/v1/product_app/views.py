@@ -613,7 +613,8 @@ class SeoProductViewSet(
             "product_name",
             "product_slug",
             "created_at",
-            "updated_at"
+            "updated_at",
+            "category_id"
         )
         cache_key = "seo_product_list_response"
         cache_response = cache.get(cache_key)
