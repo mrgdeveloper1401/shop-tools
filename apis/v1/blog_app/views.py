@@ -1,5 +1,5 @@
 from django.db.models import Prefetch
-from rest_framework import viewsets, permissions, generics, mixins, response
+from rest_framework import viewsets, permissions, generics, mixins, response, views, exceptions
 from django.core.cache import cache
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -8,6 +8,7 @@ from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
 from blog_app.models import CategoryBlog, PostBlog, TagBlog
+from account_app.models import User
 
 
 class CategoryBlogViewSet(viewsets.ModelViewSet):
@@ -194,3 +195,47 @@ class SeoBlogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         else:
             response = cache.set(cache_key, query, 60 * 60 * 24)
             return query
+
+
+class SeoPostDetailBlogViewSet(views.APIView):
+    serializer_class = serializers.SeoDetailBlogSerializer
+
+    def get_queryset(self):
+        return PostBlog.objects.select_related(
+            "post_cover_image",
+            "category"
+        ).prefetch_related(
+            Prefetch(
+                "author__profile", queryset=Profile.objects.only("first_name", "last_name", "user_id")
+            ),
+            Prefetch(
+                "tags", queryset=TagBlog.objects.filter(is_active=True).only("tag_name")
+            )
+        ).only(
+            "category__category_name",
+            "post_cover_image__image",
+            "post_title",
+            "post_slug",
+            "post_body",
+            "read_time",
+            "likes",
+            "is_active",
+            "description_slug",
+            "post_introduction",
+            "created_at",
+            "updated_at"
+        ).filter(
+            is_active=True
+        )
+
+
+    def get(self, request, *args, **kwargs):
+        post_slug = kwargs['post_slug']
+
+        try:
+            query = self.get_queryset().get(post_slug=post_slug)
+        except PostBlog.DoesNotExist:
+            raise exceptions.NotFound()
+    
+        serializer = self.serializer_class(query)
+        return response.Response(serializer.data)

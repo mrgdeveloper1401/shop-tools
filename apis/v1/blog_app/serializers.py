@@ -185,3 +185,68 @@ class SeoBlogSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at"
         )
+
+
+class SeoPostBlogAuthorSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "get_full_name"
+        )
+
+    def get_full_name(self, obj):
+        return obj.full_name
+
+
+class SeoPostTagBlogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TagBlog
+        fields = (
+            "tag_name",
+        )
+
+
+class SeoPostDetailAuthroSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "full_name"
+        )
+
+    def get_full_name(self, obj):
+        return obj.full_name
+
+
+class SeoDetailBlogSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source="category.category_name")
+    post_cover_image = serializers.CharField(source="post_cover_image.image.url")
+    tags = SeoPostTagBlogSerializer(many=True)
+    author = SeoPostDetailAuthroSerializer(many=True)
+
+    class Meta:
+        model = PostBlog
+        fields = (
+            "id",
+            "tags",
+            "category_id",
+            "category_name",
+            "created_at",
+            "updated_at",
+            "post_introduction",
+            "post_title",
+            "post_slug",
+            "post_body",
+            # "read_count",
+            "read_time",
+            "post_cover_image",
+            "likes",
+            "is_active",
+            "description_slug",
+            "author"
+        )
