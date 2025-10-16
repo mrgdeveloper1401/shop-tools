@@ -606,10 +606,13 @@ class ListBrandNameSerializer(serializers.ModelSerializer):
 
 
 class SeoProductSerializer(serializers.ModelSerializer):
+    product_id = serializers.CharField(source="id")
+
     class Meta:
         model = Product
         fields = (
             "category_id",
+            "product_id",
             "product_name",
             "product_slug",
             "created_at",
