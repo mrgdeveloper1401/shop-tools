@@ -174,3 +174,14 @@ class BlogTagWithOutPagination(serializers.ModelSerializer):
             "id",
             "tag_name",
         )
+
+
+class SeoBlogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostBlog
+        fields = (
+            "post_title",
+            "post_slug",
+            "created_at",
+            "updated_at"
+        )

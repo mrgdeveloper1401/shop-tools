@@ -1,6 +1,8 @@
 from django.db.models import Prefetch
-from rest_framework import viewsets, permissions, generics
-
+from rest_framework import viewsets, permissions, generics, mixins, response
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from account_app.models import Profile
 from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
 from core.utils.pagination import TwentyPageNumberPagination
@@ -170,3 +172,25 @@ class LatestTenPostBlogViewSet(viewsets.ReadOnlyModelViewSet):
             "author"
         ).order_by("-id")[:10]
         return query
+
+
+class SeoBlogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = serializers.SeoBlogSerializer
+    def get_queryset(self):
+        query = PostBlog.objects.filter(
+            is_active=True
+        ).only(
+            "post_title",
+            "post_slug",
+            "created_at",
+            "updated_at"
+        )
+        # import ipdb
+        # ipdb.set_trace()
+        cache_key = "seo_blog_list_response"
+        cache_response = cache.get(cache_key)
+        if cache_response:
+            return cache_response
+        else:
+            response = cache.set(cache_key, query, 60 * 60 * 24)
+            return query
