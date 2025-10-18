@@ -101,7 +101,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             else:
                 raise ValidationError(f"amount not enoght for {variant.name}")
 
-    def release_stock(self):
+    def release_stock(self, save=False):
         if self.is_reserved and self.status != 'paid':
             order_items = self.order_items.filter(is_active=True)
             for item in order_items:
@@ -111,6 +111,8 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             
             self.is_reserved = False
             self.reserved_until = None
+            # self.save()
+        if save:
             self.save()
 
     def is_reservation_valid(self):
