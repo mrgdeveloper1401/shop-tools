@@ -70,7 +70,18 @@ services:
     build:
       context: .
     env_file: ".env"
-    entrypoint: "celery -A core.utils.dj_celery flower --port=5555"
+    entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
+
+  celery_beat:
+    container_name: dj_celery_beat
+    restart: always
+    build:
+      context: .
+    env_file: ".env"
+    entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
+    depends_on:
+      - app
+
 volumes:
   gs_postgres_data:
   static_files:
