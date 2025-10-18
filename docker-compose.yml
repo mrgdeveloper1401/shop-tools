@@ -78,7 +78,7 @@ services:
     build:
       context: .
     env_file: ".env"
-    entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
+    entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
     depends_on:
       - app
 
