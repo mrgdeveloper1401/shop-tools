@@ -109,3 +109,4 @@ django-json-widget==2.0.3
 flower==2.0.1
 django-daterangefilter==1.0.1
 psycopg[pool]
+django-celery-beat

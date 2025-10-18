@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django_json_widget",
     "daterangefilter",
     "rest_framework_simplejwt.token_blacklist",
+    "django_celery_beat",
 
     # third party app
     "account_app.apps.AccountAppConfig",
@@ -227,6 +228,7 @@ CELERY_TASK_ALWAYS_EAGER = False
 CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
+
 
 # condig storage
 # STORAGES = {
