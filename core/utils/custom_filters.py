@@ -206,6 +206,7 @@ class OrderFilter(FilterSet):
             "is_complete": ['exact'],
             "is_active": ['exact'],
             "status": ['iexact'],
+            "is_reserved": ['exact']
         }
 
 

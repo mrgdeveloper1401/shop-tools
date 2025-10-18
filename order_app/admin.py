@@ -17,6 +17,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "status",
+        "is_reserved",
         "profile_id",
         "is_complete",
         "address_id",
@@ -26,6 +27,8 @@ class OrderAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "is_complete",
+        "is_reserved",
+        "status",
         ("created_at", DateRangeFilter)
         )
     formfield_overrides = {

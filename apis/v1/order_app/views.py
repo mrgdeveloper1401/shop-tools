@@ -33,6 +33,9 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.select_related(
                 "profile"
             ).only(
+                "items_data",
+                "is_reserved",
+                "reserved_until",
                 "profile__first_name",
                 "profile__last_name",
                 "created_at",
@@ -251,9 +254,6 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
                 filter=Q(profile__orders__is_active=True),
                 distinct=True
             ),
-            # total_price=Sum(
-            #     F("order_items__price") * F("order_items__quantity"), filter=Q(order_items__is_active=True)
-            # ),
         ).prefetch_related(
             Prefetch(
                 "payment_gateways", queryset=PaymentGateWay.objects.only("order_id", "payment_gateway")
