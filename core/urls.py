@@ -19,6 +19,11 @@ from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenVerifyView
 from decouple import config
+from test_code import log_request
+
+test_request_url = [
+    path("test_request/", log_request, name='log_request')
+]
 
 v1_api_urls = [
     path("v1/auth/", include("apis.v1.account_app.urls", namespace="v1_auth")),
@@ -46,7 +51,7 @@ jwt = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
-] + v1_api_urls + swagger + jwt
+] + v1_api_urls + swagger + jwt + test_request_url
 
 DEBUG = config("DEBUG", cast=bool)
 
