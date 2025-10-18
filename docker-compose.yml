@@ -45,6 +45,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
 
   celery:
     container_name: gs_celery
