@@ -28,6 +28,9 @@ class OrderAdmin(admin.ModelAdmin):
         "is_complete",
         ("created_at", DateRangeFilter)
         )
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
 
 
 @admin.register(OrderItem)

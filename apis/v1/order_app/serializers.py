@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-
+from django.db import transaction
 from account_app.models import Profile, UserAddress
 from account_app.validators import MobileRegexValidator
 from core.utils.gate_way import request_gate_way
@@ -173,46 +173,66 @@ class CreateOrderSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user # get user by context
 
-        # create order
-        profile = Profile.objects.filter(
-            user_id=self.context["request"].user.id
-        ).only("id").first()
+        # check stock number befor order
+        variant_ids = [item['product_variant_id'] for item in validated_data['items']]
+        quantities = {item['product_variant_id']: item['quantity'] for item in validated_data['items']}
 
-        # get address id
-        address_id = validated_data.pop("address_id", None)
-        # get shipping
-        shipping = validated_data.pop("shipping", None)
-        # get information
-        first_name = validated_data.pop("first_name")
-        last_name = validated_data.pop("last_name")
-        phone = validated_data.pop("phone")
-        description = validated_data.pop("descprtion", None)
-        # create order
-        order = Order.objects.create(
-            profile_id=profile.id, 
-            address_id=address_id, 
-            shipping=shipping,
-            first_name=first_name,
-            last_name=last_name,
-            phone=phone,
-            description=description
-            )
+        with transaction.atomic():
+            variants = ProductVariant.objects.filter(
+                id__in=variant_ids
+            ).select_for_update()
 
-        # create order item
-        order_items = []
-        for item in validated_data['items']:
-            variant = ProductVariant.objects.filter(id=item['product_variant_id']).only('id', "price").first()
-            order_items.append(
-                OrderItem(
-                    order_id=order.id,
-                    product_variant_id=variant.id,
-                    price=variant.price,
-                    quantity=item['quantity']
+            for variant in variants:
+                required_quantity = quantities[variant.id]
+                if variant.stock_number < required_quantity:
+                    raise serializers.ValidationError(
+                        f"amount poduct {variant.name} not enough"
+                    )
+            # create order
+            profile = Profile.objects.filter(
+                user_id=self.context["request"].user.id
+            ).only("id").first()
+
+            # get address id
+            address_id = validated_data.pop("address_id", None)
+            # get shipping
+            shipping = validated_data.pop("shipping", None)
+            # get information
+            first_name = validated_data.pop("first_name")
+            last_name = validated_data.pop("last_name")
+            phone = validated_data.pop("phone")
+            description = validated_data.pop("descprtion", None)
+            items = validated_data.get("items", None)
+            # create order
+            order = Order.objects.create(
+                profile_id=profile.id, 
+                address_id=address_id, 
+                shipping=shipping,
+                first_name=first_name,
+                last_name=last_name,
+                phone=phone,
+                description=description,
+                items_data=items
                 )
-            )
 
-        items = OrderItem.objects.bulk_create(order_items)
+            # create order item
+            order_items = []
+            for item in validated_data['items']:
+                variant = ProductVariant.objects.filter(id=item['product_variant_id']).only('id', "price").first()
+                order_items.append(
+                    OrderItem(
+                        order_id=order.id,
+                        product_variant_id=variant.id,
+                        price=variant.price,
+                        quantity=item['quantity']
+                    )
+                )
 
+            items = OrderItem.objects.bulk_create(order_items)
+
+            # reserv order
+            order.reserved_stock()
+        
         # get coupon in validated data
         coupon = validated_data.get("valid_coupon")
 

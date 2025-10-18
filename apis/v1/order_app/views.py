@@ -300,7 +300,6 @@ class VerifyPaymentGatewayView(views.APIView):
 
         # send request into gateway
         verify_req = verify_payment(int(track_id))
-
         message_verify_success = verify_req.get("message")
         status_verify_req = verify_req.get('status')
 
@@ -312,6 +311,7 @@ class VerifyPaymentGatewayView(views.APIView):
                         "status": False,
                         "message": f"Payment with track id {track_id} not found"
                     })
+
             # get obj payment
             get_payment = payment.last()
 
@@ -326,102 +326,13 @@ class VerifyPaymentGatewayView(views.APIView):
                     is_complete=True,
                     status="paid",
                     payment_date=timezone.now()
-                    )
+            )
+
+            # update stock number
+            
             send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
             send_sms_after_complete_order.delay(request.user.mobile_phone, get_order_traccking_code)
         return response.Response(verify_req)
-        # return response.Response(
-        #     data={
-        #         "status": True,
-        #         "message": "Payment verified successfully",
-        #         "payment_data": verify_req,
-        #         "order_id": order_id
-        #     }
-        # )
-        # if verify_req:
-
-            # filter query PaymentGateway
-            # payment = PaymentGateWay.objects.filter(payment_gateway__trackId=track_id).only("id", "order_id")
-
-            # if payment:
-                # get obj payment
-                # get_payment = payment.last()
-
-                # create instance of model VerifyPaymentGateWay
-                # VerifyPaymentGateWay.objects.create(
-                    # payment_gateway_id=get_payment.id,
-                    # result=verify_req
-                # )
-
-                # verify_status = verify_req.get("status")
-
-                # if verify_status == 1:
-                    # update payment after response successfully
-                    # Order.objects.filter(id=get_payment.id).update(
-                        # is_complete=True,
-                        # status="paid"
-                    # )
-                    # send_sms_to_user_after_complete_order.delay(request.user.mobile_phone)
-                    # return verify_req
-                # else:
-                    # raise exceptions.ValidationError(
-                        # {
-                            # "message": _("Your payment encountered an error.")
-                        # }
-                    # )
-            # else:
-                # raise PaymentBaseError
-
-
-# class AnalyticsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-#     """
-#     permission --> is admin user \n
-#     filter query --> ?type=(day, week, month)
-#     """
-#     serializer_class = serializers.AnalyticSaleSerializer
-#     permission_classes = (permissions.IsAdminUser,)
-#
-#     def get_queryset(self):
-#         base_query = Order.objects.filter(is_active=True)
-#
-#         qu_params = self.request.query_params.get("type", None)
-#         today = timezone.now().date()
-#
-#         if qu_params == "day":
-#             return base_query.filter(
-#                 created_at__date=today
-#             ).annotate(
-#                 date_group=TruncDate('created_at')
-#             ).values('date_group').annotate(
-#                 total_sales=Sum(F('order_items__price') * F('order_items__quantity')),
-#                 order_count=Count('id')
-#             ).order_by('date_group')
-#
-#         elif qu_params == "week":
-#             one_week_ago = today - timedelta(days=7)
-#             return base_query.filter(
-#                 created_at__date__gte=one_week_ago,
-#                 created_at__date__lte=today
-#             ).annotate(
-#                 week_group=TruncWeek('created_at')
-#             ).values('week_group').annotate(
-#                 total_sales=Sum(F('order_items__price') * F('order_items__quantity')),
-#                 order_count=Count('id')
-#             ).order_by('week_group')
-#
-#         elif qu_params == "month":
-#             one_month_ago = today - timedelta(days=30)
-#             return base_query.filter(
-#                 created_at__date__gte=one_month_ago,
-#                 created_at__date__lte=today
-#             ).annotate(
-#                 month_group=TruncMonth('created_at')
-#             ).values('month_group').annotate(
-#                 total_sales=Sum(F('order_items__price') * F('order_items__quantity')),
-#                 order_count=Count('id')
-#             ).order_by('month_group')
-#
-#         raise exceptions.NotFound()
 
 
 class AnalyticsViewSet(viewsets.ViewSet):

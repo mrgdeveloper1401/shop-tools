@@ -1,6 +1,6 @@
 import uuid
 from decimal import Decimal
-
+from rest_framework.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F
@@ -16,7 +16,9 @@ from product_app.models import ProductVariant
 
 # Create your models here.
 class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
+    reserved_until = models.DateTimeField(null=True, blank=True)
     first_name = models.CharField(_("نام سفارش دهنده"), blank=True)
+    is_reserved = models.BooleanField(default=False)
     last_name = models.CharField(_("نام خوانوادگی سفارش دهنده"), blank=True)
     phone = models.CharField(_("شماره تماس سفارش دهنده"), max_length=15, blank=True)
     description = models.CharField(max_length=500, blank=True, null=True)
@@ -53,6 +55,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         null=True
     )
     is_active = models.BooleanField(default=True)
+    items_data = models.JSONField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.tracking_code:
@@ -84,10 +87,34 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     def shipping_cost(self):
         return self.shipping.price if self.shipping else None
 
-    # @property
-    # def tax_amount(self):
-    #     amount = (self.sub_total * Decimal("0.09")) + self.sub_total + self.shipping_cost
-    #     return amount
+    def reserved_stock(self, duration=10):
+        self.reserve_stock = timezone.now() + timezone.timedelta(minutes=duration)
+        self.is_reserved = True
+        self.save()
+
+        order_items = self.order_items.filter(is_active=True)
+        for item in order_items:
+            variant = item.product_variant
+            if variant.stock_number >= item.quantity:
+                variant.stock_number -= item.quantity
+                variant.save()
+            else:
+                raise ValidationError(f"amount not enoght for {variant.name}")
+
+    def release_stock(self):
+        if self.is_reserved and self.status != 'paid':
+            order_items = self.order_items.filter(is_active=True)
+            for item in order_items:
+                variant = item.product_variant
+                variant.stock_number += item.quantity
+                variant.save()
+            
+            self.is_reserved = False
+            self.reserved_until = None
+            self.save()
+
+    def is_reservation_valid(self):
+        return self.is_reserved and self.reserved_until and timezone.now() < self.reserved_until
 
     @classmethod
     def is_valid_coupon(self, code):

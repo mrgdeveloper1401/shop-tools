@@ -43,3 +43,19 @@ def send_notification_to_user_after_complete_order(mobile_phone):
 @shared_task(queue="payment")
 def send_sms_after_complete_order(mobile_phone, tracking_code):
     asyncio.run(send_verify_payment(mobile_phone, tracking_code))
+
+
+@shared_task
+def release_expired_reservations():
+    """آزاد کردن موجودی سفارش‌های منقضی شده"""
+    expired_orders = Order.objects.filter(
+        is_reserved=True,
+        reserved_until__lt=timezone.now(),
+        status__in=['pending', 'processing']
+    )
+    
+    for order in expired_orders:
+        order.release_stock()
+        # همچنین می‌توانید وضعیت سفارش را به cancelled تغییر دهید
+        order.status = 'cancelled'
+        order.save()
