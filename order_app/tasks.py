@@ -47,20 +47,20 @@ def send_sms_after_complete_order(mobile_phone, tracking_code):
     asyncio.run(send_verify_payment(mobile_phone, tracking_code))
 
 
-@shared_task(queue='update_order')
-def release_expired_reservations():
-    from .models import Order
-    """آزاد کردن موجودی سفارش‌های منقضی شده"""
-    expired_orders = Order.objects.filter(
-        is_reserved=True,
-        reserved_until__lt=timezone.now(),
-        status__in=['pending', 'processing']
-    )
-    order_updates = []
-    for order in expired_orders:
-        order.release_stock(save=False)
-        # همچنین می‌توانید وضعیت سفارش را به cancelled تغییر دهید
-        order.status = 'cancelled'
-        order_updates.append(order)
+# @shared_task(queue='update_order')
+# def release_expired_reservations():
+#     from .models import Order
+#     """آزاد کردن موجودی سفارش‌های منقضی شده"""
+#     expired_orders = Order.objects.filter(
+#         is_reserved=True,
+#         reserved_until__lt=timezone.now(),
+#         status__in=['pending', 'processing']
+#     )
+#     order_updates = []
+#     for order in expired_orders:
+#         order.release_stock(save=False)
+#         # همچنین می‌توانید وضعیت سفارش را به cancelled تغییر دهید
+#         order.status = 'cancelled'
+#         order_updates.append(order)
     
-    Order.objects.bulk_update(order_updates, ['status', 'is_reserved', 'reserved_until'])
+#     Order.objects.bulk_update(order_updates, ['status', 'is_reserved', 'reserved_until'])
