@@ -234,5 +234,5 @@ CELERY_TASK_QUEUES = (
     Queue("otp_sms"),
     Queue("ba_salam"),
     Queue("payment"),
-    Queue("update_order")
+    Queue("update_order"),
 )
