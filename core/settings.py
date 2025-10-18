@@ -159,8 +159,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '30/minute',  # 30 درخواست در دقیقه برای کاربران ناشناس
-        'user': '60/minute',  # 60 درخواست در دقیقه برای کاربران عادی
+        'anon': '4/minute',  # 30 درخواست در دقیقه برای کاربران ناشناس
+        'user': '6/minute',  # 60 درخواست در دقیقه برای کاربران عادی
     }
 }
 
