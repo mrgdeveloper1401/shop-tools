@@ -242,6 +242,9 @@ CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
 #         }
 # }
 
+# celery beat config
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
 CELERY_TASK_QUEUES = (
     Queue("notifications"),
     Queue("otp_sms"),
