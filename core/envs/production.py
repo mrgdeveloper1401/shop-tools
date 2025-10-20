@@ -118,15 +118,6 @@ LOGGING = {
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 2
 
 # config storage
-STORAGES = {
-    'default':
-        {
-            'BACKEND': 'storages.backends.s3.S3Storage'
-        },
-    'staticfiles':
-        {
-            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-        }
-}
+STORAGES['default']['BACKEND'] = "storages.backends.s3.S3Storage"
 
 CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']

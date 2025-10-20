@@ -16,7 +16,7 @@ whitenoise
 django-silk
 pytest-django
 httpx
-uvicorn
+uvicorn[standard]
 pillow
 django-ckeditor-5
 django-debug-toolbar

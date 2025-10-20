@@ -252,3 +252,11 @@ CELERY_TASK_QUEUES = (
     Queue("payment"),
     Queue("update_order"),
 )
+
+# config base storage
+STORAGES = {
+    'staticfiles':
+        {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        }
+}
