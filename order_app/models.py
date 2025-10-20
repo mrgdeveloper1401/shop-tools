@@ -109,8 +109,8 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
                 variant.stock_number += item.quantity
                 variant.save()
             
-            self.is_reserved = False
-            self.reserved_until = None
+            # self.is_reserved = False
+            # self.reserved_until = None
             # self.save()
         if save:
             self.save()

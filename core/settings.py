@@ -260,3 +260,8 @@ STORAGES = {
             'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
         }
 }
+
+# backup bucket config
+ARVAN_BUCKET_BACKUP_URL = config("https://backup-gs-tools.s3.ir-thr-at1.arvanstorage.ir", cast=str)
+ARVAN_BUCKET_ACCESS_KEY = config("ARVAN_BUCKET_ACCESS_KET", cast=str)
+ARVAN_BUCKET_ACCESS_SECRET_KEY = config("ARVAN_BUCKET_ACCESS_SECRET_KEY", cast=str)

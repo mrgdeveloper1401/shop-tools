@@ -60,6 +60,8 @@ def release_expired_reservations():
     for order in expired_orders:
         order.release_stock(save=False)
         order.status = 'cancelled'
+        order.is_reserved = False
+        order.reserved_until = None
         order_updates.append(order)
-    
+
     Order.objects.bulk_update(order_updates, ['status', 'is_reserved', 'reserved_until'])
