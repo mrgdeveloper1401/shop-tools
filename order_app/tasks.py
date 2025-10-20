@@ -47,7 +47,7 @@ def send_sms_after_complete_order(mobile_phone, tracking_code):
     asyncio.run(send_verify_payment(mobile_phone, tracking_code))
 
 
-# @shared_task(queue='update_order')
+@shared_task(queue='update_order')
 def release_expired_reservations():
     from order_app.models import Order
 

@@ -181,7 +181,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         ordering = ("-id",)
-        db_table = "order"
+        db_table = "orders"
 
 
 class OrderItem(CreateMixin, UpdateMixin, SoftDeleteMixin):
