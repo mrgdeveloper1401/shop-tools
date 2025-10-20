@@ -88,7 +88,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return self.shipping.price if self.shipping else None
 
     def reserved_stock(self, duration=10):
-        self.reserve_stock = timezone.now() + timezone.timedelta(minutes=duration)
+        self.reserved_until = timezone.now() + timezone.timedelta(minutes=duration)
         self.is_reserved = True
         self.save()
 
