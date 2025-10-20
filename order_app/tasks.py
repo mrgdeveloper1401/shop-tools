@@ -47,21 +47,21 @@ def send_sms_after_complete_order(mobile_phone, tracking_code):
     asyncio.run(send_verify_payment(mobile_phone, tracking_code))
 
 
-@shared_task(queue='update_order')
-def release_expired_reservations():
-    from order_app.models import Order
+# @shared_task(queue='update_order')
+# def release_expired_reservations():
+#     from order_app.models import Order
 
-    expired_orders = Order.objects.filter(
-        is_reserved=True,
-        reserved_until__lt=timezone.now(),
-        status__in=['pending', 'processing']
-    )
-    order_updates = []
-    for order in expired_orders:
-        order.release_stock(save=False)
-        order.status = 'cancelled'
-        order.is_reserved = False
-        order.reserved_until = None
-        order_updates.append(order)
+#     expired_orders = Order.objects.filter(
+#         is_reserved=True,
+#         reserved_until__lt=timezone.now(),
+#         status__in=['pending', 'processing']
+#     )
+#     order_updates = []
+#     for order in expired_orders:
+#         order.release_stock(save=False)
+#         order.status = 'cancelled'
+#         order.is_reserved = False
+#         order.reserved_until = None
+#         order_updates.append(order)
 
-    Order.objects.bulk_update(order_updates, ['status', 'is_reserved', 'reserved_until'])
+#     Order.objects.bulk_update(order_updates, ['status', 'is_reserved', 'reserved_until'])
