@@ -155,7 +155,8 @@ class UserPrivateNotification(serializers.ModelSerializer):
 
 class UserAddressSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.only("mobile_phone")
+        queryset=User.objects.only("mobile_phone"),
+        required=False
     )
     city = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.only("name")
