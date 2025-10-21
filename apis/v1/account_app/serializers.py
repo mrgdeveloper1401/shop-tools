@@ -174,8 +174,11 @@ class UserAddressSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        user = self.context['request'].user
+        user = self.context['request'].user.id
+        get_user_data = validated_data.get("user", None)
         if user.is_staff is False:
+            return UserAddress.objects.create(user_id=user.id, **validated_data)
+        if user.is_staff and get_user_data is None:
             return UserAddress.objects.create(user_id=user.id, **validated_data)
         return super().create(validated_data)
 
