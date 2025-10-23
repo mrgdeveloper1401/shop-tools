@@ -2,15 +2,17 @@ from django.contrib.auth import authenticate
 from django.core.cache import cache
 from django.db.models import Prefetch
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
-
+from adrf.views import APIView as AsyncApiView
+from asgiref.sync import sync_to_async
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
-from account_app.tasks import send_otp_code_by_celery
+# from account_app.tasks import send_otp_code_by_celery
 from core.utils.jwt import get_tokens_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
     PrivateNotificationFilter, TicketFilter
-from core.utils.permissions import NotAuthenticated
+from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated
+from core.utils.sms import send_otp_sms
 from . import serializers
 
 
@@ -21,13 +23,22 @@ class UserCreateViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     permission_classes = (NotAuthenticated,)
 
 
-class RequestOtpView(views.APIView):
-    serializer_class = serializers.RequestPhoneSerializer
-    permission_classes = (NotAuthenticated,)
+class AsyncRequestOtpView(AsyncApiView):
+    serializer_class = serializers.AsyncRequestPhoneSerializer
+    permission_classes = (AsyncNotAuthenticated,)
 
-    def post(self, request):
+    async def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        await sync_to_async(serializer.is_valid)(raise_exception=True)
+
+        # check user dose exists
+        phone = serializer.validated_data["mobile_phone"]
+        user_exists = await sync_to_async(
+            User.objects.filter(mobile_phone=phone).exists
+        )()
+        
+        if not user_exists:
+            raise exceptions.NotFound()
 
         # get user ip address
         ip_addr = request.META.get("REMOTE_ADDR", "X-FORWARDED-FOR")
@@ -38,7 +49,7 @@ class RequestOtpView(views.APIView):
         otp = OtpService.generate_otp()
 
         # send otp code by celery
-        send_otp_code_by_celery.delay(phone, otp)
+        await send_otp_sms(phone, otp)
 
         # create redis key
         redis_key = f'{ip_addr}-{phone}-{otp}'

@@ -14,3 +14,10 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.user.id == request.user.id
+
+
+class AsyncNotAuthenticated(permissions.BasePermission):
+    message = "user must be not authenticated"
+
+    async def has_permission(self, request, view):
+        return not request.user.is_authenticated

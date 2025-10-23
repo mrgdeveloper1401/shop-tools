@@ -23,7 +23,7 @@ ticket_room_router = routers.NestedSimpleRouter(router, "ticket_room", lookup="r
 ticket_room_router.register("ticket", views.TicketViewSet, basename="ticket")
 
 urlpatterns = [
-    path("request-otp/", views.RequestOtpView.as_view(), name="request-otp"),
+    path("request-otp/", views.AsyncRequestOtpView.as_view(), name="request-otp"),
     path("verify-otp/", views.RequestPhoneVerifyOtpView.as_view(), name="verify_otp"),
     path("request-forget-password/", views.ForgetPasswordView.as_view(), name="request-forget-password"),
     path("confirm-forget-password/", views.ForgetPasswordConfirmView.as_view(), name='forget-password-confirm'),

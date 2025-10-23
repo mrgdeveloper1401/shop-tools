@@ -2,7 +2,8 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
-
+from asgiref.sync import sync_to_async
+from adrf.serializers import Serializer
 from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, Ticket
 from account_app.validators import MobileRegexValidator
 from core.utils.jwt import get_tokens_for_user
@@ -10,19 +11,10 @@ from core.utils.validators import PhoneNumberValidator
 from core_app.models import Image
 
 
-class RequestPhoneSerializer(serializers.Serializer):
+class AsyncRequestPhoneSerializer(Serializer):
     mobile_phone = serializers.CharField(
         validators=(MobileRegexValidator,)
     )
-
-    def validate(self, attrs):
-        user = User.objects.filter(
-            mobile_phone=attrs["mobile_phone"]
-        ).only("id")
-
-        if not user.exists():
-            raise exceptions.NotFound()
-        return attrs
 
 
 class RequestPhoneVerifySerializer(serializers.Serializer):

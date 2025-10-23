@@ -13,9 +13,9 @@ from core.utils.sms import send_otp_sms
 from core.utils.backup_arvancloud import Bucket
 
 
-@shared_task(max_retries=3, queue="otp_sms")
-def send_otp_code_by_celery(phone: str, code: str):
-    asyncio.run(send_otp_sms(phone, code))
+# @shared_task(max_retries=3, queue="otp_sms")
+# def send_otp_code_by_celery(phone: str, code: str):
+#     asyncio.run(send_otp_sms(phone, code))
 
 
 @shared_task(max_retries=3, queue="notifications")
