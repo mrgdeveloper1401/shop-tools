@@ -52,7 +52,7 @@ class AsyncRequestOtpView(AsyncApiView):
         redis_key = f'{ip_addr}-{phone}-{otp}'
 
         # set key
-        sync_to_async(OtpService.store_otp(
+        await sync_to_async(OtpService.store_otp(
             key=redis_key,
             otp=otp,
         ))
