@@ -112,3 +112,4 @@ django-daterangefilter==1.0.1
 psycopg[pool]
 django-celery-beat
 python-dotenv
+adrf==0.1.10

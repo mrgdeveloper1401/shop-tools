@@ -1,4 +1,4 @@
-FROM gs_tools:5.1.0
+FROM gs_tools:5.2.0
 
 WORKDIR /home/app
 
