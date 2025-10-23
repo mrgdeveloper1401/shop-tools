@@ -213,11 +213,16 @@ class UserAddressViewSet(viewsets.ModelViewSet):
     filterset_class = AdminUserAddressFilter
 
     def get_queryset(self):
-        query = UserAddress.objects.defer(
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at"
+        query = UserAddress.objects.select_related("city").only(
+            "city__name",
+            "state_id",
+            "is_default",
+            "title",
+            "address_line",
+            "postal_code",
+            "latitude",
+            "longitude",
+            "longitude"
         )
         if not self.request.user.is_staff:
             query = query.filter(user_id=self.request.user.id)
