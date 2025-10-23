@@ -28,22 +28,19 @@ class AsyncRequestOtpView(AsyncApiView):
     permission_classes = (AsyncNotAuthenticated,)
 
     async def post(self, request):
+        # import ipdb
+        # ipdb.set_trace()
         serializer = self.serializer_class(data=request.data)
-        await sync_to_async(serializer.is_valid)(raise_exception=True)
+        serializer.is_valid(raise_exception=True)
 
         # check user dose exists
+        # get phone
         phone = serializer.validated_data["mobile_phone"]
-        user_exists = await sync_to_async(
-            User.objects.filter(mobile_phone=phone).exists
-        )()
-        
-        if not user_exists:
+        if not await User.objects.filter(mobile_phone=phone).only("id").aexists():
             raise exceptions.NotFound()
 
         # get user ip address
         ip_addr = request.META.get("REMOTE_ADDR", "X-FORWARDED-FOR")
-        # get phone
-        phone = serializer.validated_data["mobile_phone"]
 
         # create otp code
         otp = OtpService.generate_otp()
@@ -55,10 +52,11 @@ class AsyncRequestOtpView(AsyncApiView):
         redis_key = f'{ip_addr}-{phone}-{otp}'
 
         # set key
-        OtpService.store_otp(
+        sync_to_async(OtpService.store_otp(
             key=redis_key,
             otp=otp,
-        )
+        ))
+
         # return response
         return response.Response(
             data={
