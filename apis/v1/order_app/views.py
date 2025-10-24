@@ -300,20 +300,18 @@ class VerifyPaymentGatewayView(AsyncApiView):
             raise exceptions.NotFound(output)
 
     async def check_payment(self, track_id: int, request, result_payment):
-        payment = PaymentGateWay.objects.filter(
-            payment_gateway__trackId=int(track_id), 
-            user_id=request.user.id
-            ).only(
-                "payment_gateway"
+        try:
+            payment = await PaymentGateWay.objects.only("payment_gateway").aget(
+                payment_gateway__trackId=int(track_id),
+                user_id=request.user.id
             )
-        if not await payment.aexists():
+            return payment
+        except PaymentGateWay.DoesNotExist:
             raise exceptions.NotFound({
                 "status": False,
                 "result_payment": result_payment,
                 "message": f"Payment with track id {track_id} not found"
             })
-        get_object_payment = payment.last()
-        return get_object_payment
 
     async def func_verify_payment(self, payment_id, result_payment, order_id, request):
         await VerifyPaymentGateWay.objects.acreate(
