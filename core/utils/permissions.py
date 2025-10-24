@@ -21,11 +21,3 @@ class AsyncNotAuthenticated(permissions.BasePermission):
 
     async def has_permission(self, request, view):
         return not request.user.is_authenticated
-
-
-class AsyncIsAuthenticated(permissions.BasePermission):
-    """
-        async permission Allows access only to authenticated users.
-    """
-    async def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated)
