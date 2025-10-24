@@ -9,13 +9,16 @@ from openpyxl.styles import Font
 from rest_framework import viewsets, permissions, generics, mixins, views, exceptions, response, decorators
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from adrf.views import APIView as AsyncApiView
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
 from core.utils.exceptions import PaymentBaseError
 from core.utils.gate_way import verify_payment
 from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
-from order_app.tasks import send_notification_to_user_after_complete_order, send_sms_after_complete_order
+# from order_app.tasks import send_notification_to_user_after_complete_order
+from core.utils.permissions import AsyncIsAuthenticated
+from core.utils.sms import send_verify_payment
 from . import serializers
 
 
@@ -261,13 +264,13 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
         ).order_by("-id")
 
 
-class VerifyPaymentGatewayView(views.APIView):
+class VerifyPaymentGatewayView(AsyncApiView):
     """
     example --> ?success=1&status=2&trackId=4281457157&orderId=121
     """
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (AsyncIsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
+    async def get(self, request, *args, **kwargs):
         status = request.query_params.get("status", None)
         track_id = request.query_params.get("trackId", None)
         order_id = request.query_params.get("orderId", None)
@@ -299,14 +302,19 @@ class VerifyPaymentGatewayView(views.APIView):
             )
 
         # send request into gateway
-        verify_req = verify_payment(int(track_id))
+        verify_req = await verify_payment(int(track_id))
         message_verify_success = verify_req.get("message")
         status_verify_req = verify_req.get('status')
 
         if message_verify_success == "success" and int(status_verify_req) == 1:
             # filter query PaymentGateway
-            payment = PaymentGateWay.objects.filter(payment_gateway__trackId=int(track_id), user_id=request.user.id)
-            if not payment.exists():
+            payment = PaymentGateWay.objects.filter(
+                payment_gateway__trackId=int(track_id), 
+                user_id=request.user.id
+                ).only(
+                    "payment_gateway"
+                )
+            if not await payment.aexists():
                     raise exceptions.NotFound({
                         "status": False,
                         "message": f"Payment with track id {track_id} not found"
@@ -316,22 +324,34 @@ class VerifyPaymentGatewayView(views.APIView):
             get_payment = payment.last()
 
             # create instance of model VerifyPaymentGateWay
-            VerifyPaymentGateWay.objects.create(
+            await VerifyPaymentGateWay.objects.acreate(
                 payment_gateway_id=get_payment.id,
                 result=verify_req
                 )
-            filter_order = Order.objects.filter(id=int(order_id), profile__user=request.user)
-            get_order_traccking_code = filter_order.only("tracking_code").last().tracking_code
-            filter_order.update(
+            filter_order = Order.objects.filter(
+                id=int(order_id), 
+                profile__user=request.user
+                ).only(
+                    "tracking_code"
+                )
+            get_order_traccking_code = filter_order.last().tracking_code
+            await filter_order.aupdate(
                     is_complete=True,
                     status="paid",
                     payment_date=timezone.now()
             )
 
             # update stock number
-            
-            send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
-            send_sms_after_complete_order.delay(request.user.mobile_phone, get_order_traccking_code)
+            await PrivateNotification.objects.acreate(
+                user_id = user.id,
+                title = "ثبت سفارش موفق",
+                body = "کاربر محترم سفارش شما با موفقیت پرداخت و ثبت شده است",
+                notif_type="accept_order"
+            )
+
+            # send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
+            await send_verify_payment(request.user.mobile_phone, get_order_traccking_code)
+            # send_sms_after_complete_order.delay(request.user.mobile_phone, get_order_traccking_code)
         return response.Response(verify_req)
 
 

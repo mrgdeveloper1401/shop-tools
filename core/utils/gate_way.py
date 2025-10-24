@@ -30,9 +30,9 @@ def request_gate_way(amount, description, order_id, mobile):
     return response.json()
 
 @http_error
-def verify_payment(track_id):
-    with httpx.Client() as client:
-        response = client.post(
+async def verify_payment(track_id):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
             url=config("ZIBAL_VERIFY_URL", cast=str),
             json={
                 "trackId": track_id,
