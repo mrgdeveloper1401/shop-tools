@@ -409,6 +409,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
 
             # send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
             await send_verify_payment(request.user.mobile_phone, tracking_code)
+            return response.Response(verify_req)
             # send_sms_after_complete_order.delay(request.user.mobile_phone, get_order_traccking_code)
 
         # check result 201
