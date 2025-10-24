@@ -10,6 +10,8 @@ from rest_framework import viewsets, permissions, generics, mixins, views, excep
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from adrf.views import APIView as AsyncApiView
+from asgiref.sync import sync_to_async
+from django.shortcuts import aget_object_or_404
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
 from core.utils.exceptions import PaymentBaseError
@@ -17,8 +19,17 @@ from core.utils.gate_way import verify_payment
 from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
 # from order_app.tasks import send_notification_to_user_after_complete_order
+from account_app.models import PrivateNotification
 from core.utils.permissions import AsyncIsAuthenticated
-from core.utils.sms import send_verify_payment
+from core.utils.sms import send_verify_payment, cancel_verify_payment
+from apis.v1.utils.custom_exception import (
+    TooManyRequests, 
+    PaymentTooManyRequests,
+    AmountTooManyRequests,
+    CartdIsInvalid,
+    SwitchError,
+    CartNotFound
+)
 from . import serializers
 
 
@@ -270,7 +281,61 @@ class VerifyPaymentGatewayView(AsyncApiView):
     """
     permission_classes = (AsyncIsAuthenticated,)
 
+    async def send_sms(phone):
+        ...
+
+    async def check_order(self, order_id: int, request, gateway_result):
+        try:
+            order = await Order.objects.only("id").aget(
+                id=order_id,
+                # profile__user_id=request.user.id, # TODO, uncomment
+                status__in=("processing", "pending")
+            )
+            return order
+        except Order.DoesNotExist:
+            output = {
+                "order": f"order id {order_id} not found",
+                "gateway_result": gateway_result
+                }
+            raise exceptions.NotFound(output)
+
+    async def check_payment(self, track_id: int, request, result_payment):
+        payment = PaymentGateWay.objects.filter(
+            payment_gateway__trackId=int(track_id), 
+            user_id=request.user.id
+            ).only(
+                "payment_gateway"
+            )
+        if not await payment.aexists():
+            raise exceptions.NotFound({
+                "status": False,
+                "result_payment": result_payment,
+                "message": f"Payment with track id {track_id} not found"
+            })
+        get_object_payment = payment.last()
+        return get_object_payment
+
+    async def func_verify_payment(self, payment_id, result_payment, order_id, request):
+        await VerifyPaymentGateWay.objects.acreate(
+            payment_gateway_id=payment_id,
+            result=result_payment
+        )
+        updated = await Order.objects.filter(
+            id=int(order_id),
+            profile__user_id=request.user.id
+        ).aupdate(
+            is_complete=True,
+            status="paid",
+            payment_date=timezone.now()
+        )
+
+        if updated == 0:
+            raise exceptions.NotFound("order not found")
+        return True
+
     async def get(self, request, *args, **kwargs):
+        # import ipdb
+        # ipdb.set_trace()
         status = request.query_params.get("status", None)
         track_id = request.query_params.get("trackId", None)
         order_id = request.query_params.get("orderId", None)
@@ -303,55 +368,145 @@ class VerifyPaymentGatewayView(AsyncApiView):
 
         # send request into gateway
         verify_req = await verify_payment(int(track_id))
-        message_verify_success = verify_req.get("message")
-        status_verify_req = verify_req.get('status')
+        status_verify_req = verify_req.get('status', None)
+        result_verify_req = verify_req.get('result', None)
 
-        if message_verify_success == "success" and int(status_verify_req) == 1:
+        # result_verify_req = 201
+        # verify_req = {"rest": "test"}
+        # status_verify_req = 1
+
+        # accept
+        if status_verify_req == 1:
             # filter query PaymentGateway
-            payment = PaymentGateWay.objects.filter(
-                payment_gateway__trackId=int(track_id), 
-                user_id=request.user.id
-                ).only(
-                    "payment_gateway"
-                )
-            if not await payment.aexists():
-                    raise exceptions.NotFound({
-                        "status": False,
-                        "message": f"Payment with track id {track_id} not found"
-                    })
-
-            # get obj payment
-            get_payment = payment.last()
-
-            # create instance of model VerifyPaymentGateWay
+            get_payment = await self.check_payment(track_id, request, result_verify_req)
+    
             await VerifyPaymentGateWay.objects.acreate(
                 payment_gateway_id=get_payment.id,
+                # payment_gateway_id = 1,
                 result=verify_req
                 )
-            filter_order = Order.objects.filter(
-                id=int(order_id), 
+            updated = await Order.objects.filter(
+                id=int(order_id),
                 profile__user=request.user
-                ).only(
-                    "tracking_code"
-                )
-            get_order_traccking_code = filter_order.last().tracking_code
-            await filter_order.aupdate(
-                    is_complete=True,
-                    status="paid",
-                    payment_date=timezone.now()
+            ).aupdate(
+                is_complete=True,
+                status="paid",
+                payment_date=timezone.now()
             )
 
-            # update stock number
+            if updated == 0:
+                raise exceptions.NotFound("order not found")
+            
+            # get tracking code
+            order = await Order.objects.only("tracking_code").aget(id=int(order_id))
+            tracking_code = order.tracking_code
+
+            # create notification for user
             await PrivateNotification.objects.acreate(
-                user_id = user.id,
+                user_id = request.user.id,
                 title = "ثبت سفارش موفق",
                 body = "کاربر محترم سفارش شما با موفقیت پرداخت و ثبت شده است",
                 notif_type="accept_order"
             )
 
             # send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
-            await send_verify_payment(request.user.mobile_phone, get_order_traccking_code)
+            await send_verify_payment(request.user.mobile_phone, tracking_code)
             # send_sms_after_complete_order.delay(request.user.mobile_phone, get_order_traccking_code)
+
+        # check result 201
+        if int(result_verify_req) == 201:
+            order = await self.check_order(int(order_id), request, result_verify_req)
+            payment = await self.check_payment(int(track_id), request, result_verify_req)
+            func_verify_payment = await self.func_verify_payment(payment.id, verify_req, order, request)
+            return response.Response(verify_req)
+
+        # not accept
+        elif status_verify_req == -1:
+            # update order
+            updated = await Order.objects.filter(
+                id=int(order_id),
+                profile__user_id=request.user.id
+            ).aupdate(
+                status="processing"
+            )
+            if updated == 0:
+                raise exceptions.NotFound("order not found")
+            return response.Response(
+                {
+                    "message": "process payment"
+                }
+            )
+
+        # internal error
+        elif status_verify_req == -2:
+            # update order
+            updated = await Order.objects.filter(
+                id=int(order_id),
+                profile__user_id=request.user.id
+            ).aupdate(
+                status="fail"
+            )
+            if updated == 0:
+                raise exceptions.NotFound("order not found")
+            return response.Response(
+                {
+                    "message": "gateway internal error"
+                }
+            )
+
+        # cancel by user
+        elif status_verify_req == 3:
+            # update order
+            updated = await Order.objects.filter(
+                id=int(order_id),
+                profile__user_id=request.user.id
+            ).aupdate(
+                status="fail_by_user"
+            )
+            if updated == 0:
+                raise exceptions.NotFound("order not found")
+            # send sms
+            order = await Order.objects.only("tracking_code").aget(
+                id=int(order_id),
+                profile__user_id=request.user.id
+            )
+            await cancel_verify_payment(request.user.mobile_phone, order.tracking_code)
+            return response.Response(
+                {
+                    "message": "cancel by user"
+                }
+            )
+        
+        # to many request
+        elif status_verify_req == 7:
+            raise TooManyRequests()
+
+        # payment to many request
+        elif status_verify_req == 8:
+            raise PaymentTooManyRequests()
+
+        # amount to many request
+        elif status_verify_req == 9:
+            raise AmountTooManyRequests()
+        
+        # issuer not valid
+        elif status_verify_req == 10:
+            raise CartdIsInvalid()
+
+        # switch error
+        elif status_verify_req == 11:
+            raise SwitchError()
+        
+        # cat is not access
+        elif status_verify_req == 12:
+            raise CartNotFound()
+        
+        # elif status_verify_req == 2:
+        #     ...
+
+        else:
+            raise exceptions.NotAcceptable()
+
         return response.Response(verify_req)
 
 

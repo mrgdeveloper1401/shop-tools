@@ -10,6 +10,7 @@ VERIFY_BASE_URL = KV_BASE_URL + KV_API_KEY + "/verify/lookup.json"
 KV_PHONE = config('KV_PHONE', cast=str)
 KV_PATTERN_NAME = config('KV_PATTERN_NAME', cast=str)
 KV_PAYMENT_PATTERN_NAME = config("KV_PAYMENT_PATTERN_NAME", cast=str)
+KV_CANCEL_PAYMENT_PATTERN_NAME = config("KV_CANCEL_PAYMENT_PATTERN_NAME", cast=str)
 
 async def send_otp_sms(phone: str, otp: str):
     params = {
@@ -43,5 +44,23 @@ async def send_verify_payment(phone: str, tracking_code: str):
                 timeout=10.0
             )
             return response.raise_for_status()
+        except httpx.HTTPError as e:
+            raise e
+
+
+async def cancel_verify_payment(phone: str, tracking_code: str):
+    params = {
+        "receptor": phone,
+        "token": tracking_code,
+        "template": KV_CANCEL_PAYMENT_PATTERN_NAME
+    }
+    async with httpx.AsyncClient() as client:
+        try:
+            resonse = await client.get(
+                url=VERIFY_BASE_URL,
+                params=params,
+                timeout=10.0
+            )
+            return resonse.raise_for_status()
         except httpx.HTTPError as e:
             raise e

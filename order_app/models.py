@@ -24,6 +24,8 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     description = models.CharField(max_length=500, blank=True, null=True)
     STATUS_CHOICES = [
         ('pending', 'در انتظار پرداخت'),
+        ("fail_by_user", "لغو شده توسط کاربر"),
+        ("fail", "خطا در پرداخت"),
         ('paid', 'پرداخت شده'),
         ('processing', 'در حال پردازش'),
         ('shipped', 'ارسال شده'),
