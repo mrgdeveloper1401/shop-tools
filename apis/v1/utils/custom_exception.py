@@ -36,4 +36,3 @@ class CartNotFound(APIException):
     status_code = status.HTTP_404_NOT_FOUND
     default_detail = "کارت قابل دسترسی نمی‌باشد"
     default_code = "cart_not_found"
-

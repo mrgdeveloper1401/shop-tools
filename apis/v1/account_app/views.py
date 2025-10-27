@@ -13,7 +13,7 @@ from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagin
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
     PrivateNotificationFilter, TicketFilter
 from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated
-from core.utils.sms import send_otp_sms
+from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
 from . import serializers
 
 
@@ -69,7 +69,7 @@ class AsyncRequestOtpView(AsyncApiView):
 
 class AsyncRequestPhoneVerifyOtpView(AsyncApiView):
     serializer_class = serializers.AsyncRequestPhoneVerifySerializer
-    permission_classes = (NotAuthenticated,)
+    permission_classes = (AsyncNotAuthenticated,)
 
     # async def get_user(self, phone):
     #     try:
@@ -341,34 +341,33 @@ class AdminListProfileView(generics.ListAPIView):
     )
 
 
-class ForgetPasswordView(views.APIView):
-    permission_classes = (NotAuthenticated,)
+class AsyncRequestForgetPasswordView(AsyncApiView):
+    permission_classes = (AsyncNotAuthenticated,)
     serializer_class = serializers.ForgetPasswordSerializer
 
-    def post(self, request):
+    async def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # get user in validated data
-        user = serializer.validated_data['user']
-
-        # get phone
-        user_phone = user.mobile_phone
+        # get user
+        phone = serializer.validated_data['mobile_phone']
+        user = await aget_object_or_404(User, mobile_phone=phone, is_active=True)
 
         # get user ip
         user_ip = request.META.get('REMOTE_ADDR', "X-FORWARDED-FOR")
 
-        # create otp code
+        # create code
         otp = OtpService.generate_otp()
 
         # key for redis
-        forget_password_key = f'forget-{user_phone}-{user_ip}-{otp}'
+        forget_password_key = f'forget-{user.mobile_phone}-{user_ip}-{otp}'
 
         # save key and otp in redis
-        OtpService.store_otp(key=forget_password_key, otp=otp)
+        await OtpService.store_otp(key=forget_password_key, otp=otp)
 
-        # send otp code by celery
-        send_otp_code_by_celery.delay(user_phone, otp)
+        # send otp code into phone
+        # send_otp_code_by_celery.delay(user_phone, otp)
+        await send_otp_for_request_forget_password(phone, otp)
 
         # return response
         return response.Response(

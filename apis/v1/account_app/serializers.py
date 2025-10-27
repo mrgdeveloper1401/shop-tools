@@ -233,24 +233,8 @@ class AdminProfileListSerializer(serializers.ModelSerializer):
         )
 
 
-class ForgetPasswordSerializer(serializers.Serializer):
+class ForgetPasswordSerializer(Serializer):
     mobile_phone = serializers.CharField(validators=(MobileRegexValidator,))
-
-    def validate(self, attrs):
-        user = User.objects.filter(
-            mobile_phone=attrs["mobile_phone"]
-        ).only(
-            "mobile_phone"
-        )
-
-        if not user.exists():
-            raise serializers.ValidationError(
-                {
-                    "message": _("user dose not exits")
-                }
-            )
-        attrs['user'] = user[0]
-        return attrs
 
 
 class ForgetPasswordChangeSerializer(serializers.Serializer):
