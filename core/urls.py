@@ -45,7 +45,7 @@ swagger = [
 ]
 
 jwt = [
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('/v1/api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
 
 urlpatterns = [
