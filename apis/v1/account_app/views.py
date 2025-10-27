@@ -424,7 +424,7 @@ class AsycnForgetPasswordConfirmView(AsyncApiView):
             {
                 "message": "password change successfully",
                 # "token": token,
-                "is_staff": user.is_staff,
+                # "is_staff": user.is_staff,
             }
         )
 
