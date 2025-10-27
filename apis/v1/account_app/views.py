@@ -417,13 +417,13 @@ class AsycnForgetPasswordConfirmView(AsyncApiView):
         await user.asave()
 
         # generate_token
-        token = await async_get_token_for_user(user)
+        # token = await async_get_token_for_user(user)
 
         # return success data
         return response.Response(
             {
                 "message": "password change successfully",
-                "token": token,
+                # "token": token,
                 "is_staff": user.is_staff,
             }
         )
