@@ -13,14 +13,14 @@ from core_app.models import Image
 
 class AsyncRequestPhoneSerializer(Serializer):
     mobile_phone = serializers.CharField(
-        validators=(MobileRegexValidator,)
+        validators=(MobileRegexValidator(),)
     )
 
 
 class AsyncRequestPhoneVerifySerializer(Serializer):
     code = serializers.CharField()
     phone = serializers.CharField(
-        validators=(MobileRegexValidator,)
+        validators=(MobileRegexValidator(),)
     )
 
 
@@ -216,7 +216,7 @@ class CitySerializer(serializers.ModelSerializer):
 
 
 class LoginByPhonePasswordSerializer(serializers.Serializer):
-    phone = serializers.CharField()
+    phone = serializers.CharField(validators=(MobileRegexValidator(),))
     password = serializers.CharField()
 
 
@@ -234,27 +234,26 @@ class AdminProfileListSerializer(serializers.ModelSerializer):
 
 
 class ForgetPasswordSerializer(Serializer):
-    mobile_phone = serializers.CharField(validators=(MobileRegexValidator,))
+    mobile_phone = serializers.CharField(validators=(MobileRegexValidator(),))
 
 
-class ForgetPasswordChangeSerializer(serializers.Serializer):
+class AsyncForgetPasswordChangeSerializer(Serializer):
     otp = serializers.CharField()
     password = serializers.CharField()
     confirm_password = serializers.CharField()
-    mobile_phone = serializers.CharField()
+    mobile_phone = serializers.CharField(validators=(MobileRegexValidator(),))
 
-    def validate(self, attrs):
-        password = attrs.get("password")
-        confirm_password = attrs.get("confirm_password")
+    # check password
+    def validate(self, data):
+        password = data['password']
+        confirm_password = data['confirm_password']
 
-        if password and confirm_password and password != confirm_password:
+        if password != confirm_password:
             raise serializers.ValidationError(
-                {
-                    "message": _("password and confirm_password do not match")
-                }
+                {"password": "password must be same"}
             )
 
-        return attrs
+        return data
 
 
 class TicketRoomSerializer(serializers.ModelSerializer):

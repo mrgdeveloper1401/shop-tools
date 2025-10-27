@@ -378,58 +378,53 @@ class AsyncRequestForgetPasswordView(AsyncApiView):
         )
 
 
-class ForgetPasswordConfirmView(views.APIView):
-    permission_classes = (NotAuthenticated,)
-    serializer_class = serializers.ForgetPasswordChangeSerializer
+class AsycnForgetPasswordConfirmView(AsyncApiView):
+    permission_classes = (AsyncNotAuthenticated,)
+    serializer_class = serializers.AsyncForgetPasswordChangeSerializer
 
-    def post(self, request):
+    async def post(self, request):
+        import ipdb
+        ipdb.set_trace()
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # get_user_ip
         user_ip = request.META.get('REMOTE_ADDR', "X-FORWARDED-FOR")
 
-        # get otp code
+        # get otp code and phone in serializer
         get_otp = serializer.validated_data['otp']
-
-        # get phone
         user_phone = serializer.validated_data['mobile_phone']
+        password = serializer.validated_data['password']
 
         # key for redis
         forget_password_key = f'forget-{user_phone}-{user_ip}-{get_otp}'
 
         # validate redis_key
-        otp_verify = OtpService.verify_otp(forget_password_key, get_otp)
+        otp_verify = await OtpService.verify_otp(forget_password_key, get_otp)
         if not otp_verify:
             raise exceptions.NotFound()
 
-        # filter user
-        user = User.objects.filter(mobile_phone=user_phone).only(
-            "mobile_phone",
-            "is_active",
-            "is_staff"
-        )
+        # check user
+        user = await aget_object_or_404(User, mobile_phone=user_phone, is_active=True)
 
-        # check user exists
-        if not user.exists():
-            raise exceptions.NotFound()
+        # check password
+        await user.acheck_password(password)
 
-        # get_user and set new password
-        get_user = user[0]
-        password = serializer.validated_data['password']
-        get_user.set_password(password)
-        get_user.save()
+        # set new password
+        user.set_password(password)
+
+        # save new password
+        await user.asave()
 
         # generate_token
-        token = get_tokens_for_user(get_user)
-
+        token = await async_get_token_for_user(user)
 
         # return success data
         return response.Response(
             {
                 "message": "password change successfully",
                 "token": token,
-                "is_staff": get_user.is_staff,
+                "is_staff": user.is_staff,
             }
         )
 

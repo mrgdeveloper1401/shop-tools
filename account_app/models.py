@@ -185,7 +185,7 @@ class OtpService:
 
     @staticmethod
     async def store_otp(key, otp):
-        """Store OTP in Redis with expiry time (default: 2 minutes)"""
+        """Store OTP in Redis with expiry time (production --> 2 / development --> 5)"""
         await cache.aset(key, otp, timeout=OtpService.set_time)
 
     @staticmethod

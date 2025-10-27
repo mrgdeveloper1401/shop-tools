@@ -26,7 +26,7 @@ urlpatterns = [
     path("request-otp/", views.AsyncRequestOtpView.as_view(), name="request-otp"),
     path("verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"),
     path("request-forget-password/", views.AsyncRequestForgetPasswordView.as_view(), name="request-forget-password"),
-    path("confirm-forget-password/", views.ForgetPasswordConfirmView.as_view(), name='forget-password-confirm'),
+    path("confirm-forget-password/", views.AsycnForgetPasswordConfirmView.as_view(), name='forget-password-confirm'),
     path("admin_user_list/", views.AdminUserListview.as_view(), name="admin_user_list"),
     path("login_by_phone_password/", views.LoginByPhonePasswordView.as_view(), name="login_phone_password"),
     path("", include(state_router.urls)),
