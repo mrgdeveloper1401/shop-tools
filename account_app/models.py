@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
+from django.conf import settings
 
 from core.utils.validators import PhoneNumberValidator
 from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
@@ -170,29 +171,35 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 
 class OtpService:
+    set_time = 120
+
+    def __init__(self):
+        if settings.DEBUG:
+            self.set_time = 300
+
     @staticmethod
-    def generate_otp(length=6, expiry_time=120):
+    def generate_otp(length=6):
         """Generate a numeric OTP and store it in Redis"""
         otp = ''.join([str(random.randint(0, 9)) for _ in range(length)])
         return otp
 
     @staticmethod
-    def store_otp(key, otp, expiry_time=300):
-        """Store OTP in Redis with expiry time (default: 5 minutes)"""
-        cache.set(key, otp, timeout=expiry_time)
+    async def store_otp(key, otp):
+        """Store OTP in Redis with expiry time (default: 2 minutes)"""
+        await cache.aset(key, otp, timeout=OtpService.set_time)
 
     @staticmethod
-    def verify_otp(key, submitted_otp):
+    async def verify_otp(key, submitted_otp):
         """Verify the submitted OTP against stored OTP"""
-        stored_otp = cache.get(key)
+        stored_otp = await cache.aget(key)
         if stored_otp is None:
             return False
         return stored_otp == submitted_otp
 
     @staticmethod
-    def delete_otp(key):
+    async def delete_otp(key):
         """Delete OTP from Redis"""
-        cache.delete(key)
+        await cache.adelete(key)
 
 
 class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin):

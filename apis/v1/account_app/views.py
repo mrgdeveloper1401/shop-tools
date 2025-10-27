@@ -1,13 +1,14 @@
 from django.contrib.auth import authenticate
 from django.core.cache import cache
 from django.db.models import Prefetch
+from django.shortcuts import aget_object_or_404
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
 from adrf.views import APIView as AsyncApiView
 from asgiref.sync import sync_to_async
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
 # from account_app.tasks import send_otp_code_by_celery
-from core.utils.jwt import get_tokens_for_user
+from core.utils.jwt import get_tokens_for_user, async_get_token_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
     PrivateNotificationFilter, TicketFilter
@@ -42,7 +43,7 @@ class AsyncRequestOtpView(AsyncApiView):
         # get user ip address
         ip_addr = request.META.get("REMOTE_ADDR", "X-FORWARDED-FOR")
 
-        # create otp code
+        # create code for otp
         otp = OtpService.generate_otp()
 
         # send otp code by celery
@@ -52,7 +53,7 @@ class AsyncRequestOtpView(AsyncApiView):
         redis_key = f'{ip_addr}-{phone}-{otp}'
 
         # set key
-        OtpService.store_otp(
+        await OtpService.store_otp(
             key=redis_key,
             otp=otp,
         )
@@ -66,11 +67,23 @@ class AsyncRequestOtpView(AsyncApiView):
         )
 
 
-class RequestPhoneVerifyOtpView(views.APIView):
-    serializer_class = serializers.RequestPhoneVerifySerializer
+class AsyncRequestPhoneVerifyOtpView(AsyncApiView):
+    serializer_class = serializers.AsyncRequestPhoneVerifySerializer
     permission_classes = (NotAuthenticated,)
 
-    def post(self, request):
+    # async def get_user(self, phone):
+    #     try:
+    #         user = await User.objects.only("is_staff").aget(
+    #             mobile_phone=phone,
+    #             is_active=True
+    #         )
+    #         return user
+    #     except User.DoesNotExist:
+    #         raise exceptions.NotFound()
+
+    async def post(self, request):
+        # import ipdb
+        # ipdb.set_trace()
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -83,32 +96,26 @@ class RequestPhoneVerifyOtpView(views.APIView):
         redis_key = f'{ip_addr}-{phone}-{code}'
 
         # validate otp
-        get_otp = cache.get(redis_key)
+        get_otp = await OtpService.verify_otp(redis_key, code)
 
         # check otp
         if not get_otp:
             raise exceptions.NotFound()
 
-        # create token
-        user = User.objects.filter(
-            mobile_phone=phone,
-        ).only('id', "is_active", "is_staff")
-
         # check user
-        if not user.exists():
-            raise exceptions.NotFound()
-
-        # get user
-        get_user = user.first()
+        user = await aget_object_or_404(User, mobile_phone=phone, is_active=True)
 
         # generate token
-        token = get_tokens_for_user(get_user)
+        token = await async_get_token_for_user(user)
+
+        # delete otp in redis
+        await OtpService.delete_otp(redis_key)
 
         # return token
         return response.Response(
             data={
                 "token": token,
-                "is_staff": get_user.is_staff
+                "is_staff": user.is_staff
             }
         )
 
@@ -402,7 +409,7 @@ class ForgetPasswordConfirmView(views.APIView):
             "mobile_phone",
             "is_active",
             "is_staff"
-    )
+        )
 
         # check user exists
         if not user.exists():

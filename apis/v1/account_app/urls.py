@@ -24,7 +24,7 @@ ticket_room_router.register("ticket", views.TicketViewSet, basename="ticket")
 
 urlpatterns = [
     path("request-otp/", views.AsyncRequestOtpView.as_view(), name="request-otp"),
-    path("verify-otp/", views.RequestPhoneVerifyOtpView.as_view(), name="verify_otp"),
+    path("verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"),
     path("request-forget-password/", views.ForgetPasswordView.as_view(), name="request-forget-password"),
     path("confirm-forget-password/", views.ForgetPasswordConfirmView.as_view(), name='forget-password-confirm'),
     path("admin_user_list/", views.AdminUserListview.as_view(), name="admin_user_list"),
