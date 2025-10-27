@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import aauthenticate
 from django.core.cache import cache
 from django.db.models import Prefetch
 from django.shortcuts import aget_object_or_404
@@ -296,24 +296,24 @@ class CityViewSet(
         )
 
 
-class LoginByPhonePasswordView(views.APIView):
-    serializer_class = serializers.LoginByPhonePasswordSerializer
-    permission_classes = (NotAuthenticated,)
+class AsyncLoginByPhonePasswordView(AsyncApiView):
+    serializer_class = serializers.AsyncLoginByPhonePasswordSerializer
+    permission_classes = (AsyncNotAuthenticated,)
 
-    def post(self, request, *args, **kwargs):
+    async def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         phone = serializer.validated_data['phone']
         password = serializer.validated_data['password']
 
-        user = authenticate(
+        user = await aauthenticate(
             mobile_phone=phone,
             password=password
         )
         if user and user.is_active:
             # generate token
-            token = get_tokens_for_user(user)
+            token = await async_get_token_for_user(user)
             return response.Response(
                 data={
                     "token": token,

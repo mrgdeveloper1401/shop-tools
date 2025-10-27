@@ -215,7 +215,7 @@ class CitySerializer(serializers.ModelSerializer):
         )
 
 
-class LoginByPhonePasswordSerializer(serializers.Serializer):
+class AsyncLoginByPhonePasswordSerializer(Serializer):
     phone = serializers.CharField(validators=(MobileRegexValidator(),))
     password = serializers.CharField()
 
