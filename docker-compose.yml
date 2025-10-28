@@ -82,6 +82,20 @@ services:
     depends_on:
       - app
 
+  pgadmin:
+    depends_on:
+      - db
+    container_name: shop_pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+     - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+     - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   gs_postgres_data:
   static_files:
