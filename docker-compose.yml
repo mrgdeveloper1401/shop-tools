@@ -99,3 +99,4 @@ services:
 volumes:
   gs_postgres_data:
   static_files:
+  pgadmin_data:
