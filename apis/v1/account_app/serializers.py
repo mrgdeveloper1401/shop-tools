@@ -187,7 +187,7 @@ class UserAddressSerializer(serializers.ModelSerializer):
         return fields
 
 
-class AdminUserListSerializer(serializers.ModelSerializer):
+class AsyncAdminUserListSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (

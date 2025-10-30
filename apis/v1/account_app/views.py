@@ -4,6 +4,7 @@ from django.db.models import Prefetch
 from django.shortcuts import aget_object_or_404
 from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
 from adrf.views import APIView as AsyncApiView
+from adrf.generics import ListAPIView as AsyncListAPIView
 from asgiref.sync import sync_to_async
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
@@ -12,7 +13,7 @@ from core.utils.jwt import get_tokens_for_user, async_get_token_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
     PrivateNotificationFilter, TicketFilter
-from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated
+from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated, AsyncIsAdminUser
 from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
 from . import serializers
 
@@ -245,23 +246,19 @@ class UserAddressViewSet(viewsets.ModelViewSet):
         return query
 
 
-class AdminUserListview(generics.ListAPIView):
+class AsyncAdminUserListview(AsyncListAPIView):
     """
     show list use phone \n
     you can show list user \n
     permission --> admin user \n
     filter query --> mobile_phone
     """
-    serializer_class = serializers.AdminUserListSerializer
-    permission_classes = (permissions.IsAdminUser,)
+    serializer_class = serializers.AsyncAdminUserListSerializer
+    permission_classes = (AsyncIsAdminUser,)
     filterset_class = UserMobilePhoneFilter
 
     def get_queryset(self):
-        return User.objects.only(
-            "mobile_phone"
-        ).filter(
-            is_active=True
-        )
+        return User.objects.filter(is_active=True).only("mobile_phone")
 
 
 class StateViewSet(

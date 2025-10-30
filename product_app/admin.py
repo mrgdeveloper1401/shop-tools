@@ -96,11 +96,12 @@ class ProductAdmin(admin.ModelAdmin):
         "is_active",
         "base_price",
         "product_id_ba_salam",
+        'in_person_purchase',
         "created_at",
-        "updated_at"
+        "updated_at",
     )
-    list_filter = ("is_active", ProductSku, ProductBasePriceIsNull)
-    list_editable = ("is_active",)
+    list_filter = ("is_active", ProductSku, ProductBasePriceIsNull, "in_person_purchase")
+    list_editable = ("is_active", 'in_person_purchase')
     list_per_page = 30
 
 
@@ -160,10 +161,9 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "old_price",
         "name",
         "stock_number",
-        "is_active",
-        "in_person_purchase"
+        "is_active"
     )
-    list_editable = ("is_active", "price", "old_price", "stock_number", "in_person_purchase")
+    list_editable = ("is_active", "price", "old_price", "stock_number")
     search_fields = ("name",)
     search_help_text = _("برای جست و جو میتوانید از نام ورینت استفاده کنید")
     list_filter = ("is_active", ProductVariantPriceIsNull)
@@ -178,9 +178,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
             "old_price",
             "name",
             "stock_number",
-            "is_active",
-            "in_person_purchase"
-        )
+            "is_active"        )
 
 
 @admin.register(ProductAttributeValues)

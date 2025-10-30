@@ -145,6 +145,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         blank=True,
         help_text=_("BA Salam ID")
     )
+    in_person_purchase = models.BooleanField(_("خرید به صورت حضوری"), default=False)
 
     def save(self, *args, **kwargs):
         self.product_slug = slugify(self.product_name, allow_unicode=True)
@@ -170,7 +171,7 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
     stock_number = models.PositiveIntegerField(default=10)
     is_active = models.BooleanField(default=True, db_default=True)
     short_desc = models.CharField(max_length=255, blank=True, null=True)
-    in_person_purchase = models.BooleanField(_("خرید به صورت حضوری"), default=False)
+    # in_person_purchase = models.BooleanField(_("خرید به صورت حضوری"), default=False)
 
     @cached_property
     def is_available(self):

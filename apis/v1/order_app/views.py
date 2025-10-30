@@ -128,7 +128,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
                 "price",
                 "quantity",
                 "is_active",
-                "product_variant__in_person_purchase"
+                # "product_variant__in_person_purchase"
             )
         else:
             return base_query.filter(
@@ -147,7 +147,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
                 "product_variant__product_id",
                 "product_variant__product__category_id",
                 "product_variant__product__product_name",
-                "product_variant__in_person_purchase"
+                # "product_variant__in_person_purchase"
             )
 
 

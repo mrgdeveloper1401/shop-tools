@@ -161,6 +161,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "sku",
                 "base_price",
                 "updated_at",
+                "in_person_purchase"
             ).prefetch_related(
                     Prefetch(
                 "product_product_image", queryset=ProductImages.objects.select_related("image").only(
@@ -193,7 +194,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                             "order",
                             "product_id",
                             "alt_text_image",
-                            "image__image_id_ba_salam"
+                            "image__image_id_ba_salam",
+                            "updated_at"
                         ).filter(
                             is_active=True
                         )
@@ -207,7 +209,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "base_price",
                     "description_slug",
                     "product_slug",
-                    "category_id"
+                    "category_id",
+                    "in_person_purchase"
                 )
             else:
                 return query.prefetch_related(
@@ -234,7 +237,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_slug",
                     "description_slug",
                     "sku",
-                    "updated_at"
+                    "updated_at",
+                    "in_person_purchase"
                 )
 
 
@@ -337,7 +341,7 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
              "old_price",
              "short_desc",
              "subtitle",
-             "in_person_purchase"
+            #  "in_person_purchase"
          )
 
 
@@ -436,6 +440,7 @@ class ProductListHomePageView(generics.ListAPIView):
         "sku",
         "product_brand__brand_name",
         "total_sale",
+        "in_person_purchase"
     ).select_related(
         "product_brand"
     ).prefetch_related(
@@ -462,7 +467,7 @@ class ProductListHomePageView(generics.ListAPIView):
                 "product_id",
                 "stock_number",
                 "name",
-                "in_person_purchase"
+                # "in_person_purchase"
             )
         ),
         Prefetch(
