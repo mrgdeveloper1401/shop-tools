@@ -138,7 +138,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_variant__product_id",
                     "product_variant__stock_number",
                     "product_variant__name",
-                    "product_variant__price"
+                    "product_variant__price",
                 )
             )
         )
@@ -160,7 +160,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "description_slug",
                 "sku",
                 "base_price",
-                "updated_at"
+                "updated_at",
             ).prefetch_related(
                     Prefetch(
                 "product_product_image", queryset=ProductImages.objects.select_related("image").only(
@@ -336,7 +336,8 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
              "name",
              "old_price",
              "short_desc",
-             "subtitle"
+             "subtitle",
+             "in_person_purchase"
          )
 
 
@@ -460,7 +461,8 @@ class ProductListHomePageView(generics.ListAPIView):
                 "price",
                 "product_id",
                 "stock_number",
-                "name"
+                "name",
+                "in_person_purchase"
             )
         ),
         Prefetch(

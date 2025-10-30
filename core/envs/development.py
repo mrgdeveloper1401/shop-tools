@@ -52,3 +52,4 @@ SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
 
 CACHES['default']['LOCATION'] = "redis://127.0.0.1:6381/1"
+# REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = "rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication"

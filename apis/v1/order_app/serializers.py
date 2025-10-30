@@ -82,6 +82,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(source="product_variant.product_id")
     variant_name = serializers.CharField(source="product_variant.name")
     product_name = serializers.CharField(source="product_variant.product.product_name")
+    in_person_purchase = serializers.BooleanField(source="product_variant.in_person_purchase", read_only=True)
 
     class Meta:
         model = OrderItem
@@ -95,7 +96,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "quantity",
             "price",
             "calc_price_quantity",
-            "created_at"
+            "created_at",
+            "in_person_purchase"
         )
 
 
@@ -109,6 +111,7 @@ class AdminOrderItemSerializer(serializers.ModelSerializer):
     variant_name = serializers.CharField(source="product_variant.name")
     product_name = serializers.CharField(source="product_variant.product.product_name")
     calc_price_quantity = serializers.SerializerMethodField()
+    in_person_purchase = serializers.BooleanField(source="product_variant.in_person_purchase", read_only=True)
 
     def get_calc_price_quantity(self, obj):
         return obj.price * obj.quantity
@@ -148,14 +151,14 @@ class CreateOrderSerializer(serializers.Serializer):
         variant_ids = [item['product_variant_id'] for item in data['items']]
 
         # filter variants
-        existing_variants = ProductVariant.objects.filter(id__in=variant_ids).only("id")
+        existing_variants = ProductVariant.objects.filter(id__in=variant_ids, in_person_purchase=False).only("id", "in_person_purchase")
 
         # validate variants dose exits
         if len(existing_variants) != len(variant_ids):
             existing_ids = set(existing_variants.values_list('id', flat=True))
             missing_ids = set(variant_ids) - existing_ids
             raise serializers.ValidationError(
-                f"Product variants with ids {missing_ids} do not exist"
+                {"error": f"Product variants with ids {missing_ids} do not exist or Purchase is in person only."}
             )
 
         if coupon_code:

@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenVerifyView
+from rest_framework_simplejwt.views import TokenBlacklistView
 from decouple import config
 from test_code import log_request
 
@@ -45,7 +46,8 @@ swagger = [
 ]
 
 jwt = [
-    path('/v1/api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('v1/api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('v1/api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
 
 urlpatterns = [

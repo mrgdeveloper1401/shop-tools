@@ -115,7 +115,7 @@ class NestedProductVariantPriceStockSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ("price", "stock_number", "name", "product_variant_discounts")
+        fields = ("price", "stock_number", "name", "product_variant_discounts", "in_person_purchase")
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -155,7 +155,7 @@ class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ("id", "price", "variant_id", "product_variant_discounts", "is_available", "stock_number", "name")
+        fields = ("id", "price", "variant_id", "product_variant_discounts", "is_available", "stock_number", "name", "in_person_purchase")
 
 
 class NestedProductAttributeSerializer(serializers.ModelSerializer):
@@ -248,7 +248,7 @@ class UserListProductSerializer(serializers.ModelSerializer):
             "product_slug",
             "description_slug",
             "category_id",
-            "updated_at"
+            "updated_at",
             # "product_discounts",
         )
 

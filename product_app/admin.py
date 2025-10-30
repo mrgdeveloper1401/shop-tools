@@ -160,9 +160,10 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "old_price",
         "name",
         "stock_number",
-        "is_active"
+        "is_active",
+        "in_person_purchase"
     )
-    list_editable = ("is_active", "price", "old_price", "stock_number")
+    list_editable = ("is_active", "price", "old_price", "stock_number", "in_person_purchase")
     search_fields = ("name",)
     search_help_text = _("برای جست و جو میتوانید از نام ورینت استفاده کنید")
     list_filter = ("is_active", ProductVariantPriceIsNull)
@@ -178,6 +179,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
             "name",
             "stock_number",
             "is_active",
+            "in_person_purchase"
         )
 
 

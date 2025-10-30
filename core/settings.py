@@ -134,8 +134,8 @@ AUTH_USER_MODEL = 'account_app.User'
 
 # swagger settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your API',
-    'DESCRIPTION': 'API description',
+    'TITLE': 'shop tools',
+    'DESCRIPTION': 'API description shop tools',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_DIST': 'SIDECAR',
@@ -260,6 +260,10 @@ CELERY_TASK_QUEUES = (
 
 # config base storage
 STORAGES = {
+    'default':
+        {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage'
+        },
     'staticfiles':
         {
             'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
