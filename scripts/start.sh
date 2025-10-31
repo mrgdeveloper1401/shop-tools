@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source $HOME/.local/bin/env
 uv run python manage.py makemigrations --noinput
 uv run python manage.py migrate
 uv run python manage.py collectstatic --noinput
