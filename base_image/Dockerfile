@@ -9,6 +9,7 @@ RUN cp /dev/null /etc/apk/repositories && \
     apk upgrade && \
     apk add --no-cache bash postgresql16-client curl && \
     curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    source $HOME/.local/bin/env && \
     export PATH="/root/.cargo/bin:$PATH" && \
     uv pip install --system -r requirements.txt
     # pip install --index-url https://mirror-pypi.runflare.com/simple --upgrade pip && \
