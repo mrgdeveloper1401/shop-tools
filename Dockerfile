@@ -4,7 +4,8 @@ WORKDIR /home/app
 
 COPY . .
 
-ENV C_FORCE_ROOT=1 && \
-    source $HOME/.local/bin/env && \
+ENV C_FORCE_ROOT=1
+
+RUN source $HOME/.local/bin/env && \
     echo 'eval "$(uv generate-shell-completion bash)"' >> ~/.bashrc && \
     echo 'eval "$(uvx --generate-shell-completion bash)"' >> ~/.bashrc
