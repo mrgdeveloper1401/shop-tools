@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from account_app.models import State, City
+from account_app.models import State
 import pandas as pd
 from pathlib import Path
 

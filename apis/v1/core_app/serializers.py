@@ -7,8 +7,7 @@ from core_app.models import (
     Image,
     MainSite,
     Carousel,
-    SitemapEntry,
-    UploadFile
+    SitemapEntry
 )
 from core_app.tasks import create_image_auto_into_ba_salam
 

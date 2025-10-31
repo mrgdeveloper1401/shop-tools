@@ -113,3 +113,6 @@ psycopg[pool]
 django-celery-beat
 python-dotenv
 adrf==0.1.10
+pytest-asyncio==1.2.0
+locust==2.42.1
+django-async-orm==0.1.12

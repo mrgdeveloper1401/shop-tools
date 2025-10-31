@@ -1,6 +1,5 @@
 # import asyncio
 import httpx
-import json
 
 from decouple import config
 from rest_framework import exceptions

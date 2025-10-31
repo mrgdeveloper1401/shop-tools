@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from discount_app.models import Coupon, ProductDiscount
-from product_app.models import ProductVariant, Product
+from product_app.models import ProductVariant
 
 
 class AdminCouponSerializer(serializers.ModelSerializer):

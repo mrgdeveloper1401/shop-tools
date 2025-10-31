@@ -1,5 +1,6 @@
 from rest_framework import pagination, response
 from django.utils.functional import cached_property
+from rest_framework.exceptions import ValidationError
 
 class TwentyPageNumberPagination(pagination.PageNumberPagination):
     page_size = 20
@@ -25,8 +26,8 @@ class TorobPagination(pagination.PageNumberPagination):
         if request.method == 'POST' and 'page' in request.data:
             try:
                 return int(request.data['page'])
-            except:
-                return 1
+            except Exception as e:
+                raise ValidationError(e)
         return super().get_page_number(request, paginator)
 
     @cached_property

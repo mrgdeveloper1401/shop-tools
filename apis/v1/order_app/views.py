@@ -6,15 +6,11 @@ from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.utils.dateparse import parse_date
 from openpyxl.styles import Font
-from rest_framework import viewsets, permissions, generics, mixins, views, exceptions, response, decorators
-from django.utils.translation import gettext_lazy as _
+from rest_framework import viewsets, permissions, generics, mixins, exceptions, response, decorators
 from django.utils import timezone
 from adrf.views import APIView as AsyncApiView
-from asgiref.sync import sync_to_async
-from django.shortcuts import aget_object_or_404
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
-from core.utils.exceptions import PaymentBaseError
 from core.utils.gate_way import verify_payment
 from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
@@ -418,7 +414,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
         if int(result_verify_req) == 201:
             order = await self.check_order(int(order_id), request, result_verify_req)
             payment = await self.check_payment(int(track_id), request, result_verify_req)
-            func_verify_payment = await self.func_verify_payment(payment.id, verify_req, order, request)
+            await self.func_verify_payment(payment.id, verify_req, order, request)
             return response.Response(verify_req)
 
         # not accept

@@ -1,6 +1,5 @@
 from decouple import config
 import httpx
-from rest_framework.exceptions import APIException
 from core.utils.custom_exception import HttpxCustomApiException
 
 

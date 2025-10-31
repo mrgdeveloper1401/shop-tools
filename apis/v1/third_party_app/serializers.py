@@ -1,13 +1,11 @@
 from rest_framework import serializers, exceptions
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
 from django.utils.text import slugify
-from django.core.validators import MinValueValidator, MinLengthValidator
+from django.core.validators import MinLengthValidator
 from core.utils.ba_salam import upload_image_file, upload_file
-from core.utils.browsable_api_custom import TextInputListField
 from core.utils.enums import FileTypeChoices
 from core_app.models import Image, UploadFile
-from product_app.models import Product, ProductImages, ProductVariant, ProductAttributeValues
+from product_app.models import ProductImages, ProductVariant, ProductAttributeValues
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):
@@ -202,7 +200,7 @@ class TrobSerializer(serializers.ModelSerializer):
         product_category_id = obj.product.category_id
         product_id = obj.product_id
         product_slug = obj.product.product_slug
-        product_variant_id = obj.id
+        # product_variant_id = obj.id
         # base_url = "http://localhost:8000" if settings.DEBUG else "https://gs-tools.ir"
         base_url = "https://gs-tools.ir"
         page_url = f"{base_url}/product/{product_id}/{product_category_id}/{product_slug}"

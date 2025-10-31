@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 import pandas as pd
-from django.utils import timezone
 
 from product_app.models import Product
 

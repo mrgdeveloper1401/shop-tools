@@ -5,10 +5,20 @@ from django.utils import timezone
 from django.db import transaction
 from account_app.models import Profile, UserAddress
 from account_app.validators import MobileRegexValidator
+from rest_framework.exceptions import NotFound
 from core.utils.gate_way import request_gate_way
-from discount_app.models import ProductDiscount
-from order_app.models import Order, OrderItem, ShippingMethod, ShippingCompany, PaymentGateWay
-from order_app.tasks import create_gateway_payment, send_notification_to_user_after_complete_order, send_sms_after_complete_order
+from order_app.models import (
+    Order,
+    OrderItem,
+    ShippingMethod,
+    ShippingCompany,
+    PaymentGateWay,
+)
+from order_app.tasks import (
+    create_gateway_payment,
+    send_notification_to_user_after_complete_order,
+    send_sms_after_complete_order,
+)
 from product_app.models import ProductVariant
 
 
@@ -26,7 +36,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "phone",
-            "description"
+            "description",
         )
         read_only_fields = ("is_complete", "tracking_code", "address_id")
 
@@ -38,10 +48,7 @@ class OrderSerializer(serializers.ModelSerializer):
         profile_id = Profile.objects.filter(user_id=user_id).only("id").first()
 
         # create order
-        return Order.objects.create(
-            profile_id=profile_id,
-            **validated_data
-        )
+        return Order.objects.create(profile_id=profile_id, **validated_data)
 
 
 class SimpleProfileOrderSerializer(serializers.ModelSerializer):
@@ -55,13 +62,19 @@ class SimpleProfileOrderSerializer(serializers.ModelSerializer):
 
 class AdminOrderSerializer(serializers.ModelSerializer):
     profile = serializers.PrimaryKeyRelatedField(
-        queryset=Profile.objects.only("id",),
+        queryset=Profile.objects.only(
+            "id",
+        ),
     )
     address = serializers.PrimaryKeyRelatedField(
-        queryset=UserAddress.objects.only("id",),
+        queryset=UserAddress.objects.only(
+            "id",
+        ),
     )
     shipping = serializers.PrimaryKeyRelatedField(
-        queryset=ShippingMethod.objects.only("id",),
+        queryset=ShippingMethod.objects.only(
+            "id",
+        ),
     )
 
     class Meta:
@@ -73,7 +86,9 @@ class AdminOrderSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['profile'] = SimpleProfileOrderSerializer(instance.profile, read_only=True).data
+        data["profile"] = SimpleProfileOrderSerializer(
+            instance.profile, read_only=True
+        ).data
         return data
 
 
@@ -102,9 +117,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class AdminOrderItemSerializer(serializers.ModelSerializer):
-    order = serializers.PrimaryKeyRelatedField(
-        queryset=Order.objects.only("id")
-    )
+    order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.only("id"))
     product_variant = serializers.PrimaryKeyRelatedField(
         queryset=ProductVariant.objects.only("id")
     )
@@ -133,52 +146,65 @@ class CreateOrderSerializer(serializers.Serializer):
     items = NestedCartItemSerializer(many=True)
     address_id = serializers.IntegerField()
     shipping = serializers.PrimaryKeyRelatedField(
-        queryset=ShippingMethod.objects.only("id",),
+        queryset=ShippingMethod.objects.only(
+            "id",
+        ),
     )
     coupon_code = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     payment_gateway = serializers.JSONField(read_only=True)
-    phone = serializers.CharField(
-        validators=(MobileRegexValidator,)
-    )
+    phone = serializers.CharField(validators=(MobileRegexValidator,))
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+
+    def validate_address_id(self, data):
+        user = self.context['request'].user
+        if user.is_staff is False:
+            user_address = UserAddress.objects.filter(user_id=user.id).only("id")
+            if not user_address.exists():
+                raise NotFound("address not found")
+        return data
 
     def validate(self, data):
         coupon_code = data.get("coupon_code", None)
 
         # check variant dose exits
-        variant_ids = [item['product_variant_id'] for item in data['items']]
+        variant_ids = [item["product_variant_id"] for item in data["items"]]
 
         # filter variants
-        existing_variants = ProductVariant.objects.filter(id__in=variant_ids, product__in_person_purchase=False).only("id")
+        existing_variants = ProductVariant.objects.filter(
+            id__in=variant_ids, product__in_person_purchase=False
+        ).only("id")
 
         # validate variants dose exits
         if len(existing_variants) != len(variant_ids):
-            existing_ids = set(existing_variants.values_list('id', flat=True))
+            existing_ids = set(existing_variants.values_list("id", flat=True))
             missing_ids = set(variant_ids) - existing_ids
             raise serializers.ValidationError(
-                {"error": f"Product variants with ids {missing_ids} do not exist or This product can only be delivered in person."}
+                {
+                    "error": f"Product variants with ids {missing_ids} do not exist or This product can only be delivered in person."
+                }
             )
 
         if coupon_code:
             res = Order.is_valid_coupon(code=coupon_code)
             if not res:
                 raise serializers.ValidationError(
-                    {
-                        "message": _("coupon code is invalid")
-                    },
+                    {"message": _("coupon code is invalid")},
                 )
-            data['valid_coupon'] = res
+            data["valid_coupon"] = res
         # data['existing_variants'] = existing_variants
         return data
 
     def create(self, validated_data):
-        user = self.context['request'].user # get user by context
+        user = self.context["request"].user  # get user by context
 
         # check stock number befor order
-        variant_ids = [item['product_variant_id'] for item in validated_data['items']]
-        quantities = {item['product_variant_id']: item['quantity'] for item in validated_data['items']}
+        variant_ids = [item["product_variant_id"] for item in validated_data["items"]]
+        quantities = {
+            item["product_variant_id"]: item["quantity"]
+            for item in validated_data["items"]
+        }
 
         with transaction.atomic():
             variants = ProductVariant.objects.filter(
@@ -192,9 +218,11 @@ class CreateOrderSerializer(serializers.Serializer):
                         f"amount poduct {variant.name} not enough"
                     )
             # create order
-            profile = Profile.objects.filter(
-                user_id=self.context["request"].user.id
-            ).only("id").first()
+            profile = (
+                Profile.objects.filter(user_id=self.context["request"].user.id)
+                .only("id")
+                .first()
+            )
 
             # get address id
             address_id = validated_data.pop("address_id", None)
@@ -208,26 +236,30 @@ class CreateOrderSerializer(serializers.Serializer):
             items = validated_data.get("items", None)
             # create order
             order = Order.objects.create(
-                profile_id=profile.id, 
-                address_id=address_id, 
+                profile_id=profile.id,
+                address_id=address_id,
                 shipping=shipping,
                 first_name=first_name,
                 last_name=last_name,
                 phone=phone,
                 description=description,
-                items_data=items
-                )
+                items_data=items,
+            )
 
             # create order item
             order_items = []
-            for item in validated_data['items']:
-                variant = ProductVariant.objects.filter(id=item['product_variant_id']).only('id', "price").first()
+            for item in validated_data["items"]:
+                variant = (
+                    ProductVariant.objects.filter(id=item["product_variant_id"])
+                    .only("id", "price")
+                    .first()
+                )
                 order_items.append(
                     OrderItem(
                         order_id=order.id,
                         product_variant_id=variant.id,
                         price=variant.price,
-                        quantity=item['quantity']
+                        quantity=item["quantity"],
                     )
                 )
 
@@ -235,49 +267,43 @@ class CreateOrderSerializer(serializers.Serializer):
 
             # reserv order
             order.reserved_stock()
-        
+
         # get coupon in validated data
         coupon = validated_data.get("valid_coupon")
 
         # validate stock number
-        variant_ids = [item['product_variant_id'] for item in validated_data['items']]
+        variant_ids = [item["product_variant_id"] for item in validated_data["items"]]
         validate_product_variant = ProductVariant.objects.filter(
-            id__in=variant_ids,
-            stock_number__gt=0
+            id__in=variant_ids, stock_number__gt=0
         ).only("id")
         if not validate_product_variant.exists():
             raise serializers.ValidationError(
-                {
-                    "message": _("product variant not available")
-                }
+                {"message": _("product variant not available")}
             )
 
         # ورینت های معتبر
-        variants = [i for i in validated_data['items']]
+        variants = [i for i in validated_data["items"]]
         # محاسبه قیمت نهایی
-        calc_total_price = order.total_price(
-            coupon_code=coupon,
-            variants=variants
-        )
+        calc_total_price = order.total_price(coupon_code=coupon, variants=variants)
 
-        if calc_total_price == 0: # check final price is zero
-            order.status = 'paid'
+        if calc_total_price == 0:  # check final price is zero
+            order.status = "paid"
             order.is_complete = True
             order.payment_date = timezone.now()
             order.save()
             json_data = {"message": "success", "result": 100}
             create_gateway_payment.delay(
-                order_id=order.id,
-                json_data=json_data,
-                user_id = user.id
+                order_id=order.id, json_data=json_data, user_id=user.id
             )
-            json_data['items'] = items
-            json_data['shipping'] = shipping
-            json_data['address_id'] = address_id
-            json_data['phone'] = phone
-            json_data['first_name'] = first_name
-            json_data['last_name'] = last_name
-            send_notification_to_user_after_complete_order.delay(mobile_phone=user.mobile_phone)
+            json_data["items"] = items
+            json_data["shipping"] = shipping
+            json_data["address_id"] = address_id
+            json_data["phone"] = phone
+            json_data["first_name"] = first_name
+            json_data["last_name"] = last_name
+            send_notification_to_user_after_complete_order.delay(
+                mobile_phone=user.mobile_phone
+            )
             send_sms_after_complete_order.delay(user.mobile_phone, order.tracking_code)
             return json_data
         else:
@@ -285,7 +311,7 @@ class CreateOrderSerializer(serializers.Serializer):
                 amount=calc_total_price,
                 description=validated_data.get("description", None),
                 order_id=order.id,
-                mobile=validated_data.get("mobile_phone", None)
+                mobile=validated_data.get("mobile_phone", None),
             )
             create_gateway_payment.delay(order.id, payment_gateway, user.id)
         return {
@@ -295,9 +321,9 @@ class CreateOrderSerializer(serializers.Serializer):
             "payment_gateway": payment_gateway,
             "phone": phone,
             "first_name": first_name,
-            "last_name": last_name
+            "last_name": last_name,
         }
-    
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data.pop("first_name", None)
@@ -310,10 +336,7 @@ class CreateOrderSerializer(serializers.Serializer):
 class AdminShippingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippingCompany
-        exclude = (
-            "is_deleted",
-            "deleted_at"
-        )
+        exclude = ("is_deleted", "deleted_at")
 
 
 class SimpleUserShippingCompanySerializer(serializers.ModelSerializer):
@@ -332,13 +355,13 @@ class AdminShippingMethodSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShippingMethod
-        exclude = (
-            "is_deleted",
-            "deleted_at"
-        )
+        exclude = ("is_deleted", "deleted_at")
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['company'] = SimpleUserShippingCompanySerializer(instance.company, read_only=True).data
+        data["company"] = SimpleUserShippingCompanySerializer(
+            instance.company, read_only=True
+        ).data
         return data
 
 
@@ -352,12 +375,12 @@ class UserShippingMethodSerializer(serializers.ModelSerializer):
             "estimated_days",
             "name",
             "price",
-            "shipping_type"
+            "shipping_type",
         )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['company'] = SimpleUserShippingCompanySerializer(instance.company).data
+        data["company"] = SimpleUserShippingCompanySerializer(instance.company).data
         return data
 
 
@@ -394,20 +417,13 @@ class ResultOrderCityStateNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserAddress
-        fields = (
-            "id",
-            "city",
-
-            "state_name"
-        )
+        fields = ("id", "city", "state_name")
 
 
 class ResultOrderPaymentGatewaySerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentGateWay
-        fields = (
-            "payment_gateway",
-        )
+        fields = ("payment_gateway",)
 
 
 class ResultOrderSerializer(serializers.ModelSerializer):
@@ -441,7 +457,7 @@ class ResultOrderSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "phone",
-            "description"
+            "description",
             # "total_price"
         )
 
@@ -459,7 +475,7 @@ class AnalyticSaleRangeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("created_at", )
+        fields = ("created_at",)
 
     # def get_order_count(self, obj):
     #     return obj.order_count

@@ -1,8 +1,6 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
-from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
-from asgiref.sync import sync_to_async
 from adrf.serializers import Serializer, ModelSerializer
 from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, Ticket
 from account_app.validators import MobileRegexValidator

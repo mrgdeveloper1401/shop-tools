@@ -1,15 +1,13 @@
-import asyncio
 import logging
 import os
 import subprocess
 from uuid import uuid4
-from decouple import config
 from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
-from django.core.management import call_command
+# from django.core.management import call_command
 from account_app.models import User, PrivateNotification
-from core.utils.sms import send_otp_sms
+# from core.utils.sms import send_otp_sms
 from core.utils.backup_arvancloud import Bucket
 
 

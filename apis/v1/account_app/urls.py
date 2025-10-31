@@ -9,9 +9,15 @@ app_name = "v1_auth"
 router = routers.SimpleRouter()
 
 router.register("create_user", views.UserCreateViewSet, basename="create_user")
-router.register("user_information", views.UserInformationViewSet, basename="user_information")
+router.register(
+    "user_information", views.UserInformationViewSet, basename="user_information"
+)
 router.register("profile", views.UserProfileViewSet, basename="profile")
-router.register("private_notification", views.UserPrivateNotificationViewSet, basename="private_notification")
+router.register(
+    "private_notification",
+    views.UserPrivateNotificationViewSet,
+    basename="private_notification",
+)
 router.register("user_address", views.UserAddressViewSet, basename="user_address")
 router.register("state", views.StateViewSet, basename="state")
 router.register("ticket_room", views.TicketRoomViewSet, basename="ticket_room")
@@ -24,12 +30,34 @@ ticket_room_router.register("ticket", views.TicketViewSet, basename="ticket")
 
 urlpatterns = [
     path("request-otp/", views.AsyncRequestOtpView.as_view(), name="request-otp"),
-    path("verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"),
-    path("request-forget-password/", views.AsyncRequestForgetPasswordView.as_view(), name="request-forget-password"),
-    path("confirm-forget-password/", views.AsycnForgetPasswordConfirmView.as_view(), name='forget-password-confirm'),
-    path("admin_user_list/", views.AsyncAdminUserListview.as_view(), name="admin_user_list"),
-    path("login_by_phone_password/", views.AsyncLoginByPhonePasswordView.as_view(), name="login_phone_password"),
+    path(
+        "verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"
+    ),
+    path(
+        "request-forget-password/",
+        views.AsyncRequestForgetPasswordView.as_view(),
+        name="request-forget-password",
+    ),
+    path(
+        "confirm-forget-password/",
+        views.AsycnForgetPasswordConfirmView.as_view(),
+        name="forget-password-confirm",
+    ),
+    path(
+        "admin_user_list/",
+        views.AsyncAdminUserListview.as_view(),
+        name="admin_user_list",
+    ),
+    path(
+        "login_by_phone_password/",
+        views.AsyncLoginByPhonePasswordView.as_view(),
+        name="login_phone_password",
+    ),
     path("", include(state_router.urls)),
-    path("admin_profile_list/", views.AdminListProfileView.as_view(), name="admin_profile_list"),
+    path(
+        "admin_profile_list/",
+        views.AdminListProfileView.as_view(),
+        name="admin_profile_list",
+    ),
     path("", include(ticket_room_router.urls)),
 ] + router.urls

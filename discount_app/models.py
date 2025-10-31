@@ -6,7 +6,7 @@ from django.utils.functional import cached_property
 
 from core_app.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from . import managers
-from product_app.models import ProductVariant, Product
+from product_app.models import ProductVariant
 
 
 class CouponEnums(models.TextChoices):

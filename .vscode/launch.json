@@ -6,7 +6,9 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/manage.py",
-            "args": ["runserver"],
+            "args": [
+                "runserver"
+            ],
             "console": "integratedTerminal",
             "env": {
                 "DJANGO_SETTINGS_MODULE": "core.envs.development",

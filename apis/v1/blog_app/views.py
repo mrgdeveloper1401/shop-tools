@@ -1,14 +1,11 @@
 from django.db.models import Prefetch
 from rest_framework import viewsets, permissions, generics, mixins, response, views, exceptions
 from django.core.cache import cache
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from account_app.models import Profile
 from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
 from blog_app.models import CategoryBlog, PostBlog, TagBlog
-from account_app.models import User
 
 
 class CategoryBlogViewSet(viewsets.ModelViewSet):
@@ -193,7 +190,7 @@ class SeoBlogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         if cache_response:
             return cache_response
         else:
-            response = cache.set(cache_key, query, 60 * 60 * 24)
+            cache.set(cache_key, query, 60 * 60 * 24)
             return query
 
 

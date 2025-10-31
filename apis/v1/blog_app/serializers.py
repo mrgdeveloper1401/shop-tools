@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from account_app.models import User
-from blog_app.models import CategoryBlog, PostBlog, TagBlog, CommentBlog
+from blog_app.models import CategoryBlog, PostBlog, TagBlog
 from core_app.models import Image
 
 

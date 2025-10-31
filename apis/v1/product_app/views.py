@@ -1,5 +1,4 @@
-from django.db.models import Prefetch, Min, Max, OuterRef, Subquery
-from django.utils import timezone
+from django.db.models import Prefetch, OuterRef, Subquery
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, generics, filters, mixins
 from django.core.cache import cache

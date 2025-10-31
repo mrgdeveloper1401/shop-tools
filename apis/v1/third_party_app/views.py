@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from rest_framework import views, permissions, response, mixins, viewsets, exceptions, generics
+from rest_framework import views, permissions, response, mixins, viewsets, exceptions
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Prefetch
 from apis.v1.third_party_app import serializers
@@ -288,7 +288,7 @@ class TorobProductView(views.APIView):
         # import ipdb
         # ipdb.set_trace()
         serializer = self.serializer_class(data=request.data) # data
-        validated_data = serializer.is_valid(raise_exception=True) # validate data
+        # validated_data = serializer.is_valid(raise_exception=True) # validate data
 
         page_unique = serializer.validated_data.get("page_uniques", None) # get data
         page = serializer.validated_data.get("page", None) # get data
@@ -324,7 +324,7 @@ class TorobProductView(views.APIView):
             # import ipdb
             # ipdb.set_trace()
             get_url = page_urls[0]
-            get_number = self.parse_url(page_urls[0])
+            get_number = self.parse_url(get_url)
             query = self.get_queryset().filter(id=int(get_number)).first()
             if query is None:
                 return response.Response(self.get_empty_response)

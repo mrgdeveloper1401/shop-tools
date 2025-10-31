@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django_filters import DateTimeFromToRangeFilter, DateFilter, DateTimeFilter
+from django_filters import DateTimeFromToRangeFilter, DateTimeFilter
 from django_filters.rest_framework import FilterSet, NumberFilter, RangeFilter, BooleanFilter
 from django_filters.widgets import RangeWidget
 

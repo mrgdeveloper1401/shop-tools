@@ -1,4 +1,5 @@
 import boto3
+from rest_framework.exceptions import ValidationError
 from boto3.s3.transfer import TransferConfig
 from decouple import config
 import certifi
@@ -75,14 +76,17 @@ class Bucket:
             max_concurrency=10,
             multipart_chunksize=5 * MB
         )
-        upload = self.bucket_s3_client().upload_file(
-            file_path,
-            self.bucket_name,
-            file_name,
-            ExtraArgs={'ACL': 'private'},
-            Config=config
-        )
-        
+        try:
+            upload = self.bucket_s3_client().upload_file(
+                file_path,
+                self.bucket_name,
+                file_name,
+                ExtraArgs={'ACL': 'private'},
+                Config=config
+            )
+            return upload
+        except Exception as e:
+            raise ValidationError(str(e))
 
 
 # b1 = Bucket()

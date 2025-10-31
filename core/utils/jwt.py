@@ -1,6 +1,5 @@
 from decouple import config
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from asgiref.sync import sync_to_async
 import jwt
 

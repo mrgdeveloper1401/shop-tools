@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from .tasks import create_image_auto_into_ba_salam
 
 from core_app.managers import PublishManager
 

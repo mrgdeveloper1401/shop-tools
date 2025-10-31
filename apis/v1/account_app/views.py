@@ -1,15 +1,13 @@
 from django.contrib.auth import aauthenticate
-from django.core.cache import cache
 from django.db.models import Prefetch
 from django.shortcuts import aget_object_or_404
-from rest_framework import viewsets, mixins, views, response, status, exceptions, permissions, generics
+from rest_framework import viewsets, mixins, response, status, exceptions, permissions, generics
 from adrf.views import APIView as AsyncApiView
 from adrf.generics import ListAPIView as AsyncListAPIView
-from asgiref.sync import sync_to_async
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
 # from account_app.tasks import send_otp_code_by_celery
-from core.utils.jwt import get_tokens_for_user, async_get_token_for_user
+from core.utils.jwt import async_get_token_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
     PrivateNotificationFilter, TicketFilter
