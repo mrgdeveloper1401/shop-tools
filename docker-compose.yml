@@ -12,9 +12,9 @@ services:
     restart: always
     volumes:
       - static_files:/home/app/staticfiles
-    depends_on:
-      - db
-      - nginx
+    # depends_on:
+    #   - db
+    #   - nginx
 
   db:
     container_name: gs_db
@@ -57,8 +57,8 @@ services:
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
       CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
-    depends_on:
-      - app
+    # depends_on:
+    #   - app
 
   flower:
     container_name: gs_flower
@@ -79,12 +79,12 @@ services:
       context: .
     env_file: ".env"
     entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
-    depends_on:
-      - app
+    # depends_on:
+    #   - app
 
   pgadmin:
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
     container_name: shop_pgadmin
     image: dpage/pgadmin4
     restart: always
