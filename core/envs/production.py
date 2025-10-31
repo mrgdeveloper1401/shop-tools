@@ -2,6 +2,7 @@ from datetime import timedelta, date
 from pathlib import Path
 import os
 from decouple import config, Csv
+from kombu import Queue
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
