@@ -338,3 +338,13 @@ STORAGES = {
 }
 
 CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']
+
+# celery queue
+CELERY_TASK_QUEUES = (
+    Queue("notifications"),
+    Queue("otp_sms"),
+    Queue("ba_salam"),
+    Queue("payment"),
+    Queue("update_order"),
+    Queue("backup_db")
+)
