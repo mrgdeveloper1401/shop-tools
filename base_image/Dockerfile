@@ -13,4 +13,4 @@ RUN cp /dev/null /etc/apk/repositories && \
     # pip install --index-url https://mirror-pypi.runflare.com/simple -r requirements.txt
 
 ENV PATH="/root/.cargo/bin:$PATH"
-uv pip install --system -r requirements.txt
+RUN uv pip install --system -r requirements.txt
