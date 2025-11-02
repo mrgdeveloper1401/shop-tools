@@ -5,6 +5,7 @@ WORKDIR /home/app
 # کپی کد پروژه
 COPY . .
 
+# for use celery pickle
 ENV C_FORCE_ROOT=1
 # نصب dependencies
 # RUN --mount=type=cache,target=/root/.cache/uv \

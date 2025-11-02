@@ -288,7 +288,7 @@ class TorobProductView(views.APIView):
         # import ipdb
         # ipdb.set_trace()
         serializer = self.serializer_class(data=request.data) # data
-        # validated_data = serializer.is_valid(raise_exception=True) # validate data
+        serializer.is_valid(raise_exception=True) # validate data
 
         page_unique = serializer.validated_data.get("page_uniques", None) # get data
         page = serializer.validated_data.get("page", None) # get data
