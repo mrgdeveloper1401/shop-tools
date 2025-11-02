@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 from rest_framework import views, permissions, response, mixins, viewsets, exceptions
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Prefetch
+from adrf.views import APIView as AsyncAPIView
 from apis.v1.third_party_app import serializers
 from core.utils import ba_salam
 from core.utils.ba_salam import read_categories, list_retrieve_product
@@ -210,7 +211,7 @@ class UpdateProductView(views.APIView):
         return response.Response(res)
 
 
-class TorobProductView(views.APIView):
+class TorobProductView(AsyncAPIView):
     serializer_class = serializers.PostRequestTorobSerializer
     pagination_class = TorobPagination
 
