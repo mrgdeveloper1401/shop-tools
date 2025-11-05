@@ -50,6 +50,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "django-debug-toolbar>=6.1.0",
+    "ipdb>=0.13.13",
 ]
 
 [tool.ruff]
