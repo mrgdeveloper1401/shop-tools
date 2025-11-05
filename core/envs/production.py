@@ -301,19 +301,19 @@ LOGGING = {
             "level": "ERROR",
             "class": "logging.FileHandler",
             "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'error_file.log')
+            "filename": os.path.join(log_dir, 'error_file.log')
         },
         "warning_file": {
             "level": "WARN",
             "class": "logging.FileHandler",
             "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'warning_file.log')
+            "filename": os.path.join(log_dir, 'warning_file.log')
         },
         "critical_file": {
             "level": "CRITICAL",
             "class": "logging.FileHandler",
             "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'critical_file.log')
+            "filename": os.path.join(log_dir, 'critical_file.log')
         },
     },
     "loggers": {
