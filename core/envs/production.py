@@ -284,7 +284,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_S3_MAX_MEMORY_SIZE = 1024 * 1024 * 2
 
 # with logging django
-log_dir = os.path.join(BASE_DIR / 'general_log_django', timezone.now().strftime("%Y-%m-%d"))
+log_dir = os.path.join('general_log_django', timezone.now().strftime("%Y-%m-%d"))
 os.makedirs(log_dir, exist_ok=True)
 LOGGING = {
     "version": 1,
