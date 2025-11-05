@@ -218,11 +218,7 @@ class CreateOrderSerializer(serializers.Serializer):
                         f"amount poduct {variant.name} not enough"
                     )
             # create order
-            profile = (
-                Profile.objects.filter(user_id=self.context["request"].user.id)
-                .only("id")
-                .first()
-            )
+            profile = Profile.objects.filter(user_id=self.context["request"].user.id).only("id").first()
 
             # get address id
             address_id = validated_data.pop("address_id", None)
