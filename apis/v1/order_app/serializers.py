@@ -173,7 +173,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
         # filter variants
         existing_variants = ProductVariant.objects.filter(
-            id__in=variant_ids, product__in_person_purchase=False
+            id__in=variant_ids
         ).only("id")
 
         # validate variants dose exits
@@ -182,7 +182,7 @@ class CreateOrderSerializer(serializers.Serializer):
             missing_ids = set(variant_ids) - existing_ids
             raise serializers.ValidationError(
                 {
-                    "error": f"Product variants with ids {missing_ids} do not exist or This product can only be delivered in person."
+                    "error": f"Product variants with ids {missing_ids} do not exist"
                 }
             )
 
