@@ -502,7 +502,8 @@ class VerifyPaymentGatewayView(AsyncApiView):
         #     ...
 
         else:
-            raise exceptions.NotAcceptable()
+            return response.Response(verify_req)
+            # raise exceptions.NotAcceptable()
 
         return response.Response(verify_req)
 
