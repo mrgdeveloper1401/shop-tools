@@ -452,7 +452,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
             )
 
         # cancel by user
-        elif status_verify_req == 3:
+        elif status_verify_req == 3 or int(result_verify_req) == 202:
             # update order
             updated = await Order.objects.filter(
                 id=int(order_id),
@@ -502,8 +502,8 @@ class VerifyPaymentGatewayView(AsyncApiView):
         #     ...
 
         else:
-            return response.Response(verify_req)
-            # raise exceptions.NotAcceptable()
+            # return response.Response(verify_req)
+            raise exceptions.NotAcceptable()
 
         return response.Response(verify_req)
 
