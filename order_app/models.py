@@ -101,7 +101,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
                 variant.stock_number -= item.quantity
                 variant.save()
             else:
-                raise ValidationError(f"amount not enoght for {variant.name}")
+                raise ValidationError(f"amount not enough for {variant.name}")
 
     def release_stock(self, save=False):
         if self.is_reserved and self.status != 'paid':

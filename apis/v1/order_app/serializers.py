@@ -166,10 +166,18 @@ class CreateOrderSerializer(serializers.Serializer):
         return data
 
     def validate(self, data):
+        # validate stock number
         coupon_code = data.get("coupon_code", None)
 
         # check variant dose exits
         variant_ids = [item["product_variant_id"] for item in data["items"]]
+        validate_product_variant = ProductVariant.objects.filter(
+            id__in=variant_ids, stock_number__gt=0
+        ).only("id")
+        if not validate_product_variant.exists():
+            raise serializers.ValidationError(
+                {"message": _("product variant not available")}
+            )
 
         # filter variants
         existing_variants = ProductVariant.objects.filter(
@@ -215,7 +223,7 @@ class CreateOrderSerializer(serializers.Serializer):
                 required_quantity = quantities[variant.id]
                 if variant.stock_number < required_quantity:
                     raise serializers.ValidationError(
-                        f"amount poduct {variant.name} not enough"
+                        f"amount product {variant.name} not enough"
                     )
             # create order
             profile = Profile.objects.filter(user_id=self.context["request"].user.id).only("id").first()
@@ -261,21 +269,11 @@ class CreateOrderSerializer(serializers.Serializer):
 
             items = OrderItem.objects.bulk_create(order_items)
 
-            # reserv order
+            # reserve order
             order.reserved_stock()
 
         # get coupon in validated data
         coupon = validated_data.get("valid_coupon")
-
-        # validate stock number
-        variant_ids = [item["product_variant_id"] for item in validated_data["items"]]
-        validate_product_variant = ProductVariant.objects.filter(
-            id__in=variant_ids, stock_number__gt=0
-        ).only("id")
-        if not validate_product_variant.exists():
-            raise serializers.ValidationError(
-                {"message": _("product variant not available")}
-            )
 
         # ورینت های معتبر
         variants = [i for i in validated_data["items"]]

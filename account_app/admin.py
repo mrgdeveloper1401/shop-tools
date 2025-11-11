@@ -88,6 +88,7 @@ class ProfileAdmin(admin.ModelAdmin):
 class UserAddressAdmin(admin.ModelAdmin):
     list_display = (
         "user_id",
+        "id",
         "state_id",
         "city_id",
         "title",
