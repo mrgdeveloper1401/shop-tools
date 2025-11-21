@@ -160,7 +160,7 @@ class CreateOrderSerializer(serializers.Serializer):
     def validate_address_id(self, data):
         user = self.context['request'].user
         if user.is_staff is False:
-            user_address = UserAddress.objects.filter(user_id=user.id).only("id")
+            user_address = UserAddress.objects.filter(id=data, user_id=user.id).only("id")
             if not user_address.exists():
                 raise NotFound("address not found")
         return data
