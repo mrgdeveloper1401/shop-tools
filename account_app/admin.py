@@ -86,6 +86,9 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(UserAddress)
 class UserAddressAdmin(admin.ModelAdmin):
+    raw_id_fields = ("state", "city", "user")
+    search_fields = ("user__mobile_phone",)
+    search_help_text = _("برای جست و جو میتوانید از شماره موبایل کاربر استفاده کنید")
     list_display = (
         "user_id",
         "id",
