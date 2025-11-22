@@ -35,7 +35,7 @@ class Tag(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = 'tag'
 
 
@@ -44,7 +44,7 @@ class Attribute(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = 'product_attribute'
 
 
@@ -59,7 +59,7 @@ class AttributeValue(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = 'product_attribute_value'
 
 
@@ -80,7 +80,7 @@ class ProductImages(CreateMixin, UpdateMixin, SoftDeleteMixin):
     order = models.PositiveSmallIntegerField(default=0, db_default=0)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = "product_image"
 
 
@@ -100,7 +100,7 @@ class ProductBrand(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return self.brand_image.get_image_url if self.brand_image else None
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = "product_brand"
 
 
@@ -153,7 +153,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = "product"
 
 
@@ -178,7 +178,7 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return False if self.stock_number == 0 else True
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = "product_variant"
 
 
@@ -219,7 +219,7 @@ class ProductComment(MP_Node, CreateMixin, UpdateMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = 'product_comment'
 
 

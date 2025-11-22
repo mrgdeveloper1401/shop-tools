@@ -57,7 +57,7 @@ class Image(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return self.image.url if self.image else self.wp_image_url
 
     class Meta:
-        ordering = ("-id",)
+        ordering = ("id",)
         db_table = 'core_app_image'
 
 
@@ -71,7 +71,7 @@ class UploadFile(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "upload_file"
-        ordering = ("-id",)
+        ordering = ("id",)
 
 
 class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
@@ -93,7 +93,7 @@ class MainSite(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "main_site"
-        ordering = ("-id",)
+        ordering = ("id",)
 
 
 class Carousel(CreateMixin, UpdateMixin, SoftDeleteMixin):
@@ -108,7 +108,7 @@ class Carousel(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "carousel"
-        ordering = ("-id",)
+        ordering = ("id",)
 
 
 class SitemapEntry(CreateMixin, SoftDeleteMixin):

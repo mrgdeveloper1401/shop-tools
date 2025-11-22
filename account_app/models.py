@@ -16,8 +16,8 @@ from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, CreateMixin):
     mobile_phone = models.CharField(
-        _("mobile phone"), 
-        max_length=15,
+        _("mobile phone"),
+        max_length=22,
         unique=True,
         null=True,
         blank=True,
@@ -45,7 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
     objects = UserManager()
 
     class Meta:
-        ordering = ("-id",)
+        ordering = ("id",)
         db_table = "auth_user"
 
     @cached_property
@@ -67,7 +67,7 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
 
     class Meta:
-        ordering = ("-id",)
+        ordering = ("id",)
         db_table = "auth_profile"
 
     @cached_property
@@ -148,7 +148,7 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
 
     class Meta:
-        ordering = ("-id",)
+        ordering = ("id",)
         db_table = "auth_user_address"
 
 
@@ -166,7 +166,7 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ("-id",)
+        ordering = ("id",)
         db_table = "auth_private_notification"
 
 
@@ -219,7 +219,7 @@ class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "ticker_room"
-        ordering = ("-id",)
+        ordering = ("id",)
 
 
 class Ticket(MP_Node, CreateMixin, UpdateMixin, SoftDeleteMixin):
