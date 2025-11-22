@@ -15,6 +15,7 @@ from .models import (
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    ordering = ("-id",)
     list_per_page = 20
     list_display = (
         "id",
