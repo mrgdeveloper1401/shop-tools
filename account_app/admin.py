@@ -69,8 +69,13 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    raw_id_fields = ("user", "profile_image")
+    search_fields = ("user__mobile_phone",)
+    search_help_text = _("برای جست و جو میتوانید از شماره موبایل کاربر استفاده کنید")
     list_display = (
         "user_id",
+        "user__mobile_phone",
         "first_name",
         "last_name",
         "updated_at",
@@ -78,10 +83,17 @@ class ProfileAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).defer(
-            "is_deleted",
-            "deleted_at"
-        )
+        qs = super().get_queryset(request)
+        if "changelist" in request.resolver_match.url_name:
+            return qs.select_related("user").only(
+                "user__mobile_phone",
+                "first_name",
+                "last_name",
+                "updated_at",
+                "created_at"
+            )
+        else:
+            return qs.defer("is_deleted", "deleted_at")
 
 
 @admin.register(UserAddress)
