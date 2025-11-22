@@ -15,7 +15,7 @@ from .models import (
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_max_show_all = 20
+    list_per_page = 20
     list_display = (
         "id",
         "status",
