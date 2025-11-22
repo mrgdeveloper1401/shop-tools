@@ -77,10 +77,16 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    raw_id_fields = ("order", "product_variant")
+    list_display_links = ("id", "order_id", "product_variant_id")
+    search_fields = ("order__profile__user__mobile_phone",)
+    search_help_text = _("برای جست و جو میتوانید از شماره موبایل پروفایل کاربر استفاده کنید")
     list_display = (
         "id",
         "order_id",
         "product_variant_id",
+        "get_user_phone",
         "price",
         "quantity",
         "is_active",
@@ -88,6 +94,32 @@ class OrderItemAdmin(admin.ModelAdmin):
         "updated_at"
     )
     list_filter = ("is_active",)
+    
+    def get_user_phone(self, obj):
+        return obj.order.profile.user.mobile_phone
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if "changelist" in request.resolver_match.url_name:
+            return qs.select_related("order__profile__user").only(
+                "product_variant_id",
+                "order__profile__user__mobile_phone",
+                "price",
+                "quantity",
+                "is_active",
+                "created_at",
+                "updated_at"
+            )
+        else:
+            return qs.only(
+                "order_id",
+                "product_variant_id",
+                "price",
+                "quantity",
+                "is_active",
+                "created_at",
+                "updated_at"
+            )
 
 
 @admin.register(ShippingCompany)
