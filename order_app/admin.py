@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db.models import JSONField
 from django_json_widget.widgets import JSONEditorWidget
 from daterangefilter.filters import DateRangeFilter
+from django.utils.translation import gettext_lazy as _
 from .models import (
     Order,
     OrderItem,
@@ -14,6 +15,7 @@ from .models import (
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    list_max_show_all = 20
     list_display = (
         "id",
         "status",
@@ -25,6 +27,8 @@ class OrderAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at"
     )
+    search_fields = ("profile__user__mobile_phone",)
+    search_help_text = _("برای جست و جو میتوانید از شماره موبایل پروفایل کاربر استفاده کنید")
     list_filter = (
         "is_complete",
         "is_reserved",
@@ -34,7 +38,42 @@ class OrderAdmin(admin.ModelAdmin):
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
+    list_display_links = ("id", "status")
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).select_related("profile__user")
+        if "changelist" in request.resolver_match.url_name:
+            return qs.only(
+                "status",
+                "is_reserved",
+                "is_complete",
+                "address_id",
+                "tracking_code",
+                "created_at",
+                "updated_at",
+                "profile__user__mobile_phone",
+            )
+        else:
+            return qs.only(
+                "status",
+                "is_reserved",
+                "is_complete",
+                "address_id",
+                "tracking_code",
+                "created_at",
+                "updated_at",
+                "profile__user__mobile_phone",
+                # in detail
+                "shipping_id",
+                "first_name",
+                "last_name",
+                "phone",
+                "payment_date",
+                "reserved_until",
+                "is_active",
+                "items_data",
+                "description"
+            )
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
