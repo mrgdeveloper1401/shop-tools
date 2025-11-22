@@ -147,11 +147,33 @@ class PaymentGateWayAdmin(admin.ModelAdmin):
 
 @admin.register(VerifyPaymentGateWay)
 class ResultPaymentGateWayAdmin(admin.ModelAdmin):
+    list_display_links = ("payment_gateway_id", "id", "payment_gateway__user_id")
+    raw_id_fields = ("payment_gateway",)
     list_display = (
         "payment_gateway_id",
+        "payment_gateway__user_id",
+        "payment_gateway__user__mobile_phone",
         "id",
         "created_at"    
         )
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
+    search_fields = ("payment_gateway__user__mobile_phone",)
+    search_help_text = _("برای سرچ میتوانید از شماره موبایل کاربر استفاد کنید")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        if "changelist" in request.resolver_match.url_name:
+            return qs.select_related("payment_gateway__user").only(
+                "payment_gateway__user_id",
+                "payment_gateway__user__mobile_phone",
+                "created_at",
+            )
+        else:
+            return qs.select_related("payment_gateway").only(
+                "payment_gateway__user_id",
+                "created_at",
+                "result"
+            )
