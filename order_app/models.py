@@ -36,14 +36,14 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     profile = models.ForeignKey(
         "account_app.Profile",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         related_name="orders",
     )
     is_complete = models.BooleanField(default=False)
     address = models.ForeignKey(
         "account_app.UserAddress",
         related_name="order_address",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         blank=True,
         null=True
     )
@@ -51,7 +51,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     payment_date = models.DateTimeField(null=True, blank=True)
     shipping = models.ForeignKey(
         "ShippingMethod",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         related_name="order_shipping_methods",
         blank=True, # TODO, when clean migration we remove field blank and null
         null=True
@@ -189,12 +189,12 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
 class OrderItem(CreateMixin, UpdateMixin, SoftDeleteMixin):
     order = models.ForeignKey(
         "Order",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         related_name="order_items",
     )
     product_variant = models.ForeignKey(
         "product_app.ProductVariant",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         related_name="product_variant_order_items",
     )
     price = models.DecimalField(max_digits=12, decimal_places=3)
@@ -257,10 +257,10 @@ class ShippingMethod(CreateMixin, UpdateMixin, SoftDeleteMixin):
 class PaymentGateWay(CreateMixin, SoftDeleteMixin):
     order = models.ForeignKey(
         Order,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         related_name="payment_gateways",
     )
-    user = models.ForeignKey("account_app.User", on_delete=models.DO_NOTHING, related_name="gateways", blank=True, null=True)
+    user = models.ForeignKey("account_app.User", on_delete=models.PROTECT, related_name="gateways", blank=True, null=True)
     payment_gateway = models.JSONField()
 
     class Meta:
@@ -270,7 +270,7 @@ class PaymentGateWay(CreateMixin, SoftDeleteMixin):
 class VerifyPaymentGateWay(CreateMixin, UpdateMixin, SoftDeleteMixin):
     payment_gateway = models.ForeignKey(
         PaymentGateWay,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         related_name="result_payment_gateways",
     )
     result = models.JSONField()
