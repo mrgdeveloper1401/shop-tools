@@ -117,17 +117,24 @@ class ShippingMethodAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentGateWay)
 class PaymentGateWayAdmin(admin.ModelAdmin):
+    raw_id_fields = ("user", "order")
     list_display = (
         "order_id",
         "id",
         "user_id",
-        "user",
+        "get_user_phone",
         "created_at",
         )
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
     search_fields = ("user__mobile_phone",)
+    list_per_page = 20
+    search_help_text = _("برای جست و جو میتوانید از شماره موبایل کاربر استفاده کنید")
+    list_display_links = ("id", "user_id", "order_id")
+
+    def get_user_phone(self, obj):
+        return obj.user.mobile_phone
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("user").only(
