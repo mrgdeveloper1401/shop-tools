@@ -54,7 +54,7 @@ def release_expired_reservations():
     expired_orders = Order.objects.filter(
         is_reserved=True,
         reserved_until__lt=timezone.now(),
-        status__in=['pending', 'processing']
+        status__in=['pending', 'processing', 'fail_by_user']
     )
     order_updates = []
     for order in expired_orders:

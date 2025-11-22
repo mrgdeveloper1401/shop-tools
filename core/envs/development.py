@@ -69,7 +69,7 @@ DATABASES = {
         "PASSWORD": "postgres",
         "HOST": "localhost",
         "PORT": 5434,
-        "CONN_MAX_AGE": 6000
+        "CONN_MAX_AGE": 150
     }
 }
 
