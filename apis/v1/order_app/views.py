@@ -9,6 +9,7 @@ from openpyxl.styles import Font
 from rest_framework import viewsets, permissions, generics, mixins, exceptions, response, decorators
 from django.utils import timezone
 from adrf.views import APIView as AsyncApiView
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_200_OK
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
 from core.utils.gate_way import verify_payment
@@ -415,7 +416,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
             order = await self.check_order(int(order_id), request, result_verify_req)
             payment = await self.check_payment(int(track_id), request, result_verify_req)
             await self.func_verify_payment(payment.id, verify_req, order, request)
-            return response.Response(verify_req)
+            return response.Response(verify_req, status=HTTP_200_OK)
 
         # not accept
         elif status_verify_req == -1:
@@ -431,7 +432,8 @@ class VerifyPaymentGatewayView(AsyncApiView):
             return response.Response(
                 {
                     "message": "process payment"
-                }
+                },
+                status=HTTP_204_NO_CONTENT
             )
 
         # internal error
@@ -448,7 +450,8 @@ class VerifyPaymentGatewayView(AsyncApiView):
             return response.Response(
                 {
                     "message": "gateway internal error"
-                }
+                },
+                status=HTTP_400_BAD_REQUEST
             )
 
         # cancel by user
@@ -471,7 +474,8 @@ class VerifyPaymentGatewayView(AsyncApiView):
             return response.Response(
                 {
                     "message": "cancel by user"
-                }
+                },
+                status=HTTP_400_BAD_REQUEST
             )
         
         # to many request
