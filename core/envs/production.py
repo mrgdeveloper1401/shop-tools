@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "adrf",
     "corsheaders",
+    "import_export",
 
     # third party app
     "account_app.apps.AccountAppConfig",

@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from treebeard.admin import TreeAdmin
+from import_export.admin import ImportExportModelAdmin
 from treebeard.forms import movenodeform_factory
 from daterangefilter.filters import DateRangeFilter
 
@@ -18,7 +19,7 @@ from .models import (
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     list_display = ("username", "email", "mobile_phone", "is_staff", "is_active", "is_superuser", "created_at")
     search_fields = ("mobile_phone",)
     search_help_text = _("برای جست و جو میتوانید از شماره موبایل استفاده کنید")

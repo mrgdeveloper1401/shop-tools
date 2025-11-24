@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "adrf",
     "debug_toolbar",
     "django_async_orm",
+    "import_export",
 
     # third party app
     "account_app.apps.AccountAppConfig",
