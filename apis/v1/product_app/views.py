@@ -493,7 +493,7 @@ class ProductListHomePageView(generics.ListAPIView):
         first_variant_price = ProductVariant.objects.filter(
             product_id=OuterRef('pk'),
             is_active=True
-        ).order_by('id').values('price')[:1]  # مرتب کردن بر اساس ID (می‌توانید به price تغییر دهید)
+        ).order_by('-id').values('price')[:1]  # مرتب کردن بر اساس ID (می‌توانید به price تغییر دهید)
 
         # اضافه کردن annotation به کوئری اصلی
         queryset = queryset.annotate(
