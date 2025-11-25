@@ -487,13 +487,13 @@ class ProductListHomePageView(generics.ListAPIView):
             return serializers.ProductListHomePageSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().order_by("-id")
 
         # Subquery برای گرفتن قیمت اولین variant فعال هر محصول
         first_variant_price = ProductVariant.objects.filter(
             product_id=OuterRef('pk'),
             is_active=True
-        ).order_by('-id').values('price')[:1]  # مرتب کردن بر اساس ID (می‌توانید به price تغییر دهید)
+        ).order_by('id').values('price')[:1]  # مرتب کردن بر اساس ID (می‌توانید به price تغییر دهید)
 
         # اضافه کردن annotation به کوئری اصلی
         queryset = queryset.annotate(
