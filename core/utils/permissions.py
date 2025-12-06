@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 
 class NotAuthenticated(permissions.BasePermission):
-    message = "user must be not authenticated"
+    message = "کاربر لاگین شده نمیتواند دسترسی داشته باشد"
 
     def has_permission(self, request, view):
         return not request.user.is_authenticated
@@ -16,7 +16,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 
 class AsyncNotAuthenticated(permissions.BasePermission):
-    message = "user must be not authenticated"
+    message = "کاربر لاگین شده نمیتواند دسترسی داشته باشد"
 
     async def has_permission(self, request, view):
         return not request.user.is_authenticated
