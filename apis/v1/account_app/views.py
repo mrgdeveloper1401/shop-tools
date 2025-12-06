@@ -102,7 +102,7 @@ class AsyncRequestPhoneVerifyOtpView(AsyncApiView):
         serializer.is_valid(raise_exception=True)
 
         # get ip address and phone
-        ip_addr = request.META.get("REMOTE_ADDR", "X-FORWARDED-FOR")
+        ip_addr = get_client_ip(request)
         phone = serializer.validated_data["phone"]
         code = serializer.validated_data.get("code")
 
