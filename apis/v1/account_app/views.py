@@ -1,9 +1,10 @@
 from django.contrib.auth import aauthenticate
 from django.db.models import Prefetch
 from django.shortcuts import aget_object_or_404
-from rest_framework import viewsets, mixins, response, status, exceptions, permissions, generics
+from rest_framework import views, viewsets, mixins, response, status, exceptions, permissions, generics
 from adrf.views import APIView as AsyncApiView
 from adrf.generics import ListAPIView as AsyncListAPIView
+
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
 # from account_app.tasks import send_otp_code_by_celery
@@ -16,11 +17,16 @@ from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
 from . import serializers
 
 
-class UserCreateViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+class UserCreateView(views.APIView):
     """mobile phone and password is required"""
-    queryset = User.objects.only("id")
     serializer_class = serializers.UserCreateSerializer
     permission_classes = (NotAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid()
+        serializer.save()
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class AsyncRequestOtpView(AsyncApiView):

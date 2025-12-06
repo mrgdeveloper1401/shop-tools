@@ -8,7 +8,6 @@ app_name = "v1_auth"
 
 router = routers.SimpleRouter()
 
-router.register("create_user", views.UserCreateViewSet, basename="create_user")
 router.register(
     "user_information", views.UserInformationViewSet, basename="user_information"
 )
@@ -29,6 +28,7 @@ ticket_room_router = routers.NestedSimpleRouter(router, "ticket_room", lookup="r
 ticket_room_router.register("ticket", views.TicketViewSet, basename="ticket")
 
 urlpatterns = [
+    path("create_user/", views.UserCreateView.as_view(), name='create_user'),
     path("request-otp/", views.AsyncRequestOtpView.as_view(), name="request-otp"),
     path(
         "verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"
