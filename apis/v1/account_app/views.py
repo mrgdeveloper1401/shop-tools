@@ -8,6 +8,7 @@ from adrf.generics import ListAPIView as AsyncListAPIView
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
 # from account_app.tasks import send_otp_code_by_celery
+from apis.v1.utils.ip_client import get_client_ip
 from core.utils.jwt import async_get_token_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
@@ -15,6 +16,17 @@ from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddre
 from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated, AsyncIsAdminUser
 from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
 from . import serializers
+
+
+class GetIpClent(views.APIView):
+    def get(self, request):
+        x_forwared_for = request.META.get("get_client_ip", None)
+        remote_addr = request.META.get("REMOTE_ADDR", None)
+        data = {
+            "x_forwarded_for": x_forwared_for,
+            "remote_addr": remote_addr
+        }
+        return response.Response(data)
 
 
 class UserCreateView(views.APIView):
@@ -44,8 +56,7 @@ class AsyncRequestOtpView(AsyncApiView):
             raise exceptions.NotFound("کاربری با این شماره موبایل پیدا نشد")
 
         # get user ip address
-        ip_addr = request.META.get("REMOTE_ADDR", "X-FORWARDED-FOR")
-
+        ip_addr = get_client_ip(request)
         # create code for otp
         otp = OtpService.generate_otp()
 
