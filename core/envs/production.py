@@ -4,7 +4,7 @@ import os
 from decouple import config, Csv
 from kombu import Queue
 from django.utils import timezone
-
+from core.utils.ck_editor import CKEDITOR_5_CONFIGS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -15,7 +15,6 @@ class ProductDiscountManager(models.Manager):
     def get_queryset(self):
         return ProductDiscountQuerySet(self.model, using=self._db)
 
-
 class ValidCouponManager(models.Manager):
     def is_valid_coupon(self, coupon_code):
         from discount_app.models import Coupon

@@ -2,6 +2,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 from kombu import Queue
+from core.utils.ck_editor import CKEDITOR_5_CONFIGS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
