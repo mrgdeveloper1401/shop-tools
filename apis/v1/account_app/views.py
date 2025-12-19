@@ -7,7 +7,6 @@ from adrf.generics import ListAPIView as AsyncListAPIView
 
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
-# from account_app.tasks import send_otp_code_by_celery
 from apis.v1.utils.ip_client import get_client_ip
 from core.utils.jwt import async_get_token_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
@@ -18,12 +17,12 @@ from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
 from . import serializers
 
 
-class GetIpClent(views.APIView):
+class GetIpClient(views.APIView):
     def get(self, request):
-        x_forwared_for = request.META.get("get_client_ip", None)
+        x_forwarded_for = request.META.get("get_client_ip", None)
         remote_addr = request.META.get("REMOTE_ADDR", None)
         data = {
-            "x_forwarded_for": x_forwared_for,
+            "x_forwarded_for": x_forwarded_for,
             "remote_addr": remote_addr
         }
         return response.Response(data)
@@ -84,16 +83,6 @@ class AsyncRequestOtpView(AsyncApiView):
 class AsyncRequestPhoneVerifyOtpView(AsyncApiView):
     serializer_class = serializers.AsyncRequestPhoneVerifySerializer
     permission_classes = (AsyncNotAuthenticated,)
-
-    # async def get_user(self, phone):
-    #     try:
-    #         user = await User.objects.only("is_staff").aget(
-    #             mobile_phone=phone,
-    #             is_active=True
-    #         )
-    #         return user
-    #     except User.DoesNotExist:
-    #         raise exceptions.NotFound()
 
     async def post(self, request):
         # import ipdb
@@ -364,7 +353,7 @@ class AsyncRequestForgetPasswordView(AsyncApiView):
         user = await aget_object_or_404(User, mobile_phone=phone, is_active=True)
 
         # get user ip
-        user_ip = request.META.get('REMOTE_ADDR', "X-FORWARDED-FOR")
+        user_ip = get_client_ip(request)
 
         # create code
         otp = OtpService.generate_otp()
@@ -388,7 +377,7 @@ class AsyncRequestForgetPasswordView(AsyncApiView):
         )
 
 
-class AsycnForgetPasswordConfirmView(AsyncApiView):
+class AsyncForgetPasswordConfirmView(AsyncApiView):
     permission_classes = (AsyncNotAuthenticated,)
     serializer_class = serializers.AsyncForgetPasswordChangeSerializer
 
@@ -399,7 +388,7 @@ class AsycnForgetPasswordConfirmView(AsyncApiView):
         serializer.is_valid(raise_exception=True)
 
         # get_user_ip
-        user_ip = request.META.get('REMOTE_ADDR', "X-FORWARDED-FOR")
+        user_ip = get_client_ip(request)
 
         # get otp code and phone in serializer
         get_otp = serializer.validated_data['otp']

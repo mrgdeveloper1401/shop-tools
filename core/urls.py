@@ -20,10 +20,10 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 from rest_framework_simplejwt.views import TokenVerifyView
 from rest_framework_simplejwt.views import TokenBlacklistView
 from decouple import config
-from test_code import log_request
+# from test_code import log_request
 
 test_request_url = [
-    path("test_request/", log_request, name='log_request')
+    # path("test_request/", log_request, name='log_request')
 ]
 
 v1_api_urls = [

@@ -64,11 +64,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    access_token = serializers.SerializerMethodField()
+    access_token = serializers.SerializerMethodField() # serializer method field
 
     def validate_mobile_phone(self, value):
-        validator = PhoneNumberValidator()
-        validator(value)
+        validator = PhoneNumberValidator() # regex validator
+        validator(value) # validate mobile_phone
         return value
 
     class Meta:
@@ -149,10 +149,10 @@ class UserAddressSerializer(serializers.ModelSerializer):
         required=False
     )
     city = serializers.PrimaryKeyRelatedField(
-        queryset=City.objects.only("name")
+        queryset=City.objects.only("id")
     )
     state = serializers.PrimaryKeyRelatedField(
-        queryset=State.objects.only("name")
+        queryset=State.objects.only("id")
     )
     city_name = serializers.CharField(source="city.name", read_only=True)
 
@@ -312,6 +312,7 @@ class TicketSerializer(serializers.ModelSerializer):
     def get_sender_is_staff(self, obj):
         return obj.sender.is_staff
 
+    @extend_schema_field(serializers.CharField())
     def get_sender_name(self, obj):
         return obj.sender.full_name
 

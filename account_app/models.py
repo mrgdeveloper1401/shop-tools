@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
 from django.conf import settings
 
+from core.utils.normalize_number import normalize_digits
 from core.utils.validators import PhoneNumberValidator
 from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
 
@@ -52,6 +53,10 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
     def full_name(self):
         name = self.profile.full_name
         return name if name else None
+
+    def save(self, *args, **kwargs):
+        self.mobile_phone = normalize_digits(self.mobile_phone)
+        super().save(*args, **kwargs)
 
 
 class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):

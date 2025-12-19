@@ -116,7 +116,7 @@ class TagBlogViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        query = TagBlog.objects.only("tag_name")
+        query = TagBlog.objects
 
         if not self.request.user.is_staff:
             query = query.only(
@@ -231,8 +231,7 @@ class SeoPostDetailBlogViewSet(views.APIView):
 
         try:
             query = self.get_queryset().get(post_slug=post_slug)
+            serializer = self.serializer_class(query)
+            return response.Response(serializer.data)
         except PostBlog.DoesNotExist:
             raise exceptions.NotFound()
-    
-        serializer = self.serializer_class(query)
-        return response.Response(serializer.data)

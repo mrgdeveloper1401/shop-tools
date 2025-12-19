@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
@@ -197,6 +198,7 @@ class SeoPostBlogAuthorSerializer(serializers.ModelSerializer):
             "get_full_name"
         )
 
+    @extend_schema_field(serializers.CharField())
     def get_full_name(self, obj):
         return obj.full_name
 
@@ -219,6 +221,7 @@ class SeoPostDetailAuthroSerializer(serializers.ModelSerializer):
             "full_name"
         )
 
+    @extend_schema_field(serializers.CharField())
     def get_full_name(self, obj):
         return obj.full_name
 

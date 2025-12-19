@@ -66,7 +66,7 @@ MIDDLEWARE = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "backup_gs_66_1",
+        "NAME": "gs_tools_2025_12_19db",
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",
