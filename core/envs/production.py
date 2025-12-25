@@ -81,7 +81,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -256,7 +255,7 @@ CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
 # celery beat config
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-
+# cors origin
 CORS_ALLOWED_ORIGINS = config("PRODUCTION_CORS_ALLOWED_ORIGINS", cast=Csv())
 
 # SESSION_COOKIE_SECURE = True
@@ -341,7 +340,7 @@ STORAGES = {
         },
     'staticfiles':
         {
-            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'
         }
 }
 
@@ -356,3 +355,8 @@ CELERY_TASK_QUEUES = (
     Queue("update_order"),
     Queue("backup_db")
 )
+
+USE_WHITE_NOISE = config("USE_WHITE_NOISE", cast=bool, default=False)
+if USE_WHITE_NOISE:
+    MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+    STORAGES['staticfiles']['BACKEND'] = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

@@ -83,7 +83,7 @@ class ProductDiscount(CreateMixin, UpdateMixin):
     end_date = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
-    @property
+    @cached_property
     def is_valid_discount(self):
         if self.is_active and (self.start_date <= timezone.now() <= self.end_date):
             return True

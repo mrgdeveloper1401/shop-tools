@@ -65,7 +65,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
             send_notification_order_complete.delay()
         super().save(*args, **kwargs)
 
-    @property
+    @cached_property
     def sub_total(self):
         total = sum(
             item.calc_price_quantity for item in self.order_items.filter(is_active=True).only(
@@ -74,7 +74,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         )
         return total
 
-    @property
+    @cached_property
     def sub_total_without_quantity(self):
         total = sum(
             item.price for item in self.order_items.filter(is_active=True).only(
@@ -83,7 +83,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         )
         return total
 
-    @property
+    @cached_property
     def shipping_cost(self):
         return self.shipping.price if self.shipping else None
 

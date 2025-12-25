@@ -79,7 +79,7 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
     def profile_image_url(self):
         return self.profile_image.image.url if self.profile_image else None
 
-    @property
+    @cached_property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 

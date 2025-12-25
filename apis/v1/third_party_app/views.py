@@ -1,4 +1,6 @@
 from urllib.parse import urlparse
+
+from django.utils.functional import cached_property
 from rest_framework import views, permissions, response, mixins, viewsets, exceptions
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Prefetch
@@ -225,7 +227,7 @@ class TorobProductView(AsyncAPIView):
             number = split_url[-2]
         return number
 
-    @property
+    @cached_property
     def get_empty_response(self):
         return {
             "api_version": "torob_api_v3",
