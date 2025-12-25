@@ -52,9 +52,7 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     shipping = models.ForeignKey(
         "ShippingMethod",
         on_delete=models.PROTECT,
-        related_name="order_shipping_methods",
-        blank=True, # TODO, when clean migration we remove field blank and null
-        null=True
+        related_name="order_shipping_methods"
     )
     is_active = models.BooleanField(default=True)
     items_data = models.JSONField(blank=True, null=True)

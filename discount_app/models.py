@@ -73,13 +73,6 @@ class ProductDiscount(CreateMixin, UpdateMixin):
         related_name="product_variant_discounts",
         limit_choices_to={"is_active": True}
     )
-    # product = models.ForeignKey(
-    #     Product,
-    #     on_delete=models.PROTECT,
-    #     related_name="product_discounts",
-    #     blank=True,
-    #     null=True,
-    # )
     discount_type = models.CharField(
         choices=CouponEnums.choices,
         default=CouponEnums.percent,
@@ -90,7 +83,7 @@ class ProductDiscount(CreateMixin, UpdateMixin):
     end_date = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
-    @cached_property
+    @property
     def is_valid_discount(self):
         if self.is_active and (self.start_date <= timezone.now() <= self.end_date):
             return True
