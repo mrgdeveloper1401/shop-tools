@@ -102,8 +102,13 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'core.wsgi.application'
-ASGI_APPLICATION = 'core.asgi.application'
+USE_WSGI = config('USE_WSGI', default=True, cast=bool)
+if USE_WSGI:
+    WSGI_APPLICATION = 'core.wsgi.application'
+
+USE_ASGI = config('USE_ASGI', default=False, cast=bool)
+if USE_ASGI:
+    ASGI_APPLICATION = 'core.asgi.application'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

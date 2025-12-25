@@ -1,6 +1,8 @@
 from datetime import timedelta
 from pathlib import Path
 import os
+
+from decouple import config
 from kombu import Queue
 from core.utils.ck_editor import CKEDITOR_5_CONFIGS
 
@@ -78,8 +80,13 @@ DATABASES = {
 
 ROOT_URLCONF = 'core.urls'
 
-# WSGI_APPLICATION = 'core.wsgi.application'
-ASGI_APPLICATION = 'core.asgi.application'
+USE_WSGI = config('USE_WSGI', default=True, cast=bool)
+if USE_WSGI:
+    WSGI_APPLICATION = 'core.wsgi.application'
+
+USE_ASGI = config('USE_ASGI', default=False, cast=bool)
+if USE_ASGI:
+    ASGI_APPLICATION = 'core.asgi.application'
 
 TEMPLATES = [
     {
