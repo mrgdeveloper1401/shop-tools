@@ -14,3 +14,9 @@ class CacheMixin:
 
     def get_cache(self, key):
         return self.cache.get(key)
+
+    def delete_cache(self, key):
+        return self.cache.delete(key)
+
+    def delete_many_key(self, keys):
+        return self.cache.delete_many(keys)

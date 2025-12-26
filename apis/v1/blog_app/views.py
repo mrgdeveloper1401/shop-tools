@@ -34,7 +34,7 @@ class CategoryBlogViewSet(CacheMixin, viewsets.ModelViewSet):
         return query
 
     def list(self, request, *args, **kwargs):
-        cache_key = "list_category_blog"
+        cache_key = "category_blog"
         get_cache = self.get_cache(cache_key)
         if get_cache:
             return response.Response(get_cache)
