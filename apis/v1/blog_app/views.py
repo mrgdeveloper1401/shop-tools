@@ -236,21 +236,21 @@ class LatestTenPostBlogViewSet(CacheMixin, viewsets.ReadOnlyModelViewSet):
         return query
 
 
-class SeoBlogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class SeoBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = serializers.SeoBlogSerializer
 
-    @cached_property
-    def cache_alis(self):
-        alias = caches['api-cache']
-        return alias
-
-    def set_cache(self, key, value):
-        c = self.cache_alis
-        c.set(key, value)
-        return c
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_seo_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
     def get_queryset(self):
-        query = PostBlog.objects.filter(
+        return PostBlog.objects.filter(
             is_active=True
         ).only(
             "post_title",
@@ -258,14 +258,6 @@ class SeoBlogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             "created_at",
             "updated_at"
         )
-        cache_key = "seo_blog_list_response"
-        cache_response = api_cache.get(cache_key)
-        if cache_response:
-            return cache_response
-        else:
-            self.set_cache(cache_key, query)
-            api_cache.set(cache_key, query, 60 * 60 * 24)
-            return query
 
 
 class SeoPostDetailBlogViewSet(views.APIView):
