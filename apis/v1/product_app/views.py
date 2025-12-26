@@ -593,7 +593,7 @@ class CategoryNameView(CacheMixin, generics.ListAPIView):
     serializer_class = serializers.ListCategoryNameSerializer
 
     def list(self, request, *args, **kwargs):
-        cache_key = "list_index_category_name"
+        cache_key = "list_index_category_name_key"
         get_cache = self.get_cache(cache_key)
         if get_cache:
             return response.Response(get_cache)
@@ -601,6 +601,7 @@ class CategoryNameView(CacheMixin, generics.ListAPIView):
             qs = super().list(request, *args, **kwargs)
             self.set_cache(cache_key, qs.data)
             return qs
+
 
 class AdminTagNameView(CacheMixin, generics.ListAPIView):
     queryset = Tag.objects.filter(is_active=True).only("tag_name")

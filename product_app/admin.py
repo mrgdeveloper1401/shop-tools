@@ -143,7 +143,12 @@ class ProductAdminAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "tag_name", "is_active", "created_at", "updated_at")
+    list_editable = ("is_active", )
+    list_per_page = 20
+    search_fields = ("tag_name",)
+    search_help_text = "برای جست و جو میتوانید از نام تگ استفاده کنید"
+    list_display_links = ("tag_name", "id")
 
 
 @admin.register(ProductComment)
