@@ -180,9 +180,29 @@ class BlogTagWithOutPaginationView(generics.ListAPIView):
     serializer_class = serializers.BlogTagWithOutPagination
 
 
-class LatestTenPostBlogViewSet(viewsets.ReadOnlyModelViewSet):
+class LatestTenPostBlogViewSet(CacheMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ListPostBlogSerializer
     lookup_field = "post_slug"
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_ten_post_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
+
+    def retrieve(self, request, *args, **kwargs):
+        cache_key = "retrieve_ten_post_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().retrieve(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
     def get_queryset(self):
         query = PostBlog.objects.filter(
