@@ -129,10 +129,30 @@ class PostBlogViewSet(viewsets.ModelViewSet):
         return query
 
 
-class TagBlogViewSet(viewsets.ModelViewSet):
+class TagBlogViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TagSerializer
     pagination_class = TwentyPageNumberPagination
     filterset_class = BlogTagFilter
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_tag_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
+
+    def retrieve(self, request, *args, **kwargs):
+        cache_key = "retrieve_tag_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().retrieve(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
