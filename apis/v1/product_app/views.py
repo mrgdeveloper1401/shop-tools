@@ -140,7 +140,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_variant__stock_number",
                     "product_variant__name",
                     "product_variant__price",
-                )
+                ).valid_discount()
             )
         )
 
