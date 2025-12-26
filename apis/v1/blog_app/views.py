@@ -173,9 +173,19 @@ class TagBlogViewSet(CacheMixin, viewsets.ModelViewSet):
         return query
 
 
-class BlogTagWithOutPaginationView(generics.ListAPIView):
+class BlogTagWithOutPaginationView(CacheMixin, generics.ListAPIView):
     queryset = TagBlog.objects.only("tag_name").filter(is_active=True)
     serializer_class = serializers.BlogTagWithOutPagination
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_blog_tag_with_out_pagination"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class LatestTenPostBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin):

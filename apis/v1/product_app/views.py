@@ -1,6 +1,6 @@
 from django.db.models import Prefetch, OuterRef, Subquery
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions, generics, filters, mixins
+from rest_framework import viewsets, permissions, generics, filters, mixins, response
 from django.core.cache import cache
 
 from account_app.models import Profile
@@ -29,6 +29,8 @@ from product_app.models import (
     ProductAttributeValues,
     ProductComment
 )
+from ..utils.cache_mixin import CacheMixin
+
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
@@ -581,7 +583,7 @@ class ProductCommentViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-class CategoryNameView(generics.ListAPIView):
+class CategoryNameView(CacheMixin, generics.ListAPIView):
     queryset = Category.objects.filter(is_active=True).select_related(
         "category_image"
     ).only(
@@ -590,13 +592,32 @@ class CategoryNameView(generics.ListAPIView):
     )
     serializer_class = serializers.ListCategoryNameSerializer
 
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_index_category_name"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
-class AdminTagNameView(generics.ListAPIView):
+class AdminTagNameView(CacheMixin, generics.ListAPIView):
     queryset = Tag.objects.filter(is_active=True).only("tag_name")
     serializer_class = serializers.AdminTagNameSerializer
 
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_admin_tag_name"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
-class BrandNameView(generics.ListAPIView):
+
+class BrandNameView(CacheMixin, generics.ListAPIView):
     serializer_class = serializers.ListBrandNameSerializer
     queryset = ProductBrand.objects.filter(is_active=True).select_related(
         "brand_image"
@@ -605,6 +626,15 @@ class BrandNameView(generics.ListAPIView):
         "brand_name"
     )
 
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_index_brand_name"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 class SeoProductViewSet(
     mixins.ListModelMixin,
