@@ -1,7 +1,7 @@
 from django.db.models import Prefetch, OuterRef, Subquery
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, generics, filters, mixins, response
-from django.core.cache import cache
+# from django.core.cache import cache
 
 from account_app.models import Profile
 from core.utils.custom_filters import (
@@ -637,13 +637,24 @@ class BrandNameView(CacheMixin, generics.ListAPIView):
             return qs
 
 class SeoProductViewSet(
+    CacheMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
     serializer_class = serializers.SeoProductSerializer
 
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_seo_product_name"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
+
     def get_queryset(self):
-        query = Product.objects.filter(
+        return Product.objects.filter(
             is_active=True
         ).only(
             "product_name",
@@ -652,10 +663,3 @@ class SeoProductViewSet(
             "updated_at",
             "category_id"
         )
-        cache_key = "seo_product_list_response"
-        cache_response = cache.get(cache_key)
-        if cache_response:
-            return cache_response
-        else:
-            cache_response = cache.set(cache_key, query, 60 * 60 * 24)
-            return query

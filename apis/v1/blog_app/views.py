@@ -1,5 +1,5 @@
 from django.db.models import Prefetch
-from rest_framework import viewsets, permissions, generics, mixins, response, views, exceptions
+from rest_framework import viewsets, permissions, generics, mixins, response, views
 from rest_framework.generics import get_object_or_404
 
 from account_app.models import Profile
