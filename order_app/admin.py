@@ -40,6 +40,7 @@ class OrderAdmin(admin.ModelAdmin):
         JSONField: {'widget': JSONEditorWidget},
     }
     list_display_links = ("id", "status")
+    raw_id_fields = ("profile", "address", "shipping")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).select_related("profile__user")
