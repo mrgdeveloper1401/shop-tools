@@ -1,14 +1,18 @@
 from django.db.models import Prefetch
+from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
+from django.views.decorators.cache import cache_page
 from rest_framework import viewsets, permissions, generics, mixins, response, views, exceptions
-from django.core.cache import cache
+from django.core.cache import caches
 from account_app.models import Profile
 from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
 from blog_app.models import CategoryBlog, PostBlog, TagBlog
+from ..utils.cache_mixin import CacheMixin
 
 
-class CategoryBlogViewSet(viewsets.ModelViewSet):
+class CategoryBlogViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.CategoryBlogSerializer
     filterset_class = AdminCategoryBlogFilter
 
@@ -30,6 +34,26 @@ class CategoryBlogViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_staff:
             query = query.filter(is_active=True)
         return query
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_category_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
+
+    def retrieve(self, request, *args, **kwargs):
+        cache_key = "retrieve_category_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().retrieve(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class PostBlogViewSet(viewsets.ModelViewSet):
@@ -174,6 +198,17 @@ class LatestTenPostBlogViewSet(viewsets.ReadOnlyModelViewSet):
 
 class SeoBlogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = serializers.SeoBlogSerializer
+
+    @cached_property
+    def cache_alis(self):
+        alias = caches['api-cache']
+        return alias
+
+    def set_cache(self, key, value):
+        c = self.cache_alis
+        c.set(key, value)
+        return c
+
     def get_queryset(self):
         query = PostBlog.objects.filter(
             is_active=True
@@ -183,14 +218,13 @@ class SeoBlogViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             "created_at",
             "updated_at"
         )
-        # import ipdb
-        # ipdb.set_trace()
         cache_key = "seo_blog_list_response"
-        cache_response = cache.get(cache_key)
+        cache_response = api_cache.get(cache_key)
         if cache_response:
             return cache_response
         else:
-            cache.set(cache_key, query, 60 * 60 * 24)
+            self.set_cache(cache_key, query)
+            api_cache.set(cache_key, query, 60 * 60 * 24)
             return query
 
 

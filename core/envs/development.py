@@ -226,18 +226,55 @@ SIMPLE_JWT = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6381/5",
+        "LOCATION": "redis://localhost:6381/1",
+        "TIMEOUT": 1209600,  # default time cache
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT":5,
+            "SERIALIZER": "django_redis.serializers.pickle.PickleSerializer",
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "COMPRESSOR_KWARGS": {
+                "level": 6
+            },
+            "CONNECTION_POOL_KWARGS": {
+                "max_connections": 10,
+                "retry_on_timeout": True,
+                "health_check_interval": True,
+                "socket_keepalive": True,
+            }
         }
-    }
+    },
+    "api-cache": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6381/2",
+        "TIMEOUT": 1209600,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+            "SERIALIZER": "django_redis.serializers.msgpack.MSGPackSerializer",
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "COMPRESSOR_KWARGS": {
+                "level": 6
+            },
+            "CONNECTION_POOL_KWARGS": {
+                "max_connections": 20,
+                "retry_on_timeout": True,
+                "health_check_interval": True,
+                "socket_keepalive": True,
+            }
+        }
+    },
 }
-
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True
+DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
 
 # config celery
-CELERY_BROKER_URL="redis://localhost:6381/2"
-CELERY_RESULT_BACKEND="redis://localhost:6381/3"
+CELERY_BROKER_URL="redis://localhost:6381/3"
+CELERY_RESULT_BACKEND="redis://localhost:6381/4"
 CELERY_ACCEPT_CONTENT=['json', "pickle"]
 CELERY_TASK_SERIALIZER="json"
 CELERY_RESULT_SERIALIZER="json"

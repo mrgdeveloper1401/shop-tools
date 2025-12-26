@@ -7,11 +7,7 @@ app_name = "v1_blog"
 
 router = routers.SimpleRouter()
 
-# router.register(
-#     "seo_post_detail_blog", 
-#     views.SeoPostDetailBlogViewSet, 
-#     basename="seo_post_detail_blog"
-# )
+
 router.register("category_blog", views.CategoryBlogViewSet, basename="category_blog")
 category_router = routers.NestedSimpleRouter(router, "category_blog", lookup="category_blog")
 router.register("tag_blog", views.TagBlogViewSet, basename="tag_blog")

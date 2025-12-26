@@ -226,17 +226,57 @@ SIMPLE_JWT = {
 }
 
 # config cache
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config("PRODUCTION_LOCATION_CACHE", cast=str),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+# cache config
+USE_CACHE = config("USE_CACHE", cast=bool, default=True)
+if USE_CACHE:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": config("PRODUCTION_DEFAULT_LOCATION_CACHE", cast=str),
+            "TIMEOUT": config("CACHE_DEFAULT_TIMEOUT", cast=int, default=24 * 60 * 60 * 14), # default time cache
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SOCKET_CONNECT_TIMEOUT": config("SOCKET_DEFAULT_CONNECT_TIMEOUT", default=5, cast=int),
+                "SOCKET_TIMEOUT": config("SOCKET_DEFAULT_TIMEOUT", default=5, cast=int),
+                "SERIALIZER": config("REDIS_DEFAULT_SERIALIZER", default="django_redis.serializers.pickle.PickleSerializer", cast=str),
+                "COMPRESSOR": config("REDIS_DEFAULT_COMPRESSOR", default="django_redis.compressors.zlib.ZlibCompressor", cast=str),
+                "COMPRESSOR_KWARGS": {
+                    "level": config("COMPRESSOR_DEFAULT_LEVEL_ARGS", default=6, cast=int)
+                },
+                "CONNECTION_POOL_KWARGS": {
+                    "max_connections": config("REDIS_DEFAULT_POOL_MAX_CONNECTION", default=20, cast=int),
+                    "retry_on_timeout": config("REDIS_DEFAULT_POOL_RETRY_TIMEOUT", default=True, cast=bool),
+                    "health_check_interval": config("REDIS_DEFAULT_HEALTH_CHECK_INTERVAL", default=True, cast=bool),
+                    "socket_keepalive": config("REDIS_DEFAULT_SOCKET_KEEPALIVE", default=True, cast=bool),
+                }
+            }
+        },
+        "api-cache": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/1"),
+            "TIMEOUT": config("REDIS_SECOND_TIMEOUT", default=86400, cast=int),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SOCKET_CONNECT_TIMEOUT": config("SOCKET_SECOND_CONNECT_TIMEOUT", default=5, cast=int),
+                "SOCKET_TIMEOUT": config("SOCKET_SECOND_TIMEOUT", default=5, cast=int),
+                "SERIALIZER": config("CACHE_SECOND_SERIALIZER", default="django_redis.serializers.msgpack.MSGPackSerializer"),
+                "COMPRESSOR": config("REDIS_SECOND_COMPRESSOR", default="django_redis.compressors.zlib.ZlibCompressor"),
+                "COMPRESSOR_KWARGS": {
+                    "level": config("COMPRESSOR_SECOND_LEVEL_ARGS", default=6, cast=int)
+                },
+                "CONNECTION_POOL_KWARGS": {
+                    "max_connections": config("REDIS_SECOND_POOL_MAX_CONNECTION", default=50, cast=int),
+                    "retry_on_timeout": config("REDIS_SECOND_POOL_RETRY_TIMEOUT", default=True, cast=bool),
+                    "health_check_interval": config("REDIS_SECOND_HEALTH_CHECK_INTERVAL", default=True, cast=bool),
+                    "socket_keepalive": config("REDIS_SECOND_SOCKET_KEEPALIVE", default=True, cast=bool),
+                }
+            }
+        },
     }
-}
-
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_ENGINE = config("SESSION_ENGINE", default="django.contrib.sessions.backends.cache", cast=str)
+    SESSION_CACHE_ALIAS = config("SESSION_CACHE_ALIAS", default="default", cast=str)
+    DJANGO_REDIS_IGNORE_EXCEPTIONS = config("DJANGO_REDIS_IGNORE_EXCEPTIONS", default=True, cast=bool)
+    DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = config("DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS", default=True, cast=bool)
 
 # config celery
 CELERY_BROKER_URL=config("PRODUCTION_CELERY_BROKER_URL", cast=str)
@@ -258,11 +298,11 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # cors origin
 CORS_ALLOWED_ORIGINS = config("PRODUCTION_CORS_ALLOWED_ORIGINS", cast=Csv())
 
-# SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Strict'
-# CSRF_USE_SESSIONS = True
+CSRF_USE_SESSIONS = True
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_PRELOAD = True
@@ -275,8 +315,8 @@ USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_COOKIE_AGE = 3600
-SESSION_COOKIE_DOMAIN = ".gs-tools.ir"
-CSRF_COOKIE_DOMAIN = ".gs-tools.ir"
+SESSION_COOKIE_DOMAIN = "gs-tools.ir"
+CSRF_COOKIE_DOMAIN = "gs-tools.ir"
 
 AWS_S3_REGION_NAME = 'eu-west-1'
 AWS_DEFAULT_ACL = 'public-read'
@@ -344,6 +384,7 @@ STORAGES = {
         }
 }
 
+# ckeditor
 CKEDITOR_5_FILE_STORAGE = STORAGES['default']['BACKEND']
 
 # celery queue
@@ -356,6 +397,7 @@ CELERY_TASK_QUEUES = (
     Queue("backup_db")
 )
 
+# whitenoise
 USE_WHITE_NOISE = config("USE_WHITE_NOISE", cast=bool, default=False)
 if USE_WHITE_NOISE:
     MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')

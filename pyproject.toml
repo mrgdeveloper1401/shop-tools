@@ -35,6 +35,7 @@ dependencies = [
     "httpx>=0.28.1",
     "ipython>=9.6.0",
     "locust>=2.42.1",
+    "msgpack>=1.1.2",
     "numpy>=2.3.4",
     "openpyxl>=3.1.5",
     "pandas>=2.3.3",
