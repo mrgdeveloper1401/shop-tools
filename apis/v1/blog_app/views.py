@@ -1,9 +1,7 @@
 from django.db.models import Prefetch
-from django.utils.decorators import method_decorator
-from django.utils.functional import cached_property
-from django.views.decorators.cache import cache_page
 from rest_framework import viewsets, permissions, generics, mixins, response, views, exceptions
-from django.core.cache import caches
+from rest_framework.generics import get_object_or_404
+
 from account_app.models import Profile
 from core.utils.custom_filters import AdminCategoryBlogFilter, BlogTagFilter
 from core.utils.pagination import TwentyPageNumberPagination
@@ -180,9 +178,8 @@ class BlogTagWithOutPaginationView(generics.ListAPIView):
     serializer_class = serializers.BlogTagWithOutPagination
 
 
-class LatestTenPostBlogViewSet(CacheMixin, viewsets.ReadOnlyModelViewSet):
+class LatestTenPostBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = serializers.ListPostBlogSerializer
-    lookup_field = "post_slug"
 
     def list(self, request, *args, **kwargs):
         cache_key = "list_ten_post_blog"
@@ -191,16 +188,6 @@ class LatestTenPostBlogViewSet(CacheMixin, viewsets.ReadOnlyModelViewSet):
             return response.Response(get_cache)
         else:
             qs = super().list(request, *args, **kwargs)
-            self.set_cache(cache_key, qs.data)
-            return qs
-
-    def retrieve(self, request, *args, **kwargs):
-        cache_key = "retrieve_ten_post_blog"
-        get_cache = self.get_cache(cache_key)
-        if get_cache:
-            return response.Response(get_cache)
-        else:
-            qs = super().retrieve(request, *args, **kwargs)
             self.set_cache(cache_key, qs.data)
             return qs
 
@@ -260,7 +247,7 @@ class SeoBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin)
         )
 
 
-class SeoPostDetailBlogViewSet(views.APIView):
+class SeoPostDetailBlogViewSet(CacheMixin, views.APIView):
     serializer_class = serializers.SeoDetailBlogSerializer
 
     def get_queryset(self):
@@ -291,13 +278,15 @@ class SeoPostDetailBlogViewSet(views.APIView):
             is_active=True
         )
 
-
     def get(self, request, *args, **kwargs):
         post_slug = kwargs['post_slug']
+        cache_key = "seo_post_detail_blog"
+        get_cache = self.get_cache(cache_key)
 
-        try:
-            query = self.get_queryset().get(post_slug=post_slug)
-            serializer = self.serializer_class(query)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            get_obj = get_object_or_404(self.get_queryset(), post_slug=post_slug, is_active=True)
+            serializer = self.serializer_class(get_obj)
+            self.set_cache(cache_key, serializer.data)
             return response.Response(serializer.data)
-        except PostBlog.DoesNotExist:
-            raise exceptions.NotFound()
