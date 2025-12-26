@@ -44,8 +44,6 @@ class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
         "account_app.UserAddress",
         related_name="order_address",
         on_delete=models.PROTECT,
-        blank=True,
-        null=True
     )
     tracking_code = models.CharField(max_length=50, unique=True, null=True, blank=True)
     payment_date = models.DateTimeField(null=True, blank=True)
