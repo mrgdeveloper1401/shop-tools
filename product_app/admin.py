@@ -88,7 +88,7 @@ class CategoryAdmin(TreeAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    search_fields = ("product_name",)
+    search_fields = ("product_name", "id")
     list_display = (
         "product_name",
         "id",
@@ -169,7 +169,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "is_active"
     )
     list_editable = ("is_active", "price", "old_price", "stock_number")
-    search_fields = ("name",)
+    search_fields = ("name", "id")
     search_help_text = _("برای جست و جو میتوانید از نام ورینت استفاده کنید")
     list_filter = ("is_active", ProductVariantPriceIsNull)
 
