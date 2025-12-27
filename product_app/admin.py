@@ -111,6 +111,8 @@ class AttributeAdmin(admin.ModelAdmin):
         "attribute_name",
         "id",
         "is_active",
+        "created_at",
+        "updated_at",
     )
     search_fields = ("attribute_name",)
     list_filter = ("is_active",)
@@ -122,6 +124,8 @@ class ProductAttributeValueAdmin(admin.ModelAdmin):
         "attribute_value",
         "attribute_id",
         "is_active",
+        "created_at",
+        "updated_at",
     )
     list_filter = ("is_active",)
 
@@ -166,7 +170,9 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "old_price",
         "name",
         "stock_number",
-        "is_active"
+        "is_active",
+        "created_at",
+        "updated_at",
     )
     list_editable = ("is_active", "price", "old_price", "stock_number")
     search_fields = ("name", "id")
