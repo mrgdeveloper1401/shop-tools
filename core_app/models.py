@@ -22,6 +22,13 @@ class UpdateMixin(models.Model):
         abstract = True
 
 
+class ActiveMixin(models.Model):
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        abstract = True
+
+
 class SoftDeleteMixin(models.Model):
     deleted_at = models.DateTimeField(null=True, editable=False)
     is_deleted = models.BooleanField(editable=False, null=True)

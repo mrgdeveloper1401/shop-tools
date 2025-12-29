@@ -11,11 +11,11 @@ from django.conf import settings
 
 from core.utils.normalize_number import normalize_digits
 from core.utils.validators import PhoneNumberValidator
-from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin
+from core_app.models import UpdateMixin, SoftDeleteMixin, CreateMixin, ActiveMixin
 
 
 # Create your models here.
-class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, CreateMixin):
+class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, CreateMixin, ActiveMixin):
     mobile_phone = models.CharField(
         _("mobile phone"),
         max_length=22,
@@ -38,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
     )
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    # is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'mobile_phone'
     REQUIRED_FIELDS = ('email', "username")
@@ -84,26 +84,25 @@ class Profile(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return f'{self.first_name} {self.last_name}'
 
 
-class State(models.Model):
+class State(CreateMixin, UpdateMixin, ActiveMixin, SoftDeleteMixin):
     name = models.CharField(_("state name"), max_length=150)
     slug = models.SlugField(max_length=150, allow_unicode=True, null=True)
-    tel_prefix = models.CharField(max_length=3, null=True)
-    is_active = models.BooleanField(default=True)
+    tel_prefix = models.CharField(max_length=5, null=True)
 
     class Meta:
         db_table = "state"
 
 
-class City(models.Model):
+class City(CreateMixin, UpdateMixin, ActiveMixin, SoftDeleteMixin):
     name = models.CharField(_("city name"), max_length=150)
     state = models.ForeignKey(State, on_delete=models.PROTECT, related_name="cities")
-    is_active = models.BooleanField(default=True)
+    tel_prefix = models.CharField(max_length=5, null=True, blank=True)
 
     class Meta:
         db_table = "city"
 
 
-class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
+class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
     state = models.ForeignKey(
         State,
         on_delete=models.PROTECT,
@@ -157,7 +156,7 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = "auth_user_address"
 
 
-class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
+class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
@@ -168,13 +167,12 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     notifi_redirect_url = models.CharField(blank=True, null=True, max_length=255)
     body = models.TextField()
     is_read = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ("id",)
         db_table = "auth_private_notification"
 
-
+# manage otp in redis
 class OtpService:
     set_time = 120
 
@@ -207,7 +205,7 @@ class OtpService:
         await cache.adelete(key)
 
 
-class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin):
+class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
     """
     create ticket room
     """
@@ -219,7 +217,6 @@ class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin):
     )
     title_room = models.CharField(max_length=100, help_text=_("عنوان چت روم تیکت"))
     subject_room = models.CharField(max_length=50, help_text=_("موضوع تیکت"))
-    is_active = models.BooleanField(default=True)
     is_close = models.BooleanField(default=False)
 
     class Meta:
@@ -227,7 +224,7 @@ class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin):
         ordering = ("id",)
 
 
-class Ticket(MP_Node, CreateMixin, UpdateMixin, SoftDeleteMixin):
+class Ticket(MP_Node, CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
     sender = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -239,11 +236,8 @@ class Ticket(MP_Node, CreateMixin, UpdateMixin, SoftDeleteMixin):
         on_delete=models.PROTECT,
         related_name="tickets"
     )
-    # reply = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="ticket_reply", blank=True, null=True,
-    #                           limit_choices_to={"is_staff": True, "is_active": True})
     ticket_body = models.TextField(_("متن تیکت"))
     ticket_file = models.FileField(upload_to="ticket/%Y/%m/%d", blank=True, null=True)
-    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ("id",)
