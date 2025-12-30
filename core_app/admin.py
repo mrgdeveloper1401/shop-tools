@@ -36,6 +36,7 @@ class CoreAdminMixin(admin.ModelAdmin):
     list_per_page = 20
     list_filter = ('is_active', "created_at", "updated_at")
     list_editable = ("is_active",)
+    actions = ("disable_is_active", "enable_is_active")
 
     @admin.action(description="disable fields")
     def disable_is_active(self, request, queryset):
@@ -45,9 +46,8 @@ class CoreAdminMixin(admin.ModelAdmin):
     def enable_is_active(self, request, queryset):
         queryset.update(is_active=True)
 
-    def get_actions(self, request):
-        self.actions = ("disable_is_active", "enable_is_active")
-        return super().get_actions(request)
+    def get_action(self, action):
+        return super().get_action(action)
 
     def get_queryset(self, request):
         return super().get_queryset(request).defer(

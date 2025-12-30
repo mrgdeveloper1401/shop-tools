@@ -14,7 +14,7 @@ from product_app.models import (
     ProductVariant,
     Attribute,
     AttributeValue,
-    ProductAttributeValues,
+    ProductVariantAttributeValues,
     ProductComment
 )
 
@@ -177,7 +177,7 @@ class NestedVariantAttributeSerializer(serializers.ModelSerializer):
     value = NestedAttributeValueSerializer()
 
     class Meta:
-        model = ProductAttributeValues
+        model = ProductVariantAttributeValues
         fields = (
             "attribute",
             "value"
@@ -193,11 +193,11 @@ class NestedProductVariantAttributeSerializer(serializers.ModelSerializer):
         fields = ("price", "variant_id", "attributes")
 
 
-class NestedProductAttributeValuesSerializer(serializers.ModelSerializer):
+class NestedProductVariantAttributeValuesSerializer(serializers.ModelSerializer):
     attribute_name = serializers.CharField(source="attribute.attribute_name")
 
     class Meta:
-        model = ProductAttributeValues
+        model = ProductVariantAttributeValues
         fields = (
             "attribute_name",
             "value"
@@ -206,7 +206,7 @@ class NestedProductAttributeValuesSerializer(serializers.ModelSerializer):
 
 class RetrieveAdminProductSerializer(ProductSerializer):
     # variants = NestedProductVariantAttributeSerializer(many=True, read_only=True)
-    attributes = NestedProductAttributeValuesSerializer(many=True, read_only=True)
+    attributes = NestedProductVariantAttributeValuesSerializer(many=True, read_only=True)
 
 
 class NestedImageSerializer(serializers.ModelSerializer):
@@ -264,7 +264,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     tags = NestedProductTagsSerializer(many=True)
     product_brand = SimpleProductBrandSerializer()
     product_product_image = NestedProductImageSerializer(many=True)
-    attributes = NestedProductAttributeValuesSerializer(many=True, read_only=True)
+    attributes = NestedProductVariantAttributeValuesSerializer(many=True, read_only=True)
     variants = NestedProductVariantPriceAttributeSerializer(many=True)
 
     class Meta:
@@ -396,7 +396,7 @@ class SimpleAttribute(serializers.ModelSerializer):
 #     attribute_name = serializers.CharField(source="attribute.attribute_name")
 #
 #     class Meta:
-#         model = ProductAttributeValues
+#         model = ProductVariantAttributeValues
 #         fields = (
 #             "id",
 #             "product_id",
@@ -406,7 +406,7 @@ class SimpleAttribute(serializers.ModelSerializer):
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
-    # attribute_values = NestedProductAttributeValueSerializer(many=True, read_only=True)
+    # attribute_values = NestedProductVariantAttributeValueserializer(many=True, read_only=True)
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.only("id")
     )
@@ -415,7 +415,7 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = ProductAttributeValues
+        model = ProductVariantAttributeValues
         exclude = (
             "is_deleted",
             "deleted_at",
@@ -456,7 +456,7 @@ class AdminProducttAttributeSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = ProductAttributeValues
+        model = ProductVariantAttributeValues
         exclude = (
             "is_deleted",
             "deleted_at",
@@ -620,4 +620,20 @@ class SeoProductSerializer(serializers.ModelSerializer):
             "product_slug",
             "created_at",
             "updated_at"
+        )
+
+
+class UserProductVariantImage(serializers.ModelSerializer):
+    ...
+
+class UserProductVariantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = (
+            "id",
+            "product_id",
+            "price",
+            "name",
+            "subtitle",
+            "stock_number"
         )

@@ -10,7 +10,7 @@ from core.utils import ba_salam
 from core.utils.ba_salam import read_categories, list_retrieve_product
 from core.utils.pagination import FlexiblePagination
 from core_app.models import Image, UploadFile
-from product_app.models import ProductVariant, Product, ProductImages, ProductAttributeValues
+from product_app.models import ProductVariant, Product, ProductImages, ProductVariantAttributeValues
 from product_app.tasks import update_product_id_ba_salam
 from core.utils.pagination import TorobPagination
 from drf_spectacular.utils import extend_schema

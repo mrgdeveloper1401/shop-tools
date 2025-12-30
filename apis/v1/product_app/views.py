@@ -1,7 +1,6 @@
 from django.db.models import Prefetch, OuterRef, Subquery
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, generics, filters, mixins, response
-# from django.core.cache import cache
 
 from account_app.models import Profile
 from core.utils.custom_filters import (
@@ -26,9 +25,10 @@ from product_app.models import (
     ProductVariant,
     Attribute,
     AttributeValue,
-    ProductAttributeValues,
+    ProductVariantAttributeValues,
     ProductComment
 )
+from .filters import UserProductVariantsFilter
 from ..utils.cache_mixin import CacheMixin
 
 
@@ -178,7 +178,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "tags", queryset=Tag.objects.only("tag_name")
                 ),
                 Prefetch(
-                    "attributes", queryset=ProductAttributeValues.objects.select_related("attribute").only(
+                    "attributes", queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(
                         "attribute__attribute_name",
                         "product_id",
                         "value"
@@ -219,7 +219,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                         "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
                     ),
                     Prefetch(
-                        "attributes", queryset=ProductAttributeValues.objects.select_related(
+                        "attributes", queryset=ProductVariantAttributeValues.objects.select_related(
                             "attribute"
                         ).only(
                             "attribute__attribute_name",
@@ -409,7 +409,7 @@ class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        return ProductAttributeValues.objects.filter(
+        return ProductVariantAttributeValues.objects.filter(
             product_id=self.kwargs['product_pk']
         ).select_related(
                 "attribute"
@@ -637,6 +637,7 @@ class BrandNameView(CacheMixin, generics.ListAPIView):
             self.set_cache(cache_key, qs.data)
             return qs
 
+
 class SeoProductViewSet(
     CacheMixin,
     mixins.ListModelMixin,
@@ -664,3 +665,12 @@ class SeoProductViewSet(
             "updated_at",
             "category_id"
         )
+
+
+class UserProductVariantViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.UserProductVariantSerializer
+    pagination_class = TwentyPageNumberPagination
+    filterset_class = UserProductVariantsFilter
+
+    def get_queryset(self):
+        return ProductVariant.objects.filter(is_active=True)

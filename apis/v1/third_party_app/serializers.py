@@ -5,7 +5,7 @@ from django.core.validators import MinLengthValidator
 from core.utils.ba_salam import upload_image_file, upload_file
 from core.utils.enums import FileTypeChoices
 from core_app.models import Image, UploadFile
-from product_app.models import ProductImages, ProductVariant, ProductAttributeValues
+from product_app.models import ProductImages, ProductVariant, ProductVariantAttributeValues
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):
@@ -151,7 +151,7 @@ class TorobProductAttributeValue(serializers.ModelSerializer):
     attribute_name = serializers.CharField(source="attribute.attribute_name")
 
     class Meta:
-        model = ProductAttributeValues
+        model = ProductVariantAttributeValues
         fields = (
             "attribute_name",
             "value"
