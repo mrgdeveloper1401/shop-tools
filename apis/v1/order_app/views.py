@@ -232,7 +232,7 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
     """
     serializer_class = serializers.ResultOrderSerializer
     permission_classes = (permissions.IsAdminUser,)
-    pagination_class = FlexiblePagination
+    pagination_class = TwentyPageNumberPagination
     filterset_class = ResultOrderFilter
 
     def get_queryset(self):
