@@ -15,6 +15,7 @@ from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddre
 from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated, AsyncIsAdminUser
 from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
 from . import serializers
+from ..utils.cache_mixin import CacheMixin
 
 
 class GetIpClient(views.APIView):
@@ -148,10 +149,8 @@ class UserInformationViewSet(viewsets.ModelViewSet):
             "is_active",
             "is_staff"
         )
-
         if not self.request.user.is_staff:
             query = query.filter(id=self.request.user.id)
-
         return query
 
 
@@ -241,7 +240,8 @@ class UserAddressViewSet(viewsets.ModelViewSet):
             "postal_code",
             "latitude",
             "longitude",
-            "longitude"
+            "longitude",
+            "is_active",
         )
         if not self.request.user.is_staff:
             query = query.filter(user_id=self.request.user.id)
@@ -264,6 +264,7 @@ class AsyncAdminUserListview(AsyncListAPIView):
 
 
 class StateViewSet(
+    CacheMixin,
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin
@@ -276,8 +277,29 @@ class StateViewSet(
             "name"
         ).filter(is_active=True)
 
+    def list(self, request, *args, **kwargs):
+        state_list_cache = self.get_cache(key="state_list_api_cache")
+        if state_list_cache:
+            return response.Response(state_list_cache)
+        else:
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            self.set_cache("state_list_api_cache", serializer.data)
+            return response.Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        retrieve_cache = self.get_cache(key="retrieve_state_api_cache")
+        if retrieve_cache:
+            return response.Response(retrieve_cache)
+        else:
+            obj = self.get_object()
+            serializer = self.get_serializer(obj)
+            self.set_cache("retrieve_state_api_cache", serializer.data)
+            return response.Response(serializer.data)
+
 
 class CityViewSet(
+    CacheMixin,
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
 ):
@@ -293,6 +315,26 @@ class CityViewSet(
             "name",
             "state_id"
         )
+
+    def list(self, request, *args, **kwargs):
+        state_list_cache = self.get_cache(key="city_list_api_cache")
+        if state_list_cache:
+            return response.Response(state_list_cache)
+        else:
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            self.set_cache("city_list_api_cache", serializer.data)
+            return response.Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        retrieve_cache = self.get_cache(key="retrieve_city_api_cache")
+        if retrieve_cache:
+            return response.Response(retrieve_cache)
+        else:
+            obj = self.get_object()
+            serializer = self.get_serializer(obj)
+            self.set_cache("retrieve_city_api_cache", serializer.data)
+            return response.Response(serializer.data)
 
 
 class AsyncLoginByPhonePasswordView(AsyncApiView):
@@ -350,7 +392,7 @@ class AsyncRequestForgetPasswordView(AsyncApiView):
 
         # get user
         phone = serializer.validated_data['mobile_phone']
-        user = await aget_object_or_404(User, mobile_phone=phone, is_active=True)
+        user = await aget_object_or_404(User.objects.only("mobile_phone"), mobile_phone=phone, is_active=True)
 
         # get user ip
         user_ip = get_client_ip(request)
@@ -404,7 +446,8 @@ class AsyncForgetPasswordConfirmView(AsyncApiView):
             raise exceptions.NotFound()
 
         # check user
-        user = await aget_object_or_404(User, mobile_phone=user_phone, is_active=True)
+        fields = ("mobile_phone", "password")
+        user = await aget_object_or_404(User.objects.only(*fields), mobile_phone=user_phone, is_active=True)
 
         # check password
         await user.acheck_password(password)

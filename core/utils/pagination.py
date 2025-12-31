@@ -12,6 +12,7 @@ class AdminTwentyPageNumberPagination(pagination.PageNumberPagination):
     def paginate_queryset(self, queryset, request, view=None):
         if request.user.is_staff:
             return super().paginate_queryset(queryset, request, view)
+        return None
 
 
 class FlexiblePagination(pagination.LimitOffsetPagination):

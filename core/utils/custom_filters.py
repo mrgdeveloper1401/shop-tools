@@ -15,8 +15,8 @@ class AdminUserInformationFilter(FilterSet):
     class Meta:
         model = User
         fields = {
-            "mobile_phone": ["contains",],
-            "is_active": ['exact',],
+            "mobile_phone": ("contains",),
+            "is_active": ('exact',),
         }
 
     def filter_queryset(self, queryset):
