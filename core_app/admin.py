@@ -48,10 +48,18 @@ class CarouselNameAdmin(admin.ModelAdmin):
     list_filter = ("created_at", "updated_at")
     list_display_links = ("id", "name")
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).defer("is_deleted", "deleted_at")
+
 
 @admin.register(models.SitemapEntry)
 class SitemapEntryAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "last_modified", "changefreq", "priority")
+    list_per_page = 20
+    list_display_links = ("id", "last_modified", "changefreq")
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).defer("is_deleted", "deleted_at")
 
 
 @admin.register(models.UploadFile)

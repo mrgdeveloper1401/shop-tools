@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from apis.v1.utils.cache_mixin import CacheMixin
 from core.utils.ba_salam import upload_image_file
-from .models import PublicNotification, Image, MainSite, Carousel
+from .models import PublicNotification, Image, MainSite, Carousel, SitemapEntry
 
 # from .tasks import create_image_auto_into_ba_salam
 
@@ -32,3 +32,7 @@ def clear_main_site_cache(instance, **kwargs):
 @receiver([post_save, post_delete], sender=Carousel)
 def clear_carousel_cache(instance, **kwargs):
     cache_instance.delete_cache("carousel")
+
+@receiver([post_save, post_delete], sender=SitemapEntry)
+def clear_sitemap_cache(instance, **kwargs):
+    cache_instance.delete_cache("sitemap")

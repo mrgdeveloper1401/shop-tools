@@ -108,7 +108,7 @@ class CarouselViewSet(CacheMixin, viewsets.ModelViewSet):
             return data
 
 
-class SiteMapViewSet(viewsets.ModelViewSet):
+class SiteMapViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.SiteMapSerializer
     queryset = SitemapEntry.objects.defer("is_deleted", "deleted_at")
 
@@ -116,3 +116,13 @@ class SiteMapViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "partial_update", "update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        sitemap_cache = self.get_cache("sitemap")
+
+        if sitemap_cache:
+            return response.Response(sitemap_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("sitemap", data.data)
+            return data
