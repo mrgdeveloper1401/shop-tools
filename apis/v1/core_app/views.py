@@ -46,8 +46,17 @@ class AdminImageViewSet(viewsets.ModelViewSet):
     )
 
 
-class MainSiteViewSet(viewsets.ModelViewSet):
+class MainSiteViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.MainSiteSerializer
+
+    def list(self, request, *args, **kwargs):
+        main_site_cache = self.get_cache("main_site")
+        if main_site_cache:
+            return response.Response(main_site_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("main_site", data.data)
+            return data
 
     def get_permissions(self):
         if self.action in ("create", "partial_update", "update", "destroy"):

@@ -3,7 +3,8 @@ from django.dispatch import receiver
 
 from apis.v1.utils.cache_mixin import CacheMixin
 from core.utils.ba_salam import upload_image_file
-from .models import PublicNotification, Image
+from .models import PublicNotification, Image, MainSite
+
 # from .tasks import create_image_auto_into_ba_salam
 
 
@@ -23,3 +24,7 @@ def create_ba_salam_id_after_upload(instance, created, **kwargs):
 @receiver([post_save, post_delete], sender=PublicNotification)
 def clear_public_notification_cache(instance, **kwargs):
     cache_instance.delete_cache("public_notification")
+
+@receiver([post_save, post_delete], sender=MainSite)
+def clear_main_site_cache(instance, **kwargs):
+    cache_instance.delete_cache("main_site")

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Prefetch
 
 from . import models
 
@@ -23,7 +24,20 @@ class PublicNotificationAdmin(admin.ModelAdmin):
 
 @admin.register(models.MainSite)
 class MainSiteAdmin(admin.ModelAdmin):
-    pass
+    filter_horizontal = ("images",)
+    list_display = ("id", "is_publish", "created_at", "updated_at")
+    list_per_page = 20
+    list_editable = ("is_publish",)
+    list_display_links = ("id", "created_at")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).defer("is_deleted", "deleted_at")
+        if "change_list" in request.resolver_match:
+            return qs.prefetch_related(
+                Prefetch("images", queryset=models.Image.objects.only("image"))
+            )
+        else:
+            return qs
 
 
 @admin.register(models.Carousel)
