@@ -1,19 +1,21 @@
+import asyncio
 import logging
 import os
 import subprocess
 from uuid import uuid4
+
 from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
 # from django.core.management import call_command
 from account_app.models import User, PrivateNotification
-# from core.utils.sms import send_otp_sms
 from core.utils.backup_arvancloud import Bucket
+from core.utils.sms import send_otp_sms
 
 
-# @shared_task(max_retries=3, queue="otp_sms")
-# def send_otp_code_by_celery(phone: str, code: str):
-#     asyncio.run(send_otp_sms(phone, code))
+@shared_task(max_retries=3, queue="otp_sms")
+def send_otp_code_by_celery(phone: str, code: str):
+    asyncio.run(send_otp_sms(phone, code))
 
 
 @shared_task(max_retries=3, queue="notifications")

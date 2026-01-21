@@ -295,7 +295,7 @@ CELERY_TASK_QUEUES = (
     Queue("ba_salam"),
     Queue("payment"),
     Queue("update_order"),
-    Queue("backup_db")
+    # Queue("backup_db")
 )
 
 # config base storage

@@ -1,7 +1,7 @@
 from decouple import config
 import httpx
 from core.utils.custom_exception import HttpxCustomApiException
-
+from core.utils.exceptions import http_error
 
 KV_BASE_URL = config('KV_BASE_URL', cast=str)
 KV_API_KEY = config('KV_API_KEY', cast=str)
@@ -12,7 +12,7 @@ KV_PAYMENT_PATTERN_NAME = config("KV_PAYMENT_PATTERN_NAME", cast=str)
 KV_CANCEL_PAYMENT_PATTERN_NAME = config("KV_CANCEL_PAYMENT_PATTERN_NAME", cast=str)
 KV_REQUEST_FORGE_PASSWORD = config("KV_REQUEST_FORGE_PASSWORD", cast=str)
 
-
+@http_error
 async def send_otp_sms(phone: str, otp: str):
     params = {
         "receptor": phone,
@@ -20,15 +20,12 @@ async def send_otp_sms(phone: str, otp: str):
         "template": KV_PATTERN_NAME,
     }
     async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(
-                url=VERIFY_BASE_URL,
-                params=params,
-                timeout=10.0
-            )
-            return response.raise_for_status()
-        except Exception as e:
-            raise HttpxCustomApiException(e)
+        response = await client.get(
+            url=VERIFY_BASE_URL,
+            params=params,
+            timeout=10.0
+        )
+        return response
 
 
 async def send_verify_payment(phone: str, tracking_code: str):

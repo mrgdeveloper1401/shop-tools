@@ -253,7 +253,7 @@ if USE_CACHE:
         },
         "api-cache": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/1"),
+            "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/1", cast=str),
             "TIMEOUT": config("REDIS_SECOND_TIMEOUT", default=86400, cast=int),
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -284,8 +284,8 @@ CELERY_RESULT_BACKEND=config("PRODUCTION_CELERY_RESULT_BACKEND", cast=str)
 CELERY_ACCEPT_CONTENT = config("CELERY_ACCEPT_CONTENT", default="json", cast=Csv())
 CELERY_TASK_SERIALIZER=config("CELERY_TASK_SERIALIZER", cast=str)
 CELERY_RESULT_SERIALIZER=config("CELERY_RESULT_SERIALIZER", cast=str)
-CELERY_TIMEZONE=config("CELERY_TIMEZONE", cast=str)
-CELERY_ENABLE_UTC=config("CELERY_ENABLE_UTC", cast=bool)
+CELERY_TIMEZONE=config("CELERY_TIMEZONE", cast=str, default="UTC")
+CELERY_ENABLE_UTC=config("CELERY_ENABLE_UTC", cast=bool, default=True)
 CELERY_WORKER_CONCURRENCY = os.cpu_count()
 CELERY_TASK_ALWAYS_EAGER = False
 CELERY_TASK_ACKS_LATE = True

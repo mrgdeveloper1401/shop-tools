@@ -1,3 +1,5 @@
+import asyncio
+
 from django.contrib.auth import aauthenticate
 from django.db.models import Prefetch
 from django.shortcuts import aget_object_or_404
@@ -7,6 +9,7 @@ from adrf.generics import ListAPIView as AsyncListAPIView
 
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
+from account_app.tasks import send_otp_code_by_celery
 from apis.v1.utils.ip_client import get_client_ip
 from core.utils.jwt import async_get_token_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
@@ -41,18 +44,18 @@ class UserCreateView(views.APIView):
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class AsyncRequestOtpView(AsyncApiView):
-    serializer_class = serializers.AsyncRequestPhoneSerializer
-    permission_classes = (AsyncNotAuthenticated,)
+class RequestOtpView(views.APIView):
+    serializer_class = serializers.RequestPhoneSerializer
+    permission_classes = (NotAuthenticated,)
 
-    async def post(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # check user dose exists
         # get phone
         phone = serializer.validated_data["mobile_phone"]
-        if not await User.objects.filter(mobile_phone=phone).aexists():
+        if not User.objects.filter(mobile_phone=phone).exists():
             raise exceptions.NotFound("کاربری با این شماره موبایل پیدا نشد")
 
         # get user ip address
@@ -64,13 +67,14 @@ class AsyncRequestOtpView(AsyncApiView):
         redis_key = f'{ip_addr}-{phone}-{otp}'
 
         # set key
-        await OtpService.store_otp(
+        OtpService.sync_store_otp(
             key=redis_key,
             otp=otp,
         )
 
         # send otp code by celery
-        await send_otp_sms(phone, otp)
+        # asyncio.run(send_otp_sms(phone, otp))
+        send_otp_code_by_celery.delay(phone, otp)
 
         # return response
         return response.Response(
@@ -248,7 +252,7 @@ class UserAddressViewSet(viewsets.ModelViewSet):
         return query
 
 
-class AsyncAdminUserListview(AsyncListAPIView):
+class AsyncAdminUserListview(generics.ListAPIView):
     """
     show list use phone \n
     you can show list user \n

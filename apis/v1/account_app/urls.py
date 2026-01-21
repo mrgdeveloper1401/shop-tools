@@ -30,7 +30,7 @@ ticket_room_router.register("ticket", views.TicketViewSet, basename="ticket")
 urlpatterns = [
     path("get_ip_client/", views.GetIpClient.as_view(), name='get_ip_client'),
     path("create_user/", views.UserCreateView.as_view(), name='create_user'),
-    path("request-otp/", views.AsyncRequestOtpView.as_view(), name="request-otp"),
+    path("request-otp/", views.RequestOtpView.as_view(), name="request-otp"),
     path(
         "verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"
     ),

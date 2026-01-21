@@ -9,7 +9,16 @@ class ImageAdmin(admin.ModelAdmin):
 
 @admin.register(models.PublicNotification)
 class PublicNotificationAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "title", "is_active", "created_at", "updated_at")
+    list_per_page = 20
+    list_filter = ("is_active", "created_at", "updated_at")
+    search_fields = ("title", "id")
+    list_display_links = ("id", "title")
+    list_editable = ("is_active",)
+    search_help_text = "برای جست و جو میتوانید از عنوان نوتیفیکیشن استفاده کنید"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).defer("is_deleted", "deleted_at")
 
 
 @admin.register(models.MainSite)

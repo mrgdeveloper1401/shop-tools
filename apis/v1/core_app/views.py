@@ -1,13 +1,14 @@
 from django.db.models import Prefetch
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, response
 
 from core.utils.custom_filters import AdminImageFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
 from core_app.models import PublicNotification, Image, MainSite, Carousel, SitemapEntry
+from ..utils.cache_mixin import CacheMixin
 
 
-class PublicNotificationViewSet(viewsets.ModelViewSet):
+class PublicNotificationViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.PublicNotificationSerializer
     queryset = PublicNotification.objects.filter(is_active=True).only(
         "title",
@@ -16,11 +17,19 @@ class PublicNotificationViewSet(viewsets.ModelViewSet):
     )
 
     def get_permissions(self):
-        if self.action in ("list", "retrieve"):
-            self.permission_classes = (permissions.IsAuthenticated,)
-        else:
+        if self.action in ("create", "partial_update", "update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        public_notify_cache = self.get_cache("public_notification")
+
+        if public_notify_cache:
+            return response.Response(public_notify_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("public_notification", data.data)
+            return data
 
 
 class AdminImageViewSet(viewsets.ModelViewSet):

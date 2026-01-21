@@ -32,10 +32,12 @@ def http_error(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except httpx.ConnectError as ce:
+        except httpx.ConnectError as ce: # connect error
             raise HttpConnectionError(detail=str(ce))
-        except httpx.TimeoutException as te:
+        except httpx.TimeoutException as te: # timeout error
             raise TimeOutError(detail=str(te))
-        except Exception as e:
+        except httpx.HTTPStatusError as he: # status code
+            raise HTTPStatusError(detail=str(he))
+        except Exception as e: # other exception
             raise InvalidDataError(detail=str(e))
     return wrapper

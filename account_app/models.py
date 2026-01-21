@@ -176,10 +176,6 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin
 class OtpService:
     set_time = 120
 
-    def __init__(self):
-        if settings.DEBUG:
-            self.set_time = 300
-
     @staticmethod
     def generate_otp(length=6):
         """Generate a numeric OTP and store it in Redis"""
@@ -190,6 +186,11 @@ class OtpService:
     async def store_otp(key, otp):
         """Store OTP in Redis with expiry time (production --> 2 / development --> 5)"""
         await cache.aset(key, otp, timeout=OtpService.set_time)
+
+    @staticmethod
+    def sync_store_otp(key, otp):
+        """Store OTP in Redis with expiry time (production --> 2 / development --> 5)"""
+        cache.set(key, otp, timeout=OtpService.set_time)
 
     @staticmethod
     async def verify_otp(key, submitted_otp):
