@@ -42,7 +42,11 @@ class MainSiteAdmin(admin.ModelAdmin):
 
 @admin.register(models.Carousel)
 class CarouselNameAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ("image",)
+    list_display = ("id", "name", "created_at", "updated_at")
+    list_per_page = 20
+    list_filter = ("created_at", "updated_at")
+    list_display_links = ("id", "name")
 
 
 @admin.register(models.SitemapEntry)

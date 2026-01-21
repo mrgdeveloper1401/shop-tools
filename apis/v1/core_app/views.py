@@ -85,7 +85,7 @@ class MainSiteViewSet(CacheMixin, viewsets.ModelViewSet):
             )
 
 
-class CarouselViewSet(viewsets.ModelViewSet):
+class CarouselViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.CarouselSerializer
     queryset = Carousel.objects.select_related("image").only(
         "name",
@@ -97,6 +97,15 @@ class CarouselViewSet(viewsets.ModelViewSet):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
+    def list(self, request, *args, **kwargs):
+        carousel_cache = self.get_cache("carousel")
+
+        if carousel_cache:
+            return response.Response(carousel_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("carousel", data.data)
+            return data
 
 
 class SiteMapViewSet(viewsets.ModelViewSet):
