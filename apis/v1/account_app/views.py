@@ -154,8 +154,9 @@ class UserInformationViewSet(viewsets.ModelViewSet):
             "is_staff"
         )
         if not self.request.user.is_staff:
-            query = query.filter(id=self.request.user.id)
-        return query
+            return query.filter(id=self.request.user.id)
+        else:
+            return query
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
