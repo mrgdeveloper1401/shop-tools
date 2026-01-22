@@ -238,6 +238,7 @@ class UserAddressViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         query = UserAddress.objects.select_related("city").only(
             "city__name",
+            "user_id",
             "state_id",
             "is_default",
             "title",
