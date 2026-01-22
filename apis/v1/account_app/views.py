@@ -304,11 +304,7 @@ class StateViewSet(
             return response.Response(serializer.data)
 
 
-class CityViewSet(
-    CacheMixin,
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-):
+class CityViewSet(CacheMixin,viewsets.GenericViewSet,mixins.ListModelMixin):
     serializer_class = serializers.CitySerializer
     permission_classes = (permissions.IsAuthenticated,)
 
