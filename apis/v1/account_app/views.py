@@ -150,6 +150,7 @@ class UserInformationViewSet(viewsets.ModelViewSet):
             "mobile_phone",
             'username',
             "email",
+            "password",
             "is_active",
             "is_staff"
         )

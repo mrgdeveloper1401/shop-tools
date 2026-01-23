@@ -73,10 +73,16 @@ DATABASES = {
         "PASSWORD": "postgres",
         "HOST": "localhost",
         "PORT": 5434,
-        "CONN_MAX_AGE": 100
+        "CONN_MAX_AGE": 60,
+        # "OPTIONS": {
+        #     "pool": {
+        #         "min_size": 2,
+        #         "max_size": 15,
+        #         "timeout": 2,
+        #     }
+        # }
     }
 }
-
 
 ROOT_URLCONF = 'core.urls'
 

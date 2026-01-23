@@ -20,21 +20,20 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         _("mobile phone"),
         max_length=22,
         unique=True,
-        null=True,
-        blank=True,
         validators=(PhoneNumberValidator,)
     )
     username = models.CharField(
         _("username"),
         max_length=150,
         blank=True,
-        null=True
+        null=True,
+        db_index=True,
     )
     email = models.EmailField(
         _("email address"), 
         blank=True, 
         null=True, 
-        # unique=True
+        db_index=True,
     )
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)

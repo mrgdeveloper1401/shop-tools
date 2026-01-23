@@ -4,6 +4,7 @@ from rest_framework.generics import get_object_or_404
 from adrf.serializers import Serializer, ModelSerializer
 from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, Ticket
 from account_app.validators import MobileRegexValidator
+from apis.v1.account_app.exceptions import EmailAlreadyExistsError, UsernameAlreadyExistsError
 from core.utils.jwt import get_tokens_for_user
 from core.utils.validators import PhoneNumberValidator
 from core_app.models import Image
@@ -106,14 +107,35 @@ class UserInformationSerializer(serializers.ModelSerializer):
             "id",
             "mobile_phone",
             'username',
+            "password",
             "email",
             "is_active",
             "is_staff"
         )
-        read_only_fields = (
-            "is_active",
-            "mobile_phone"
-        )
+        extra_kwargs = {
+            "email": {"required": True},
+            "username": {'required': True}
+        }
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop("password", None)
+        return data
+
+    def validate(self, attrs):
+        email = attrs['email']
+        username = attrs['username']
+
+        # check email
+        if User.objects.filter(email=email).exists():
+            raise EmailAlreadyExistsError()
+        # check username
+        if User.objects.filter(username=username).exists():
+            raise UsernameAlreadyExistsError()
+        return attrs
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
 
 
 class UserPrivateNotification(serializers.ModelSerializer):
