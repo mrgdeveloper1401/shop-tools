@@ -160,7 +160,13 @@ class UserInformationViewSet(viewsets.ModelViewSet):
             return query
 
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin
+):
     """
     permission (create and delete) --> user must be admin \n
     pagination --> 20 item , only user admin have pagination
