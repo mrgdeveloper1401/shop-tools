@@ -32,3 +32,8 @@ def clear_state_cache(sender, instance, **kwargs):
 def clear_city_cache(sender, instance, **kwargs):
     keys = ("retrieve_city_api_cache", "city_list_api_cache")
     cache_instance.delete_many_key(keys=keys)
+
+# delete cache user address
+@receiver([post_save, post_delete], sender=City)
+def clear_user_address_cache(sender, instance, **kwargs):
+    cache_instance.delete_cache("user_address_cache")

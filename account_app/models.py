@@ -145,10 +145,10 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
         null=True,
         help_text=_("طول جغرافیایی")
     )
-    is_default = models.BooleanField(
-        default=False,
-        help_text=_("آیا آدرس پیش‌فرض کاربر است؟")
-    )
+    # is_default = models.BooleanField(
+    #     default=False,
+    #     help_text=_("آیا آدرس پیش‌فرض کاربر است؟")
+    # )
 
     class Meta:
         ordering = ("id",)

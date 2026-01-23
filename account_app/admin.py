@@ -127,12 +127,12 @@ class UserAddressAdmin(CoreAdminMixin):
         "city_id",
         "get_user_phone",
         "title",
-        "is_default",
+        # "is_default",
         "is_active"
     )
     list_editable = (
-        "is_default",
-        "is_active"
+        # "is_default",
+        "is_active",
     )
     list_display_links = (
         "user_id",
@@ -142,10 +142,10 @@ class UserAddressAdmin(CoreAdminMixin):
     )
     list_select_related = ("user",)
 
-    def get_list_filter(self, request):
-        list_filter = super().get_list_filter(request)
-        list_filter = list_filter + ("is_default",)
-        return list_filter
+    # def get_list_filter(self, request):
+    #     list_filter = super().get_list_filter(request)
+    #     list_filter = list_filter + ("is_default",)
+    #     return list_filter
 
     def get_user_phone(self, obj):
         return obj.user.mobile_phone
@@ -158,7 +158,7 @@ class UserAddressAdmin(CoreAdminMixin):
                 "state_id",
                 "city_id",
                 "title",
-                "is_default",
+                # "is_default",
                 "is_active",
                 "created_at",
                 "updated_at",

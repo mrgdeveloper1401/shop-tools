@@ -232,7 +232,7 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
         )
 
 
-class UserAddressViewSet(viewsets.ModelViewSet):
+class UserAddressViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     pagination --> 20 item , only user admin have pagination \n
     filter query --> postal cdde, only admin user can use filter query
@@ -242,12 +242,24 @@ class UserAddressViewSet(viewsets.ModelViewSet):
     pagination_class = AdminTwentyPageNumberPagination
     filterset_class = AdminUserAddressFilter
 
+    def list(self, request, *args, **kwargs):
+        # cache user address where not staff
+        if not request.user.is_staff:
+            user_address_cache = self.get_cache("user_address_cache")
+            if user_address_cache:
+                return response.Response(user_address_cache)
+            else:
+                data = super().list(request, *args, **kwargs)
+                self.set_cache("user_address_cache", data.data)
+                return response.Response(data.data)
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         query = UserAddress.objects.select_related("city").only(
             "city__name",
             "user_id",
             "state_id",
-            "is_default",
+            # "is_default",
             "title",
             "address_line",
             "postal_code",
