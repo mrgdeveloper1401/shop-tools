@@ -381,7 +381,7 @@ class AsyncLoginByPhonePasswordView(AsyncApiView):
                 }
             )
         else:
-            raise exceptions.NotFound()
+            raise UserNotFound()
 
 
 class AdminListProfileView(generics.ListAPIView):
