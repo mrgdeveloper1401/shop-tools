@@ -87,9 +87,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
             "access_token"
         )
         extra_kwargs = {
-            "password": {
-                "write_only": True,
-            }
+            "password": {"write_only": True},
+            "username": {"required": True}
         }
 
     @extend_schema_field(serializers.DictField())

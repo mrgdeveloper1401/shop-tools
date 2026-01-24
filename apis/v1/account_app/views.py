@@ -288,12 +288,7 @@ class AsyncAdminUserListview(generics.ListAPIView):
         return User.objects.filter(is_active=True).only("mobile_phone")
 
 
-class StateViewSet(
-    CacheMixin,
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin
-):
+class StateViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     serializer_class = serializers.StateSerializer
     # permission_classes = (permissions.IsAuthenticated,)
 
@@ -313,13 +308,14 @@ class StateViewSet(
             return response.Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        retrieve_cache = self.get_cache(key="retrieve_state_api_cache")
+        state_id = kwargs['pk']
+        retrieve_cache = self.get_cache(key="retrieve_state_api_cache_{}".format(state_id))
         if retrieve_cache:
             return response.Response(retrieve_cache)
         else:
             obj = self.get_object()
             serializer = self.get_serializer(obj)
-            self.set_cache("retrieve_state_api_cache", serializer.data)
+            self.set_cache("retrieve_state_api_cache_{}".format(state_id), serializer.data)
             return response.Response(serializer.data)
 
 
@@ -338,23 +334,26 @@ class CityViewSet(CacheMixin,viewsets.GenericViewSet,mixins.ListModelMixin):
         )
 
     def list(self, request, *args, **kwargs):
-        state_list_cache = self.get_cache(key="city_list_api_cache")
+        state_pk = kwargs['state_pk']
+        state_list_cache = self.get_cache(key="city_list_api_cache_{}".format(state_pk))
         if state_list_cache:
             return response.Response(state_list_cache)
         else:
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset, many=True)
-            self.set_cache("city_list_api_cache", serializer.data)
+            self.set_cache("city_list_api_cache_{}".format(state_pk), serializer.data)
             return response.Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        retrieve_cache = self.get_cache(key="city_retrieve_api_cache")
+        state_pk = kwargs['state_pk']
+        city_id = kwargs['pk']
+        retrieve_cache = self.get_cache(key="city_retrieve_api_cache_{}_{}".format(state_pk, city_id))
         if retrieve_cache:
             return response.Response(retrieve_cache)
         else:
             obj = self.get_object()
             serializer = self.get_serializer(obj)
-            self.set_cache("city_retrieve_api_cache", serializer.data)
+            self.set_cache("city_retrieve_api_cache_{}_{}".format(state_pk, city_id), serializer.data)
             return response.Response(serializer.data)
 
 
