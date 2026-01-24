@@ -325,7 +325,7 @@ class StateViewSet(
 
 class CityViewSet(CacheMixin,viewsets.GenericViewSet,mixins.ListModelMixin):
     serializer_class = serializers.CitySerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    # permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return City.objects.filter(
