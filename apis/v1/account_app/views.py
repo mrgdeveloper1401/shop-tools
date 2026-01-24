@@ -18,6 +18,7 @@ from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddre
 from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated, AsyncIsAdminUser
 from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
 from . import serializers
+from .exceptions import UserNotFound
 from ..utils.cache_mixin import CacheMixin
 
 
@@ -56,7 +57,7 @@ class RequestOtpView(views.APIView):
         # get phone
         phone = serializer.validated_data["mobile_phone"]
         if not User.objects.filter(mobile_phone=phone).exists():
-            raise exceptions.NotFound("کاربری با این شماره موبایل پیدا نشد")
+            raise UserNotFound()
 
         # get user ip address
         ip_addr = get_client_ip(request)
