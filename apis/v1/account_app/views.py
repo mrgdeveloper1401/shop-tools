@@ -295,7 +295,7 @@ class StateViewSet(
     mixins.RetrieveModelMixin
 ):
     serializer_class = serializers.StateSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    # permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return State.objects.only(
