@@ -32,7 +32,7 @@ urlpatterns = [
     path("create_user/", views.UserCreateView.as_view(), name='create_user'),
     path("request-otp/", views.RequestOtpView.as_view(), name="request-otp"),
     path(
-        "verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"
+        "verify-otp/", views.RequestPhoneVerifyOtpView.as_view(), name="verify_otp"
     ),
     path(
         "request-forget-password/",

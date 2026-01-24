@@ -11,7 +11,7 @@ from account_app.models import User, OtpService, Profile, PrivateNotification, U
     Ticket
 from account_app.tasks import send_otp_code_by_celery
 from apis.v1.utils.ip_client import get_client_ip
-from core.utils.jwt import async_get_token_for_user
+from core.utils.jwt import async_get_token_for_user, get_tokens_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
     PrivateNotificationFilter, TicketFilter
@@ -86,39 +86,37 @@ class RequestOtpView(views.APIView):
         )
 
 
-class AsyncRequestPhoneVerifyOtpView(AsyncApiView):
-    serializer_class = serializers.AsyncRequestPhoneVerifySerializer
-    permission_classes = (AsyncNotAuthenticated,)
+class RequestPhoneVerifyOtpView(views.APIView):
+    serializer_class = serializers.RequestPhoneVerifySerializer
+    permission_classes = (NotAuthenticated,)
 
-    async def post(self, request):
-        # import ipdb
-        # ipdb.set_trace()
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # get ip address and phone
         ip_addr = get_client_ip(request)
         phone = serializer.validated_data["phone"]
-        code = serializer.validated_data.get("code")
+        code = serializer.validated_data["code"]
 
         # pattern redis-key
         redis_key = f'{ip_addr}-{phone}-{code}'
 
         # validate otp
-        get_otp = await OtpService.verify_otp(redis_key, code)
+        get_otp = OtpService.sync_verify_otp(redis_key, code)
 
         # check otp
         if not get_otp:
             raise exceptions.NotFound()
 
         # check user
-        user = await aget_object_or_404(User, mobile_phone=phone, is_active=True)
+        user = generics.get_object_or_404(User.objects.only("id"), mobile_phone=phone, is_active=True)
 
         # generate token
-        token = await async_get_token_for_user(user)
+        token = get_tokens_for_user(user)
 
         # delete otp in redis
-        await OtpService.delete_otp(redis_key)
+        OtpService.sync_delete_otp(redis_key)
 
         # return token
         return response.Response(

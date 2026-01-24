@@ -200,9 +200,22 @@ class OtpService:
         return stored_otp == submitted_otp
 
     @staticmethod
+    def sync_verify_otp(key, submitted_otp):
+        """Verify the submitted OTP against stored OTP"""
+        stored_otp = cache.get(key)
+        if stored_otp is None:
+            return False
+        return stored_otp == submitted_otp
+
+    @staticmethod
     async def delete_otp(key):
         """Delete OTP from Redis"""
         await cache.adelete(key)
+
+    @staticmethod
+    def sync_delete_otp(key):
+        """Delete OTP from Redis"""
+        cache.delete(key)
 
 
 class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):

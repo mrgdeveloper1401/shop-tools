@@ -21,6 +21,13 @@ class RequestPhoneSerializer(serializers.Serializer):
     )
 
 
+class RequestPhoneVerifySerializer(serializers.Serializer):
+    code = serializers.CharField()
+    phone = serializers.CharField(
+        validators=(MobileRegexValidator(),)
+    )
+
+
 class AsyncRequestPhoneVerifySerializer(Serializer):
     code = serializers.CharField()
     phone = serializers.CharField(
