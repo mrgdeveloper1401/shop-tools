@@ -348,13 +348,13 @@ class CityViewSet(CacheMixin,viewsets.GenericViewSet,mixins.ListModelMixin):
             return response.Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        retrieve_cache = self.get_cache(key="retrieve_city_api_cache")
+        retrieve_cache = self.get_cache(key="city_retrieve_api_cache")
         if retrieve_cache:
             return response.Response(retrieve_cache)
         else:
             obj = self.get_object()
             serializer = self.get_serializer(obj)
-            self.set_cache("retrieve_city_api_cache", serializer.data)
+            self.set_cache("city_retrieve_api_cache", serializer.data)
             return response.Response(serializer.data)
 
 

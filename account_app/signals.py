@@ -25,12 +25,13 @@ def create_notification_ticket(sender, instance, created, **kwargs):
 # delete cache state
 @receiver([post_save, post_delete], sender=State)
 def clear_state_cache(sender, instance, **kwargs):
-    cache_instance.delete_cache("state_list_api_cache")
+    keys = ("retrieve_state_api_cache", "state_list_api_cache")
+    cache_instance.delete_many_key(keys=keys)
 
 # delete cache city
 @receiver([post_save, post_delete], sender=City)
 def clear_city_cache(sender, instance, **kwargs):
-    keys = ("retrieve_city_api_cache", "city_list_api_cache")
+    keys = ("city_retrieve_api_cache", "city_list_api_cache")
     cache_instance.delete_many_key(keys=keys)
 
 # delete cache user address
