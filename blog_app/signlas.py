@@ -18,5 +18,5 @@ def clear_tag_blog_cache(sender, **kwargs):
 
 @receiver([post_save, post_delete], sender=models.PostBlog)
 def clean_latest_ten_post_blog_cache(sender, instance, **kwargs):
-    keys = ("list_ten_post_blog", "list_seo_blog", "seo_post_detail_blog_{}".format(instance.post_slug))
+    keys = ("list_ten_post_blog", "list_seo_blog", "introduction_post_blog", "seo_post_detail_blog_{}".format(instance.post_slug))
     cache_instance.delete_many_key(keys)

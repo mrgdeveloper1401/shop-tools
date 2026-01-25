@@ -17,6 +17,7 @@ category_router = routers.NestedSimpleRouter(router, "category_blog", lookup="ca
 category_router.register("post_blog", views.PostBlogViewSet, basename="post_blog")
 
 urlpatterns = [
+    path("introduction_blog_post/", views.IntroductionPostBlogView.as_view(), name="introduction"),
    path("seo_post_detail_blog/<slug:post_slug>/", views.SeoPostDetailBlogViewSet.as_view(), name='seo_post_detail'),
    path("tag_blog_without_pagination/", views.BlogTagWithOutPaginationView.as_view(), name='tag_blog_without_pagination'),
    path("", include(category_router.urls)),

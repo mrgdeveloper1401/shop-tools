@@ -120,6 +120,52 @@ class PostBlogViewSet(viewsets.ModelViewSet):
         return query
 
 
+class IntroductionPostBlogView(CacheMixin, generics.ListAPIView):
+    serializer_class = serializers.ListPostBlogSerializer
+    queryset = PostBlog.objects.filter(
+        is_active=True,
+        is_introduction_article=True
+    ).select_related(
+        "post_cover_image",
+        "category",
+    ).prefetch_related(
+        Prefetch(
+            "author", queryset=Profile.objects.only(
+                "first_name",
+                "last_name",
+                "user_id"
+            )
+        ),
+        Prefetch(
+            "tags", queryset=TagBlog.objects.only("tag_name")
+        )
+    ).only(
+        "created_at",
+        "updated_at",
+        "post_cover_image__image",
+        "author",
+        "post_introduction",
+        "post_slug",
+        "description_slug",
+        "post_title",
+        "category__category_name",
+        "read_time",
+        "likes",
+        "is_introduction_article",
+        "tags",
+    )
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "introduction_post_blog"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, data.data)
+            return response.Response(data.data)
+
+
 class TagBlogViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TagSerializer
     pagination_class = TwentyPageNumberPagination
