@@ -25,7 +25,7 @@ class TagBlog(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 
 class PostBlog(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    author = models.ManyToManyField('account_app.User', related_name='post_authors')
+    author = models.ManyToManyField('account_app.Profile', related_name='post_authors', blank=True)
     category = models.ForeignKey(CategoryBlog, on_delete=models.PROTECT, related_name="blog_posts")
     post_title = models.CharField(max_length=255)
     post_slug = models.SlugField(max_length=500, allow_unicode=True)
@@ -41,6 +41,7 @@ class PostBlog(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
     description_slug = models.TextField(blank=True, null=True)
     post_introduction = models.CharField(blank=True, null=True, max_length=255)
+    is_introduction_article = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("id",)

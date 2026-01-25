@@ -1,8 +1,8 @@
 from drf_spectacular.utils import extend_schema_field
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from rest_framework.generics import get_object_or_404
 
-from account_app.models import User
+from account_app.models import User, Profile
 from blog_app.models import CategoryBlog, PostBlog, TagBlog
 from core_app.models import Image
 
@@ -46,8 +46,10 @@ class CategoryBlogSerializer(serializers.ModelSerializer):
         if parent is None:
             return CategoryBlog.add_root(**validated_data)
         else:
-            category = get_object_or_404(CategoryBlog, pk=parent)
-            return category.add_child(**validated_data)
+            category = CategoryBlog.objects.only("id", "depth", "numchild", "path").filter(pk=parent)
+            if not category.exists():
+                raise exceptions.NotFound("category parent not found")
+            return category.first().add_child(**validated_data)
 
 
 class SimpleCategoryNameSerializer(serializers.ModelSerializer):
@@ -85,6 +87,7 @@ class ListPostBlogSerializer(serializers.ModelSerializer):
             "author",
             "post_cover_image",
             "created_at",
+            "updated_at",
             "post_introduction",
             "post_slug",
             "description_slug",
@@ -112,16 +115,16 @@ class SimpleBlogTagSerializer(serializers.ModelSerializer):
         )
 
 
-class PostblogSerializer(serializers.ModelSerializer):
+class PostBlogSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
         queryset=CategoryBlog.objects.only("id").filter(is_active=True)
     )
     author = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.only("mobile_phone").filter(is_active=True),
-        many=True,
+        queryset=Profile.objects.only("id").filter(user__is_active=True, user__is_staff=True),
+        many=True
     )
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=TagBlog.objects.only("id").filter(is_active=True),
+        queryset=TagBlog.objects.only("id"),
         many=True
     )
     post_cover_image = serializers.PrimaryKeyRelatedField(

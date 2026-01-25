@@ -348,7 +348,7 @@ LOGGING = {
 }
 
 # config django-silk
-USE_DJANGO_SILK = config('USE_DJANGO_SILK', default=True, cast=bool)
+USE_DJANGO_SILK = config('USE_DJANGO_SILK', default=False, cast=bool)
 if USE_DJANGO_SILK:
     MIDDLEWARE.append("silk.middleware.SilkyMiddleware")
     INSTALLED_APPS.append("silk")

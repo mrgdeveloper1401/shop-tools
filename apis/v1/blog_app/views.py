@@ -44,7 +44,7 @@ class CategoryBlogViewSet(CacheMixin, viewsets.ModelViewSet):
             return qs
 
     def retrieve(self, request, *args, **kwargs):
-        cache_key = "retrieve_category_blog"
+        cache_key = "retrieve_category_blog_{}".format(kwargs["pk"])
         get_cache = self.get_cache(cache_key)
         if get_cache:
             return response.Response(get_cache)
@@ -71,9 +71,10 @@ class PostBlogViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return serializers.ListPostBlogSerializer
         else:
-            return serializers.PostblogSerializer
+            return serializers.PostBlogSerializer
 
     def get_queryset(self):
+        # base query
         query = PostBlog.objects.select_related(
             "post_cover_image",
             "category"
@@ -81,49 +82,41 @@ class PostBlogViewSet(viewsets.ModelViewSet):
             category_id=self.kwargs.get("category_blog_pk")
         ).prefetch_related(
             Prefetch(
-                "author__profile", queryset=Profile.objects.select_related("user").only(
+                "author", queryset=Profile.objects.only(
                     "first_name",
                     "last_name",
                     "user_id"
                 )
+            ),
+            Prefetch(
+                "tags", queryset=TagBlog.objects.only("tag_name")
             )
         )
 
+        # filter active post for normal user
         if not self.request.user.is_staff:
             query = query.filter(is_active=True)
 
+        list_fields = (
+            "created_at",
+            "updated_at",
+            "post_cover_image__image",
+            "author",
+            "post_introduction",
+            "post_slug",
+            "description_slug",
+            "post_title",
+            "category__category_name",
+            "read_time",
+            "likes",
+            "is_introduction_article",
+            "tags",
+        )
         if self.action == "list":
-            query = query.only(
-                "created_at",
-                "post_cover_image__image",
-                "author",
-                "post_introduction",
-                "post_slug",
-                "description_slug",
-                "post_title",
-                "category__category_name"
-            )
+            query = query.only(*list_fields)
         else:
-            query = query.only(
-                "created_at",
-                "post_cover_image__image",
-                "author",
-                "category_id",
-                "tags",
-                "updated_at",
-                "post_title",
-                "post_slug",
-                "post_body",
-                "read_time",
-                "likes",
-                "is_active",
-                "description_slug",
-                "post_introduction"
-            ).prefetch_related(
-                Prefetch(
-                    "tags", queryset=TagBlog.objects.only("tag_name")
-                )
-            )
+            fields = list_fields + ("post_body",)
+            query = query.only(*fields)
         return query
 
 
@@ -209,7 +202,8 @@ class LatestTenPostBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListM
             "post_cover_image"
         ).prefetch_related(
             Prefetch(
-                "author__profile", queryset=Profile.objects.only(
+                "author",
+                queryset=Profile.objects.only(
                     "first_name",
                     "last_name",
                     "user_id"
@@ -228,10 +222,10 @@ class LatestTenPostBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListM
             "likes",
             "post_slug",
             "created_at",
+            "updated_at",
             "author"
         ).order_by("-id")[:10]
         return query
-
 
 class SeoBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = serializers.SeoBlogSerializer
@@ -266,7 +260,7 @@ class SeoPostDetailBlogViewSet(CacheMixin, views.APIView):
             "category"
         ).prefetch_related(
             Prefetch(
-                "author__profile", queryset=Profile.objects.only("first_name", "last_name", "user_id")
+                "author", queryset=Profile.objects.only("first_name", "last_name", "user_id")
             ),
             Prefetch(
                 "tags", queryset=TagBlog.objects.filter(is_active=True).only("tag_name")
@@ -290,7 +284,7 @@ class SeoPostDetailBlogViewSet(CacheMixin, views.APIView):
 
     def get(self, request, *args, **kwargs):
         post_slug = kwargs['post_slug']
-        cache_key = "seo_post_detail_blog"
+        cache_key = "seo_post_detail_blog_{}".format(post_slug)
         get_cache = self.get_cache(cache_key)
 
         if get_cache:

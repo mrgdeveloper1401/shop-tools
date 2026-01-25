@@ -83,7 +83,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin, CoreAdminMixin):
 @admin.register(Profile)
 class ProfileAdmin(CoreAdminMixin):
     list_editable = ()
-    list_filter = ("created_at", "updated_at")
+    list_filter = ("created_at", "updated_at", "user__is_staff")
     raw_id_fields = ("user", "profile_image")
     search_fields = ("user__mobile_phone", "id")
     search_help_text = _("برای جست و جو میتوانید از شماره موبایل کاربر استفاده کنید")
@@ -106,6 +106,7 @@ class ProfileAdmin(CoreAdminMixin):
         if "changelist" in request.resolver_match.url_name:
             return qs.select_related("user").only(
                 "user__mobile_phone",
+                "user__is_staff",
                 "first_name",
                 "last_name",
                 "updated_at",
