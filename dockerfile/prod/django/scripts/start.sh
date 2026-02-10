@@ -1,7 +1,6 @@
 #!/bin/bash
 
-
 python manage.py makemigrations --noinput
 python manage.py migrate
 python manage.py collectstatic --noinput
-gunicorn core.wsgi:application -c /home/app/scripts/gunicorn.conf.py
+gunicorn core.wsgi:application -c /home/app/dockerfile/prod/django/scripts/gunicorn.conf.py

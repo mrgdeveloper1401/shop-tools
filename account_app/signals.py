@@ -1,9 +1,12 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch.dispatcher import receiver
 
-from .models import User, Profile, Ticket
+from apis.v1.utils.cache_mixin import CacheMixin
+from .models import State, User, Profile, Ticket, City, UserAddress
 from .tasks import send_notification_after_create_ticket
 
+
+cache_instance = CacheMixin()
 
 # create profile by signal
 @receiver(post_save, sender=User)
@@ -18,3 +21,21 @@ def create_notification_ticket(sender, instance, created, **kwargs):
         send_notification_after_create_ticket.delay(
             room_id=instance.room.id,
         )
+
+# delete cache state
+@receiver([post_save, post_delete], sender=State)
+def clear_state_cache(sender, instance, **kwargs):
+    keys = ("retrieve_state_api_cache", "state_list_api_cache")
+    cache_instance.delete_many_key(keys=keys)
+
+# delete cache city
+@receiver([post_save, post_delete], sender=City)
+def clear_city_cache(sender, instance, **kwargs):
+    keys = ("city_retrieve_api_cache", "city_list_api_cache")
+    cache_instance.delete_many_key(keys=keys)
+
+# delete cache user address
+@receiver([post_save, post_delete], sender=UserAddress)
+def clear_user_address_cache(sender, instance, **kwargs):
+    user_id = instance.user_id
+    cache_instance.delete_cache(f"user_address_cache_{user_id}")

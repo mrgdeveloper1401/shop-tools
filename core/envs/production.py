@@ -60,15 +60,15 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD", cast=str),
         "HOST": config("DB_HOST", cast=str),
         "PORT": config("DB_PORT", cast=int),
-        # "CONN_MAX_AGE": config("CON_MAX_AGE", cast=int, default=60),
-        'OPTIONS': {
-            'pool': {
-                'min_size': os.cpu_count() * 2,       # Minimum number of connections in the pool
-                'max_size': os.cpu_count() * 5 * 3,       # Maximum number of connections in the pool
-                # 'increment': os.cpu_count() * 5 * 3,  # Number of new connections to create when needed
-                'timeout': config("POOL_TIMEOUT", cast=int, default=30),  # Connection lifetime in seconds (optional)
-            }
-        }
+        "CONN_MAX_AGE": config("CON_MAX_AGE", cast=int, default=60),
+        # 'OPTIONS': {
+        #     'pool': {
+        #         'min_size': config("POOL_MIN_SIZE", cast=int, default=2),       # Minimum number of connections in the pool
+        #         'max_size': config("POOL_MAX_SIZE", cast=int, default=15),       # Maximum number of connections in the pool
+        #         # 'increment': os.cpu_count() * 5 * 3,  # Number of new connections to create when needed
+        #         'timeout': config("POOL_TIMEOUT", cast=int, default=30),  # Connection lifetime in seconds (optional)
+        #     }
+        # }
     }
 }
 
@@ -139,7 +139,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR.parent / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -253,7 +253,7 @@ if USE_CACHE:
         },
         "api-cache": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/1"),
+            "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/1", cast=str),
             "TIMEOUT": config("REDIS_SECOND_TIMEOUT", default=86400, cast=int),
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -298,25 +298,25 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # cors origin
 CORS_ALLOWED_ORIGINS = config("PRODUCTION_CORS_ALLOWED_ORIGINS", cast=Csv())
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SAMESITE = 'Strict'
-CSRF_USE_SESSIONS = True
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_PRELOAD = True
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = "DENY"
-SECURE_REFERRER_POLICY = "strict-origin"
-USE_X_FORWARDED_HOST = True
-USE_X_FORWARDED_PORT = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_COOKIE_AGE = 3600
-SESSION_COOKIE_DOMAIN = "gs-tools.ir"
-CSRF_COOKIE_DOMAIN = "gs-tools.ir"
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool, default=True)
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", cast=bool, default=True)
+CSRF_COOKIE_HTTPONLY = config("CSRF_COOKIE_HTTPONLY", cast=bool, default=True)
+CSRF_COOKIE_SAMESITE = config("CSRF_COOKIE_SAMESITE", cast=str, default='Strict')
+CSRF_USE_SESSIONS = config("CSRF_USE_SESSIONS", cast=bool, default=True)
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", cast=bool, default=True)
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", cast=int, default=31536000)
+SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD", cast=bool, default=True)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config("SECURE_HSTS_INCLUDE_SUBDOMAINS", cast=bool, default=True)
+SECURE_CONTENT_TYPE_NOSNIFF = config("SECURE_CONTENT_TYPE_NOSNIFF", cast=bool, default=True)
+SECURE_BROWSER_XSS_FILTER = config("SECURE_BROWSER_XSS_FILTER", cast=bool, default=True)
+X_FRAME_OPTIONS = config("X_FRAME_OPTIONS", cast=str, default='DENY')
+SECURE_REFERRER_POLICY = config("SECURE_REFERRER_POLICY", cast=str, default='strict-origin')
+USE_X_FORWARDED_HOST = config("USE_X_FORWARDED_HOST", cast=bool, default=True)
+USE_X_FORWARDED_PORT = config("USE_X_FORWARDED_PORT", cast=bool, default=True)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", config("HTTP_X_FORWARDED_PROTO", cast=str, default='https'))
+CSRF_COOKIE_AGE = config("CSRF_COOKIE_AGE", cast=int, default=3600)
+SESSION_COOKIE_DOMAIN = config("SESSION_COOKIE_DOMAIN", cast=str, default='gs-tools.ir')
+CSRF_COOKIE_DOMAIN = config("CSRF_COOKIE_DOMAIN", cast=str, default='gs-tools.ir')
 
 AWS_S3_REGION_NAME = 'eu-west-1'
 AWS_DEFAULT_ACL = 'public-read'
@@ -394,7 +394,6 @@ CELERY_TASK_QUEUES = (
     Queue("ba_salam"),
     Queue("payment"),
     Queue("update_order"),
-    Queue("backup_db")
 )
 
 # whitenoise

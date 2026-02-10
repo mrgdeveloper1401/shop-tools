@@ -11,14 +11,14 @@ loglevel = "error"
 errorlog = "-"
 accesslog = "-"
 
-# Timeouts
-timeout = 30 # Automatically restart workers if they take too long
+# Timeout
+# timeout = 60 # Automatically restart workers if they take too long
 keepalive = 1 # Keep connections alive for 1s after 1s unlock thread
-graceful_timeout = 30 #  Graceful shutdown for workers
+# graceful_timeout = 30 #  Graceful shutdown for workers
 
 # Worker Restart Settings
-max_requests = 1000  # Restart workers after processing 1000 requests
-max_requests_jitter = 50  # Add randomness to avoid mass restarts
+# max_requests = 1000  # Restart workers after processing 1000 requests
+# max_requests_jitter = 50  # Add randomness to avoid mass restarts
 
 # Process naming
 proc_name = "django_shop_tools"

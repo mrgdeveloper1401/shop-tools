@@ -399,7 +399,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
             tracking_code = order.tracking_code
 
             # create notification for user
-            await PrivateNotification.objects.acreate(
+            await PrivateNotification.objects.acreate( # TODOD  create by celery
                 user_id = request.user.id,
                 title = "ثبت سفارش موفق",
                 body = "کاربر محترم سفارش شما با موفقیت پرداخت و ثبت شده است",
@@ -407,7 +407,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
             )
 
             # send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
-            await send_verify_payment(request.user.mobile_phone, tracking_code)
+            await send_verify_payment(request.user.mobile_phone, tracking_code) # TODOD  create by celery
             return response.Response(verify_req)
             # send_sms_after_complete_order.delay(request.user.mobile_phone, get_order_traccking_code)
 
@@ -470,7 +470,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
                 id=int(order_id),
                 profile__user_id=request.user.id
             )
-            await cancel_verify_payment(request.user.mobile_phone, order.tracking_code)
+            await cancel_verify_payment(request.user.mobile_phone, order.tracking_code) # TODOD  create by celery
             return response.Response(
                 {
                     "message": "cancel by user"

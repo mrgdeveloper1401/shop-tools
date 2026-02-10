@@ -7,89 +7,67 @@ services:
     expose:
       - 5432
     restart: always
+    env_file: "env_folder/db.env"
     environment:
-      POSTGRES_PASSWORD: ${COMPOSE_POSTGRES_PASSWORD}
+     - POSTGRES_PASSWORD=${COMPOSE_POSTGRES_PASSWORD}
 
-#  pgadmin:
-#    container_name: shop_pgadmin
-#    image: dpage/pgadmin4
-#    restart: always
-#    ports:
-#      - "8081:80"
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-#      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-#    volumes:
-#      - pgadmin_data:/var/lib/pgadmin
+  redis:
+    container_name: gs_redis
+    image: redis:8-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
 
   app:
     container_name: django
     build:
       context: .
+      dockerfile: "dockerfile/prod/django/Dockerfile"
     ports:
       - "8000:8000"
     expose:
       - 8000
-    env_file: ".env"
-    entrypoint: ["/home/app/scripts/start.sh"]
+    env_file: "env_folder/.env"
     restart: always
     volumes:
-      - static_files:/home/app/core/staticfiles
-
-  redis:
-    container_name: gs_redis
-    image: docker.arvancloud.ir/redis:7.4-alpine
-    restart: always
-    expose:
-      - 6379
+      - static_files:/home/app/staticfiles
 
   nginx:
     container_name: gs_nginx
     restart: always
     volumes:
       - static_files:/vol/
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     command: ["nginx", "-g", "daemon off;"]
     build:
-      context: nginx
+      context: "dockerfile/prod/nginx/"
     ports:
       - "80:80"
       - "443:443"
-#    depends_on:
-#      - app
-#      - pgadmin
 
   celery:
     container_name: gs_celery
     restart: always
     build:
       context: .
-    env_file: ".env"
-    environment:
-      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
-      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      dockerfile: "./dockerfile/prod/django/Dockerfile"
+    env_file: "env_folder/.env"
     entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
-
-#  flower:
-#    container_name: gs_flower
-#    expose:
-#      - 5555
-#    ports:
-#      - "5555:5555"
-#    restart: always
-#    build:
-#      context: .
-#    env_file: ".env"
-#    entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
+    dns:
+      - 94.182.153.78
+      - 2.188.21.130
 
   celery_beat:
     container_name: dj_celery_beat
     restart: always
     build:
       context: .
-    env_file: ".env"
+      dockerfile: "./dockerfile/prod/django/Dockerfile"
+    env_file: "env_folder/.env"
     entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
 
 volumes:
   gs_postgres_data:
   static_files:
-#  pgadmin_data:

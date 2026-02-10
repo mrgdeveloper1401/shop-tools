@@ -3,7 +3,7 @@ name = "shop-tools"
 version = "1.0.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "adrf>=0.1.11",
     "boto3>=1.40.63",
