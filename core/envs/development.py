@@ -68,7 +68,7 @@ MIDDLEWARE = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "gs_tools_2025_12_19db",
+        "NAME": "gs_tools_2026_01_12db",
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",

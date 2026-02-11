@@ -90,8 +90,7 @@ class ProductDiscount(CreateMixin, UpdateMixin):
         return False
 
     objects = managers.ProductDiscountManager()
-    # valid_discount = ProductDiscountManager()
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = "product_discount"
