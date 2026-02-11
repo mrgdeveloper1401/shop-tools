@@ -1,15 +1,20 @@
-from django.db.models import Prefetch, Subquery, OuterRef
-from rest_framework import generics
+from django.db.models import Prefetch, OuterRef
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, filters
 
 from core.utils.pagination import TwentyPageNumberPagination
 from discount_app.models import ProductDiscount
 from product_app.models import ProductVariant, ProductImages
+from .filters import ProductVariantFilter
 from .serializers import ProductListHomePageSerializer
 
 
 class ProductListHomePageView(generics.ListAPIView):
     serializer_class = ProductListHomePageSerializer
     pagination_class = TwentyPageNumberPagination
+    filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
+    ordering_fields = ("id", "price")
+    filterset_class = ProductVariantFilter
 
     def get_queryset(self):
         # fields
@@ -27,10 +32,9 @@ class ProductListHomePageView(generics.ListAPIView):
         )
         product_variant_fields = (
             "product__category__id",
-            # "product__category_name",
             "product__product_slug",
             "product__description_slug",
-            "product__product_name",
+            # "product__product_name",
             "name",
             "price",
             "stock_number",
