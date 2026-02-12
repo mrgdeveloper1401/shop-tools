@@ -46,6 +46,7 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
     discount = serializers.SerializerMethodField(source="product_variant_discounts", allow_null=True)
     product_slug = serializers.CharField(source="product.product_slug")
     description_slug = serializers.CharField(source="product.description_slug")
+    brand_id = serializers.IntegerField(source="product.product_brand_id", allow_null=True)
 
     def get_discount(self, obj):
         if hasattr(obj, "discounts") and obj.discounts:
@@ -62,6 +63,7 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
         fields = (
             "variant_id",
             "category_id",
+            "brand_id",
             # "product_name",
             "variant_price",
             "variant_name",

@@ -32,6 +32,7 @@ class ProductListHomePageView(generics.ListAPIView):
         )
         product_variant_fields = (
             "product__category__id",
+            "product__product_brand__id",
             "product__product_slug",
             "product__description_slug",
             # "product__product_name",
