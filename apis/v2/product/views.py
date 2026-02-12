@@ -23,6 +23,7 @@ class ProductListHomePageView(generics.ListAPIView):
             "order",
             "alt_text_image",
             "product_id",
+            "image__image_id_ba_salam"
         )
         product_discount_field = (
             "id",
@@ -35,7 +36,12 @@ class ProductListHomePageView(generics.ListAPIView):
             "product__product_brand__id",
             "product__product_slug",
             "product__description_slug",
-            # "product__product_name",
+            "product__product_brand__brand_name",
+            "product__product_name",
+            "product__base_price",
+            "product__in_person_purchase",
+            "product__sku",
+            "product__sku",
             "name",
             "price",
             "stock_number",
@@ -53,7 +59,8 @@ class ProductListHomePageView(generics.ListAPIView):
         return ProductVariant.objects.filter(
             is_active=True
         ).select_related(
-            "product__category"
+            "product__category",
+            "product__product_brand",
         ).prefetch_related(
             Prefetch(
                 "product__product_product_image", queryset=ProductImages.objects.filter(
