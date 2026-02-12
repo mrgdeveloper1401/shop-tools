@@ -50,6 +50,7 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
     sku = serializers.CharField(source="product.sku")
     product_brand_name = serializers.CharField(source="product.product_brand.brand_name")
     in_person_purchase = serializers.BooleanField(source="product.in_person_purchase")
+    stock = serializers.IntegerField(source="stock_number")
 
     def get_product_variant_discounts(self, obj):
         if hasattr(obj, "discounts") and obj.discounts:
@@ -73,7 +74,7 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "price",
             "name",
             "is_available",
-            "stock_number",
+            "stock",
             "product_slug",
             "description_slug",
             "created_at",
