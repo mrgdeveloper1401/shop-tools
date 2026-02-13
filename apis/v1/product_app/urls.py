@@ -12,7 +12,7 @@ router.register("product_category", views.ProductCategoryViewSet, basename="prod
 router.register("product_brand", views.ProductBrandViewSet, basename="product_brand")
 router.register("attribute", views.AttributeViewSet, basename="attribute")
 router.register("product_tag", views.TagViewSet, basename="product_tag")
-router.register("seo_product", views.SeoProductViewSet, basename="seo_product") # add cache here
+router.register("seo_product", views.SeoProductViewSet, basename="seo_product")
 
 category_router = routers.NestedSimpleRouter(router, "product_category", lookup="category")
 category_router.register("products", views.ProductViewSet, basename="products")

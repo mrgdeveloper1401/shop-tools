@@ -387,9 +387,6 @@ class AttributeViewSet(CacheMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         cache_key = "product_attribute_cache"
-        page = request.GET.get("page", None)
-        if page:
-            cache_key += page
         get_cache = self.get_cache(cache_key)
         if get_cache:
             return response.Response(get_cache)

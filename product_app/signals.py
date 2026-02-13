@@ -1,6 +1,6 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch.dispatcher import receiver
-from django.core.cache import cache, caches
+from django.core.cache import caches
 
 from apis.v1.utils.cache_mixin import CacheMixin
 from . import models
@@ -11,7 +11,7 @@ cache_instance = CacheMixin()
 
 @receiver([post_delete, post_save], sender=models.Tag)
 def clean_cache_list_admin_tag_name(sender, **kwargs):
-    key = "list_admin_tag_name"
+    key = ("list_admin_tag_name", "list_index_tag_name")
     cache_instance.delete_many_key(key)
 
     # delete pattern with by module django core
@@ -21,7 +21,7 @@ def clean_cache_list_admin_tag_name(sender, **kwargs):
 @receiver([post_delete, post_save], sender=models.Category)
 def clean_cache_list_index_category_name(sender, **kwargs):
     key = "list_index_category_name_key"
-    cache_instance.delete_many_key(key)
+    cache_instance.delete_cache(key)
 
     # delete pattern with by module django core
     api_cache = caches['api-cache']
@@ -30,7 +30,7 @@ def clean_cache_list_index_category_name(sender, **kwargs):
 @receiver([post_delete, post_save], sender=models.ProductBrand)
 def clear_cache_list_index_brand_name(sender, **kwargs):
     keys = "list_index_brand_name"
-    cache_instance.delete_many_key(keys)
+    cache_instance.delete_cache(keys)
 
     # delete pattern with by module django core
     api_cache = caches['api-cache']
