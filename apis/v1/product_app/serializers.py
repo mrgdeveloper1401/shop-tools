@@ -556,6 +556,7 @@ class AdminAttributeSerializer(serializers.ModelSerializer):
             "attribute_name"
         )
 
+
 class ListCategoryNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category

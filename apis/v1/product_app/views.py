@@ -27,26 +27,32 @@ from product_app.models import (
     Tag,
     ProductVariant,
     Attribute,
-    AttributeValue,
     ProductAttributeValues,
     ProductComment
 )
 from ..utils.cache_mixin import CacheMixin
 
 
-class ProductCategoryViewSet(viewsets.ModelViewSet):
+class ProductCategoryViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     pagination --> 20 item, only user admin have pagination \n
     filter query --> (category_name, is_active) --> only user admin have filter
     """
     filterset_class = AdminProductCategoryFilter
     pagination_class = TwentyPageNumberPagination
-    list_cache_timeout = config("PRODUCT_CATEGORY_CACHE_TIMEOUT", cast=int, default=1209600)
 
-    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_list_category_cache", cache='api-cache'))
     def list(self, request, *args, **kwargs):
-        qs = super().list(request, *args, **kwargs)
-        return qs
+        cache_key = "product_list_category_cache"
+        page = request.GET.get("page", None)
+        if page:
+            cache_key += page
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
     def get_queryset(self):
         base_query = Category.objects.select_related("category_image")
@@ -251,14 +257,13 @@ class ProductViewSet(viewsets.ModelViewSet):
                 )
 
 
-class ProductBrandViewSet(viewsets.ModelViewSet):
+class ProductBrandViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     pagination --> 20 item for normal user and admin user \n
     filter query --> (category_name, is_active)
     """
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductBrandFilter
-    list_cache_timeout = config("PRODUCT_BRAND_CACHE_TIMEOUT", cast=int, default=1209600)
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -287,10 +292,18 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
                 "brand_name", "brand_image__image"
             )
 
-    @method_decorator(cache_page(list_cache_timeout, key_prefix="list_product_brand_view", cache='api-cache'))
     def list(self, request, *args, **kwargs):
-        qs = super().list(request, *args, **kwargs)
-        return qs
+        cache_key = "list_product_brand_view"
+        page = request.GET.get("page", None)
+        if page:
+            cache_key += page
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class AdminCreateProductImage(generics.CreateAPIView):
@@ -360,10 +373,9 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
          )
 
 
-class AttributeViewSet(viewsets.ModelViewSet):
+class AttributeViewSet(CacheMixin, viewsets.ModelViewSet):
     filterset_class = AttributeFilter
     serializer_class = serializers.AdminAttributeSerializer
-    list_cache_timeout = config("PRODUCT_ATTRIBUTE_CACHE_TIMEOUT", cast=int, default=1209600)
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -376,10 +388,18 @@ class AttributeViewSet(viewsets.ModelViewSet):
         else:
             return Attribute.objects.filter(is_active=True).only("attribute_name")
 
-    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_attribute_cache", cache='api-cache'))
     def list(self, request, *args, **kwargs):
-        qs = super().list(request, *args, **kwargs)
-        return qs
+        cache_key = "product_attribute_cache"
+        page = request.GET.get("page", None)
+        if page:
+            cache_key += page
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
@@ -502,7 +522,6 @@ class TagViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     filterset_class = ProductTagFilter
     pagination_class = TwentyPageNumberPagination
-    list_cache_timeout = config("PRODUCT_TAG_CACHE_TIMEOUT", cast=int, default=1209600)
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
