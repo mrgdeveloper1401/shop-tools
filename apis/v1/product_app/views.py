@@ -12,7 +12,7 @@ from core.utils.custom_filters import (
     ProductHomePageFilter,
     ProductTagFilter
 )
-from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
+from core.utils.pagination import TwentyPageNumberPagination
 from core.utils.permissions import IsOwnerOrReadOnly
 from discount_app.models import ProductDiscount
 from . import serializers
