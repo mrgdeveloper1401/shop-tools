@@ -43,7 +43,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     pagination_class = TwentyPageNumberPagination
     list_cache_timeout = config("PRODUCT_CATEGORY_CACHE_TIMEOUT", cast=int, default=1209600)
 
-    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_list_category_cache"))
+    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_list_category_cache", cache='api-cache'))
     def list(self, request, *args, **kwargs):
         qs = super().list(request, *args, **kwargs)
         return qs
@@ -287,7 +287,7 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
                 "brand_name", "brand_image__image"
             )
 
-    @method_decorator(cache_page(list_cache_timeout, key_prefix="list_product_brand_view"))
+    @method_decorator(cache_page(list_cache_timeout, key_prefix="list_product_brand_view", cache='api-cache'))
     def list(self, request, *args, **kwargs):
         qs = super().list(request, *args, **kwargs)
         return qs
@@ -376,7 +376,7 @@ class AttributeViewSet(viewsets.ModelViewSet):
         else:
             return Attribute.objects.filter(is_active=True).only("attribute_name")
 
-    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_attribute_cache"))
+    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_attribute_cache", cache='api-cache'))
     def list(self, request, *args, **kwargs):
         qs = super().list(request, *args, **kwargs)
         return qs
