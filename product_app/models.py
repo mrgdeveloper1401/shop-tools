@@ -40,7 +40,7 @@ class Tag(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 
 class Attribute(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    attribute_name = models.CharField(max_length=255, db_index=True)
+    attribute_name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -55,7 +55,7 @@ class AttributeValue(CreateMixin, UpdateMixin, SoftDeleteMixin):
         related_name="attribute_values",
         limit_choices_to={"is_active": True}
     )
-    attribute_value = models.CharField(max_length=255, db_index=True)
+    attribute_value = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
 
     class Meta:

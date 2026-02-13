@@ -407,21 +407,6 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
         return data
 
 
-class AdminAttributeValueSerializer(serializers.ModelSerializer):
-    attribute = serializers.PrimaryKeyRelatedField(
-        queryset=Attribute.objects.only('id'),
-    )
-
-    class Meta:
-        model = AttributeValue
-        exclude = (
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at",
-        )
-
-
 class AdminProducttAttributeSerializer(serializers.ModelSerializer):
     variant = serializers.PrimaryKeyRelatedField(
         queryset=ProductVariant.objects.only("id")

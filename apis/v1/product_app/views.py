@@ -1,7 +1,9 @@
+from decouple import config
 from django.db.models import Prefetch, OuterRef, Subquery
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, generics, filters, mixins, response
-# from django.core.cache import cache
 
 from account_app.models import Profile
 from core.utils.custom_filters import (
@@ -39,6 +41,12 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
     filterset_class = AdminProductCategoryFilter
     pagination_class = TwentyPageNumberPagination
+    list_cache_timeout = config("PRODUCT_CATEGORY_CACHE_TIMEOUT", cast=int, default=1209600)
+
+    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_list_category_cache"))
+    def list(self, request, *args, **kwargs):
+        qs = super().list(request, *args, **kwargs)
+        return qs
 
     def get_queryset(self):
         base_query = Category.objects.select_related("category_image")
@@ -250,6 +258,7 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
     """
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductBrandFilter
+    list_cache_timeout = config("PRODUCT_BRAND_CACHE_TIMEOUT", cast=int, default=1209600)
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -277,6 +286,11 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
             ).only(
                 "brand_name", "brand_image__image"
             )
+
+    @method_decorator(cache_page(list_cache_timeout, key_prefix="list_product_brand_view"))
+    def list(self, request, *args, **kwargs):
+        qs = super().list(request, *args, **kwargs)
+        return qs
 
 
 class AdminCreateProductImage(generics.CreateAPIView):
@@ -348,40 +362,8 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
 
 class AttributeViewSet(viewsets.ModelViewSet):
     filterset_class = AttributeFilter
-
-    def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
-            self.permission_classes = (permissions.IsAdminUser,)
-        return super().get_permissions()
-
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            return serializers.AdminAttributeSerializer
-        pass
-
-    def get_queryset(self):
-        base_query = Attribute.objects.defer(
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at"
-        )#.prefetch_related(
-        #     Prefetch(
-        #         "attribute_values", queryset=ProductAttributeValue.objects.only(
-        #             "attribute_value",
-        #         )
-        #     )
-        # )
-
-        # filter staff user
-        if self.request.user.is_staff:
-            return base_query
-
-
-class AttributeValueViewSet(viewsets.ModelViewSet):
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            return serializers.AdminAttributeValueSerializer
+    serializer_class = serializers.AdminAttributeSerializer
+    list_cache_timeout = config("PRODUCT_ATTRIBUTE_CACHE_TIMEOUT", cast=int, default=1209600)
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -389,15 +371,15 @@ class AttributeValueViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        base_query = AttributeValue.objects.defer(
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at"
-        )
-        # filter staff user
         if self.request.user.is_staff:
-            return base_query
+            return Attribute.objects.defer("is_deleted", "deleted_at", "created_at", "updated_at")
+        else:
+            return Attribute.objects.filter(is_active=True).only("attribute_name")
+
+    @method_decorator(cache_page(list_cache_timeout, key_prefix="product_attribute_cache"))
+    def list(self, request, *args, **kwargs):
+        qs = super().list(request, *args, **kwargs)
+        return qs
 
 
 class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
@@ -512,14 +494,15 @@ class ProductListHomePageView(generics.ListAPIView):
         return queryset
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     filter query --> tag_name and is_active \n
     pagination --> 20 item \n
     permissions --> method post and put and patch and deleted only user admin
     """
     filterset_class = ProductTagFilter
-    pagination_class = FlexiblePagination
+    pagination_class = TwentyPageNumberPagination
+    list_cache_timeout = config("PRODUCT_TAG_CACHE_TIMEOUT", cast=int, default=1209600)
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
@@ -542,6 +525,19 @@ class TagViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "product_tags_cache_view"
+        page = request.GET.get("page",None)
+        if page:
+            cache_key += page
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class ProductCommentViewSet(viewsets.ModelViewSet):
@@ -603,12 +599,12 @@ class CategoryNameView(CacheMixin, generics.ListAPIView):
             return qs
 
 
-class AdminTagNameView(CacheMixin, generics.ListAPIView):
+class ListTagNameView(CacheMixin, generics.ListAPIView):
     queryset = Tag.objects.filter(is_active=True).only("tag_name")
     serializer_class = serializers.AdminTagNameSerializer
 
     def list(self, request, *args, **kwargs):
-        cache_key = "list_admin_tag_name"
+        cache_key = "list_index_tag_name"
         get_cache = self.get_cache(cache_key)
         if get_cache:
             return response.Response(get_cache)

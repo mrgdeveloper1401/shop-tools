@@ -142,7 +142,12 @@ class ProductImagesAdmin(admin.ModelAdmin):
 
 @admin.register(ProductBrand)
 class ProductAdminAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "brand_name", "brand_image_id", "is_active")
+    list_per_page = 20
+    list_editable = ("is_active",)
+    list_filter = ("is_active",)
+    list_display_links = ("id", "brand_name")
+    raw_id_fields = ("brand_image",)
 
 
 @admin.register(Tag)

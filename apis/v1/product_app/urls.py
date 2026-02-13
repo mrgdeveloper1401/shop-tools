@@ -11,9 +11,8 @@ router = routers.SimpleRouter()
 router.register("product_category", views.ProductCategoryViewSet, basename="product_category")
 router.register("product_brand", views.ProductBrandViewSet, basename="product_brand")
 router.register("attribute", views.AttributeViewSet, basename="attribute")
-router.register("attribute_value", views.AttributeValueViewSet, basename="attribute_value")
 router.register("product_tag", views.TagViewSet, basename="product_tag")
-router.register("seo_product", views.SeoProductViewSet, basename="seo_product")
+router.register("seo_product", views.SeoProductViewSet, basename="seo_product") # add cache here
 
 category_router = routers.NestedSimpleRouter(router, "product_category", lookup="category")
 category_router.register("products", views.ProductViewSet, basename="products")
@@ -48,7 +47,7 @@ urlpatterns = [
     #     views.AdminCreateVariantAttributeView.as_view(),
     #     name='admin_create_variant_attribute'
     # )
-    path("list_index_tag_name/", views.AdminTagNameView.as_view(), name="admin_tag_name"),
+    path("list_index_tag_name/", views.ListTagNameView.as_view(), name="admin_tag_name"),
     path("list_index_category_name/", views.CategoryNameView.as_view(), name="list_index_category_name"),
     path("list_index_brand_name/", views.BrandNameView.as_view(), name="list_index_brand_name"),
 ] + router.urls
