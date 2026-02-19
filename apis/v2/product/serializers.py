@@ -23,6 +23,19 @@ class ProductImageSerializer(serializers.ModelSerializer):
             "updated_at"
         )
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return {
+            "image": {
+                "get_image_url": data.get("get_image_url"),
+                "image_id_ba_salam": data.get("get_image_id_ba_salam"),
+            },
+            "order": data.get("order"),
+            "alt_text_image": data.get("alt_text_image"),
+            "updated_at": data.get("updated_at"),
+        }
+
+
 class NestedProductImageSerializer(serializers.ModelSerializer):
     image = ProductImageSerializer(many=True, source="product_product_image")
 
@@ -89,5 +102,5 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['product_product_image'] = [data['product_product_image']]
+        data['product_product_image'] = data['product_product_image']['image']
         return data
