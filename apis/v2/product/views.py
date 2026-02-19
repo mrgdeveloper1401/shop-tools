@@ -72,4 +72,4 @@ class ProductListHomePageView(generics.ListAPIView):
                 queryset=latest_discount_subquery,
                 to_attr="discounts",
             )
-        ).only(*product_variant_fields)
+        ).only(*product_variant_fields).order_by("-id")
