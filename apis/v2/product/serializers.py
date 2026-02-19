@@ -16,10 +16,11 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImages
         fields = (
-            "alt_text_image",
-            "order",
             "get_image_url",
-            'image_id_ba_salam'
+            'image_id_ba_salam',
+            "order",
+            "alt_text_image",
+            "updated_at"
         )
 
 class NestedProductImageSerializer(serializers.ModelSerializer):
@@ -88,5 +89,5 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['product_product_image'] = data['product_product_image']
+        data['product_product_image'] = [data['product_product_image']]
         return data

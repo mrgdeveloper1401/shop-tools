@@ -23,7 +23,8 @@ class ProductListHomePageView(generics.ListAPIView):
             "order",
             "alt_text_image",
             "product_id",
-            "image__image_id_ba_salam"
+            "image__image_id_ba_salam",
+            "updated_at"
         )
         product_discount_field = (
             "id",
