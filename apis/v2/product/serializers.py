@@ -70,7 +70,6 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
         if hasattr(obj, "discounts") and obj.discounts:
             discount = obj.discounts[-1]
             return {
-                "id": discount.id,
                 "amount": discount.amount,
                 "discount_type": discount.discount_type,
             }
