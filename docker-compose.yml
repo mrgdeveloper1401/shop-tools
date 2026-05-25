@@ -20,8 +20,6 @@ services:
       --appendonly no
       --maxmemory 512mb
       --maxmemory-policy allkeys-lru
-    ports:
-      - "6379:6379"
     expose:
       - 6379
 
@@ -45,12 +43,14 @@ services:
     volumes:
       - static_files:/vol/
       - /etc/letsencrypt:/etc/letsencrypt:ro
-    command: ["nginx", "-g", "daemon off;"]
+    entrypoint: ["nginx", "-g", "daemon off;"]
     build:
       context: "dockerfile/prod/nginx/"
     ports:
       - "80:80"
       - "443:443"
+    depends_on:
+      - app
 
   celery:
     container_name: gs_celery
