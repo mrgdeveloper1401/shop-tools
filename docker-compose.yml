@@ -7,7 +7,6 @@ services:
     expose:
       - 5432
     restart: always
-    env_file: "env_folder/db.env"
     environment:
      POSTGRES_PASSWORD: ${COMPOSE_POSTGRES_PASSWORD}
     healthcheck:
