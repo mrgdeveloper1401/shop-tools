@@ -9,7 +9,13 @@ services:
     restart: always
     env_file: "env_folder/db.env"
     environment:
-     - POSTGRES_PASSWORD=${COMPOSE_POSTGRES_PASSWORD}
+     POSTGRES_PASSWORD: ${COMPOSE_POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
 
   redis:
     container_name: gs_redis
@@ -17,11 +23,20 @@ services:
     restart: always
     command: >
       redis-server
+      --loglevel warning
       --appendonly no
-      --maxmemory 512mb
+      --save ""
+      --maxmemory 1024mb
       --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
     expose:
       - 6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
 
   app:
     container_name: django
@@ -43,6 +58,7 @@ services:
     volumes:
       - static_files:/vol/
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/ssl:/etc/ssl:ro
     entrypoint: ["nginx", "-g", "daemon off;"]
     build:
       context: "dockerfile/prod/nginx/"
