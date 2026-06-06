@@ -68,12 +68,12 @@ MIDDLEWARE = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "gs_tools_2026_01_12db",
+        "NAME": "gs_tools",
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",
-        "PORT": 5434,
-        "CONN_MAX_AGE": 100
+        "PORT": 5433,
+        "CONN_MAX_AGE": 60
     }
 }
 
@@ -323,3 +323,13 @@ INTERNAL_IPS = [
 ]
 
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+AWS_S3_REGION_NAME = 'eu-west-1'
+AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
+AWS_ACCESS_KEY_ID = config('ARVAN_AWS_ACCESS_KEY_ID', cast=str)
+AWS_SECRET_ACCESS_KEY = config('ARVAN_AWS_SECRET_ACCESS_KEY', cast=str)
+AWS_STORAGE_BUCKET_NAME = config('ARVAN_AWS_STORAGE_BUCKET_NAME', cast=str)
+AWS_S3_ENDPOINT_URL = config('ARVAN_AWS_S3_ENDPOINT_URL', cast=str)
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_MAX_MEMORY_SIZE = 1024 * 1024 * 2

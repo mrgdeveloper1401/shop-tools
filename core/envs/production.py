@@ -315,8 +315,8 @@ USE_X_FORWARDED_HOST = config("USE_X_FORWARDED_HOST", cast=bool, default=True)
 USE_X_FORWARDED_PORT = config("USE_X_FORWARDED_PORT", cast=bool, default=True)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", config("HTTP_X_FORWARDED_PROTO", cast=str, default='https'))
 CSRF_COOKIE_AGE = config("CSRF_COOKIE_AGE", cast=int, default=3600)
-SESSION_COOKIE_DOMAIN = config("SESSION_COOKIE_DOMAIN", cast=str, default='gs-tools.ir')
-CSRF_COOKIE_DOMAIN = config("CSRF_COOKIE_DOMAIN", cast=str, default='gs-tools.ir')
+SESSION_COOKIE_DOMAIN = config("SESSION_COOKIE_DOMAIN", cast=str, default='api.gs-tools.ir')
+CSRF_COOKIE_DOMAIN = config("CSRF_COOKIE_DOMAIN", cast=str, default='api.gs-tools.ir')
 
 AWS_S3_REGION_NAME = 'eu-west-1'
 AWS_DEFAULT_ACL = 'public-read'
