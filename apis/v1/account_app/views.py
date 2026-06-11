@@ -1,3 +1,5 @@
+from rest_framework.generics import get_object_or_404
+
 from account_app.tasks import send_otp_code_by_celery, send_otp_forget_password
 from django.contrib.auth import authenticate
 from django.db.models import Prefetch
@@ -411,7 +413,7 @@ class RequestForgetPasswordView(views.APIView):
 
         # get user
         phone = serializer.validated_data['mobile_phone']
-        user = await aget_object_or_404(User.objects.only("mobile_phone"), mobile_phone=phone, is_active=True)
+        user = get_object_or_404(User.objects.only("mobile_phone"), mobile_phone=phone, is_active=True)
 
         # get user ip
         user_ip = get_client_ip(request)
@@ -463,7 +465,7 @@ class ForgetPasswordConfirmView(views.APIView):
 
         # check user
         fields = ("mobile_phone", "password")
-        user = await aget_object_or_404(User.objects.only(*fields), mobile_phone=user_phone, is_active=True)
+        user = get_object_or_404(User.objects.only(*fields), mobile_phone=user_phone, is_active=True)
 
         # check password
         user.check_password(password)

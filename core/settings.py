@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv(), default='*')
 
 SECRET_KEY = config("SECRET_KEY", cast=str, default="salam_donya")
 
@@ -62,9 +62,8 @@ DATABASES = {
         # "CONN_MAX_AGE": config("CON_MAX_AGE", cast=int, default=60),
         'OPTIONS': {
             'pool': {
-                'min_size': config("POOL_MIN_SIZE", cast=int, default=2),       # Minimum number of connections in the pool
-                'max_size': config("POOL_MAX_SIZE", cast=int, default=50),       # Maximum number of connections in the pool
-                # 'increment': os.cpu_count() * 5 * 3,  # Number of new connections to create when needed
+                'min_size': config("POOL_MIN_SIZE", cast=int, default=4),       # Minimum number of connections in the pool
+                'max_size': config("POOL_MAX_SIZE", cast=int, default=os.cpu_count() * 2 * 5),       # Maximum number of connections in the pool
                 'timeout': config("POOL_TIMEOUT", cast=int, default=30),  # Connection lifetime in seconds (optional)
             }
         }
@@ -204,7 +203,7 @@ SIMPLE_JWT = {
 CACHES = {
     "default": {
          "BACKEND": "django_redis.cache.RedisCache",
-         "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/1", cast=str),
+         "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/4", cast=str),
          "TIMEOUT": config("REDIS_SECOND_TIMEOUT", default=86400, cast=int),
          "OPTIONS": {
              "CLIENT_CLASS": "django_redis.client.DefaultClient",
