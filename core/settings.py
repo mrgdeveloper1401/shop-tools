@@ -343,3 +343,6 @@ if USE_DEBUG_TOOLBAR and DEBUG:
     INSTALLED_APPS.append('debug_toolbar')
     MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware",)
     INTERNAL_IPS = ["127.0.0.1"]
+
+# django silk
+USE_DJANGO_SILK = config("USE_DJANGO_SILK", cast=bool, default=False)
