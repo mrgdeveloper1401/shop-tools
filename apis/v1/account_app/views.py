@@ -14,6 +14,7 @@ from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddre
     PrivateNotificationFilter, TicketFilter
 from core.utils.permissions import NotAuthenticated
 from . import serializers
+from ..utils.cache_mixin import CacheMixin
 
 
 class GetIpClient(views.APIView):
@@ -146,7 +147,6 @@ class UserInformationViewSet(viewsets.ModelViewSet):
             "is_active",
             "is_staff"
         )
-
         if not self.request.user.is_staff:
             query = query.filter(id=self.request.user.id)
         return query
@@ -258,7 +258,8 @@ class UserAddressViewSet(CacheMixin, viewsets.ModelViewSet):
             "postal_code",
             "latitude",
             "longitude",
-            "longitude"
+            "longitude",
+            "is_active",
         )
         if not self.request.user.is_staff:
             query = query.filter(user_id=self.request.user.id)
@@ -280,7 +281,12 @@ class AdminUserListview(generics.ListAPIView):
         return User.objects.filter(is_active=True).only("mobile_phone")
 
 
-class StateViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+class StateViewSet(
+    CacheMixin,
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin
+):
     serializer_class = serializers.StateSerializer
     # permission_classes = (permissions.IsAuthenticated,)
 
@@ -300,18 +306,21 @@ class StateViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin, m
             return response.Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        state_id = kwargs['pk']
-        retrieve_cache = self.get_cache(key="retrieve_state_api_cache_{}".format(state_id))
+        retrieve_cache = self.get_cache(key="retrieve_state_api_cache")
         if retrieve_cache:
             return response.Response(retrieve_cache)
         else:
             obj = self.get_object()
             serializer = self.get_serializer(obj)
-            self.set_cache("retrieve_state_api_cache_{}".format(state_id), serializer.data)
+            self.set_cache("retrieve_state_api_cache", serializer.data)
             return response.Response(serializer.data)
 
 
-class CityViewSet(CacheMixin,viewsets.GenericViewSet,mixins.ListModelMixin):
+class CityViewSet(
+    CacheMixin,
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+):
     serializer_class = serializers.CitySerializer
     # permission_classes = (permissions.IsAuthenticated,)
 
@@ -326,27 +335,25 @@ class CityViewSet(CacheMixin,viewsets.GenericViewSet,mixins.ListModelMixin):
         )
 
     def list(self, request, *args, **kwargs):
-        state_pk = kwargs['state_pk']
-        state_list_cache = self.get_cache(key="city_list_api_cache_{}".format(state_pk))
+        state_list_cache = self.get_cache(key="city_list_api_cache")
         if state_list_cache:
             return response.Response(state_list_cache)
         else:
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset, many=True)
-            self.set_cache("city_list_api_cache_{}".format(state_pk), serializer.data)
+            self.set_cache("city_list_api_cache", serializer.data)
             return response.Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        state_pk = kwargs['state_pk']
-        city_id = kwargs['pk']
-        retrieve_cache = self.get_cache(key="city_retrieve_api_cache_{}_{}".format(state_pk, city_id))
+        retrieve_cache = self.get_cache(key="retrieve_city_api_cache")
         if retrieve_cache:
             return response.Response(retrieve_cache)
         else:
             obj = self.get_object()
             serializer = self.get_serializer(obj)
-            self.set_cache("city_retrieve_api_cache_{}_{}".format(state_pk, city_id), serializer.data)
+            self.set_cache("retrieve_city_api_cache", serializer.data)
             return response.Response(serializer.data)
+
 
 
 class LoginByPhonePasswordView(views.APIView):
@@ -404,17 +411,7 @@ class RequestForgetPasswordView(views.APIView):
 
         # get user
         phone = serializer.validated_data['mobile_phone']
-        user =  User.objects.filter(mobile_phone=phone, is_active=True).only("id")
-        
-        # check user when dose not exists
-        if not user:
-            # return response
-            return response.Response(
-                data={
-                    "message": "OTP sent successfully",
-                },
-                status=status.HTTP_201_CREATED,
-            )
+        user = await aget_object_or_404(User.objects.only("mobile_phone"), mobile_phone=phone, is_active=True)
 
         # get user ip
         user_ip = get_client_ip(request)
@@ -465,7 +462,8 @@ class ForgetPasswordConfirmView(views.APIView):
             raise exceptions.NotFound()
 
         # check user
-        user =  generics.get_object_or_404(User.objects.only("id"), mobile_phone=user_phone, is_active=True)
+        fields = ("mobile_phone", "password")
+        user = await aget_object_or_404(User.objects.only(*fields), mobile_phone=user_phone, is_active=True)
 
         # check password
         user.check_password(password)
