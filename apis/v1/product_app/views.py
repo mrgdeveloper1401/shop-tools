@@ -152,7 +152,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_variant__product_id",
                     "product_variant__stock_number",
                     "product_variant__name",
-                    "product_variant__price",
                 ).valid_discount()
             )
         )
@@ -173,9 +172,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_name",
                 "description_slug",
                 "sku",
-                "base_price",
                 "updated_at",
-                "in_person_purchase"
             ).prefetch_related(
                     Prefetch(
                 "product_product_image", queryset=ProductImages.objects.select_related("image").only(
@@ -220,11 +217,9 @@ class ProductViewSet(viewsets.ModelViewSet):
                 return query.only(
                     "updated_at",
                     "product_name",
-                    "base_price",
                     "description_slug",
                     "product_slug",
                     "category_id",
-                    "in_person_purchase"
                 )
             else:
                 return query.prefetch_related(
@@ -252,7 +247,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "description_slug",
                     "sku",
                     "updated_at",
-                    "in_person_purchase"
                 )
 
 
@@ -368,7 +362,6 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
              "old_price",
              "short_desc",
              "subtitle",
-            #  "in_person_purchase"
          )
 
 
@@ -435,11 +428,10 @@ class ProductListHomePageView(generics.ListAPIView):
         "description_slug",
         "created_at",
         "updated_at",
-        "base_price",
+        "price",
         "sku",
         "product_brand__brand_name",
         "total_sale",
-        "in_person_purchase"
     ).select_related(
         "product_brand"
     ).prefetch_related(
