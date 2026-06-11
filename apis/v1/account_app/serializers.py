@@ -1,7 +1,6 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 from rest_framework.generics import get_object_or_404
-from adrf.serializers import Serializer, ModelSerializer
 from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, Ticket
 from account_app.validators import MobileRegexValidator
 from apis.v1.account_app.exceptions import EmailAlreadyExistsError, UsernameAlreadyExistsError
@@ -10,7 +9,7 @@ from core.utils.validators import PhoneNumberValidator
 from core_app.models import Image
 
 
-class AsyncRequestPhoneSerializer(Serializer):
+class AsyncRequestPhoneSerializer(serializers.Serializer):
     mobile_phone = serializers.CharField(
         validators=(MobileRegexValidator(),)
     )

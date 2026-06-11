@@ -5,13 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "adrf>=0.1.11",
     "boto3>=1.40.63",
     "celery[redis]>=5.5.3",
-    "channels>=4.3.1",
-    "colorlog>=6.10.1",
     "django<6.0",
-    "django-async-orm>=0.1.12",
     "django-celery-beat>=2.8.1",
     "django-ckeditor-5>=0.2.18",
     "django-cors-headers>=4.9.0",
@@ -29,9 +25,8 @@ dependencies = [
     "drf-nested-routers>=0.95.0",
     "drf-spectacular>=0.28.0",
     "drf-spectacular-sidecar>=2025.10.1",
-    "eventlet>=0.40.4",
     "flower>=2.0.1",
-    "gunicorn>=23.0.0",
+    "gunicorn>=25.0.0",
     "httpx>=0.28.1",
     "ipython>=9.6.0",
     "locust>=2.42.1",
@@ -41,13 +36,9 @@ dependencies = [
     "pandas>=2.3.3",
     "pillow>=12.0.0",
     "psycopg[c,pool]>=3.3.2",
-    "pytest-asyncio>=1.2.0",
     "pytest-django>=4.11.1",
     "python-decouple>=3.8",
     "python-dotenv>=1.2.1",
-    "uvicorn-worker>=0.4.0",
-    "uvicorn[standard]>=0.38.0",
-    "whitenoise>=6.11.0",
 ]
 
 [dependency-groups]
@@ -57,4 +48,4 @@ dev = [
 ]
 
 [tool.ruff]
-line-length = 88
+line-length = 108
