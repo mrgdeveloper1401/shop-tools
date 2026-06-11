@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     "daterangefilter",
     "rest_framework_simplejwt.token_blacklist",
     "django_celery_beat",
-    "corsheaders",
     "import_export",
 
     # third party app
@@ -208,14 +207,14 @@ CACHES = {
          "OPTIONS": {
              "CLIENT_CLASS": "django_redis.client.DefaultClient",
              "SOCKET_CONNECT_TIMEOUT": config("SOCKET_SECOND_CONNECT_TIMEOUT", default=5, cast=int),
-             "SOCKET_TIMEOUT": config("SOCKET_SECOND_TIMEOUT", default=5, cast=int),
+             "SOCKET_TIMEOUT": config("SOCKET_SECOND_TIMEOUT", default=10, cast=int),
              "SERIALIZER": config("CACHE_SECOND_SERIALIZER", default="django_redis.serializers.msgpack.MSGPackSerializer"),
              # "COMPRESSOR": config("REDIS_SECOND_COMPRESSOR", default="django_redis.compressors.zlib.ZlibCompressor"),
              # "COMPRESSOR_KWARGS": {
              #     "level": config("COMPRESSOR_SECOND_LEVEL_ARGS", default=6, cast=int)
              # },
              "CONNECTION_POOL_KWARGS": {
-                 "max_connections": config("REDIS_SECOND_POOL_MAX_CONNECTION", default=50, cast=int),
+                 "max_connections": config("REDIS_SECOND_POOL_MAX_CONNECTION", default=os.cpu_count() * 2 * 5, cast=int),
                  "retry_on_timeout": config("REDIS_SECOND_POOL_RETRY_TIMEOUT", default=True, cast=bool),
                  "health_check_interval": config("REDIS_SECOND_HEALTH_CHECK_INTERVAL", default=True, cast=bool),
                  "socket_keepalive": config("REDIS_SECOND_SOCKET_KEEPALIVE", default=True, cast=bool),
@@ -250,6 +249,7 @@ USE_CORS = config("USE_CORS", cast=bool, default=False)
 if USE_CORS:
     MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
     CORS_ALLOWED_ORIGINS = config("PRODUCTION_CORS_ALLOWED_ORIGINS", cast=Csv())
+    INSTALLED_APPS.append("corsheaders")
 
 USE_SSL = config("USE_SSL", cast=bool, default=False)
 if USE_SSL:
