@@ -15,8 +15,8 @@ class AdminUserInformationFilter(FilterSet):
     class Meta:
         model = User
         fields = {
-            "mobile_phone": ["contains",],
-            "is_active": ['exact',],
+            "mobile_phone": ("contains",),
+            "is_active": ('exact',),
         }
 
     def filter_queryset(self, queryset):
@@ -148,7 +148,7 @@ class ProductFilter(FilterSet):
         model = Product
         fields = {
             "product_name": ['contains'],
-            "sku": ['contains'],
+            # "sku": ['contains'],
             "is_active": ['exact'],
         }
 
