@@ -170,6 +170,7 @@ class TrobSerializer(serializers.ModelSerializer):
     page_url = serializers.SerializerMethodField()
     page_unique = serializers.CharField(source="id")
     spec = serializers.SerializerMethodField()
+    old_price = serializers.CharField(source="price")
 
     class Meta:
         model = ProductVariant

@@ -71,7 +71,6 @@ DATABASES = {
 }
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -183,8 +182,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ALGORITHM": "HS256",
     "VERIFYING_KEY": "",
-    "SIGNING_KEY": config("JWT_SIGNING_KEY", cast=str),
-    "AUDIENCE": None,
+    "AUDIENCE": config("AUDIENCE", cast=str, default=None),
     "ISSUER": None,
     "JSON_ENCODER": None,
     "JWK_URL": None,
@@ -196,14 +194,16 @@ SIMPLE_JWT = {
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "JTI_CLAIM": "jti",
 }
+if DEBUG:
+    SIMPLE_JWT['SIGNING_KEY'] = "salam_donna"
+else:
+    SIMPLE_JWT['SIGNING_KEY'] = config("JWT_SIGNING_KEY", cast=str, default=SECRET_KEY)
 
 # config cache
-# cache config
-
 CACHES = {
     "default": {
          "BACKEND": "django_redis.cache.RedisCache",
-         "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/4", cast=str),
+         "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/5", cast=str),
          "TIMEOUT": config("REDIS_SECOND_TIMEOUT", default=86400, cast=int),
          "OPTIONS": {
              "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -229,7 +229,7 @@ DJANGO_REDIS_IGNORE_EXCEPTIONS = config("DJANGO_REDIS_IGNORE_EXCEPTIONS", defaul
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = config("DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS", default=True, cast=bool)
 
 # config celery
-CELERY_BROKER_URL = config("PRODUCTION_CELERY_BROKER_URL", cast=str, default='redis://localhost:6381/2')
+CELERY_BROKER_URL = config("PRODUCTION_CELERY_BROKER_URL", cast=str, default='redis://localhost:6381/4')
 CELERY_RESULT_BACKEND = config("PRODUCTION_CELERY_RESULT_BACKEND", cast=str, default='redis://localhost:6381/3')
 CELERY_ACCEPT_CONTENT = config("CELERY_ACCEPT_CONTENT", default="json", cast=Csv())
 CELERY_TASK_SERIALIZER = config("CELERY_TASK_SERIALIZER", cast=str, default='json')
@@ -246,7 +246,10 @@ CELERY_WORKER_MAX_MEMORY_PER_CHILD = config("WORKER_MAX_MEMORY_PER_CHILD", cast=
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # cors origin
-CORS_ALLOWED_ORIGINS = config("PRODUCTION_CORS_ALLOWED_ORIGINS", cast=Csv())
+USE_CORS = config("USE_CORS", cast=bool, default=False)
+if USE_CORS:
+    MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
+    CORS_ALLOWED_ORIGINS = config("PRODUCTION_CORS_ALLOWED_ORIGINS", cast=Csv())
 
 USE_SSL = config("USE_SSL", cast=bool, default=False)
 if USE_SSL:
@@ -311,9 +314,6 @@ LOGGING = {
     }
 }
 
-# FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 2
-# DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 2
-
 # config storage
 STORAGES = {
     'default':
@@ -342,8 +342,4 @@ USE_DEBUG_TOOLBAR = config("USE_DEBUG_TOOLBAR", cast=bool, default=True)
 if USE_DEBUG_TOOLBAR and DEBUG:
     INSTALLED_APPS.append('debug_toolbar')
     MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware",)
-    INTERNAL_IPS = [
-        # ...
-        "127.0.0.1",
-        # ...
-    ]
+    INTERNAL_IPS = ["127.0.0.1"]

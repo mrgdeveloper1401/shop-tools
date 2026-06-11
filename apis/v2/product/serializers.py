@@ -60,10 +60,9 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
     product_slug = serializers.CharField(source="product.product_slug")
     description_slug = serializers.CharField(source="product.description_slug")
     brand_id = serializers.IntegerField(source="product.product_brand_id", allow_null=True)
-    base_price = serializers.IntegerField(source="product.base_price", allow_null=True)
-    sku = serializers.CharField(source="product.sku")
+    base_price = serializers.IntegerField(source="price", allow_null=True)
     product_brand_name = serializers.CharField(source="product.product_brand.brand_name")
-    in_person_purchase = serializers.BooleanField(source="product.in_person_purchase")
+    in_person_purchase = serializers.BooleanField()
     stock = serializers.IntegerField(source="stock_number")
 
     def get_product_variant_discounts(self, obj):

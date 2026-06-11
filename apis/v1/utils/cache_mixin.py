@@ -3,7 +3,7 @@ from django.utils.functional import cached_property
 
 
 class CacheMixin:
-    cache_alis = "api-cache"
+    cache_alis = "default"
 
     @cached_property
     def cache(self):
