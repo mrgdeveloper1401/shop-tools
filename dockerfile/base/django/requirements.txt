@@ -100,8 +100,8 @@ typing_extensions==4.15.0
 tzdata==2025.2
 uritemplate==4.2.0
 urllib3==2.5.0
-uvicorn==0.37.0
-uvicorn-worker==0.4.0
+# uvicorn==0.37.0
+# uvicorn-worker==0.4.0
 vine==5.1.0
 wcwidth==0.2.14
 whitenoise==6.11.0
@@ -109,14 +109,14 @@ zope.interface==8.0.1
 django-json-widget==2.0.3
 flower==2.0.1
 django-daterangefilter==1.0.1
-psycopg[c,pool]
+psycopg[binary,pool]
 django-celery-beat
 python-dotenv
 adrf==0.1.10
 pytest-asyncio==1.2.0
 locust==2.42.1
 django-async-orm==0.1.12
-uvicorn_worker==0.4.0
+# uvicorn_worker==0.4.0
 django-import-export==4.3.14
 eventlet==0.40.4
 msgpack==1.1.2

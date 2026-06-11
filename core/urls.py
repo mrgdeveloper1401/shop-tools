@@ -1,31 +1,12 @@
-"""
-URL configuration for core project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenVerifyView
 from rest_framework_simplejwt.views import TokenBlacklistView
 from decouple import config
-# from test_code import log_request
 
-test_request_url = [
-    # path("test_request/", log_request, name='log_request')
-]
 
+# v1
 v1_api_urls = [
     path("v1/auth/", include("apis.v1.account_app.urls", namespace="v1_auth")),
     path("v1/core/", include("apis.v1.core_app.urls", namespace="v1_core")),
@@ -36,7 +17,12 @@ v1_api_urls = [
     path("v1/third_party_app/", include("apis.v1.third_party_app.urls", namespace="v1_third_party_app")),
 ]
 
+# v2
+v2_api_urls = [
+    path("v2/product/", include("apis.v2.product.urls", namespace="v2_product")),
+]
 
+# swagger
 swagger = [
     # YOUR PATTERNS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -45,6 +31,7 @@ swagger = [
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
 
+# jwt
 jwt = [
     path('v1/api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
     path('v1/api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
@@ -53,7 +40,7 @@ jwt = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
-] + v1_api_urls + swagger + jwt + test_request_url
+] + v1_api_urls + swagger + jwt + v2_api_urls
 
 DEBUG = config("DEBUG", cast=bool)
 

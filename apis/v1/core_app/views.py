@@ -1,13 +1,14 @@
 from django.db.models import Prefetch
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, response
 
 from core.utils.custom_filters import AdminImageFilter
 from core.utils.pagination import TwentyPageNumberPagination
 from . import serializers
 from core_app.models import PublicNotification, Image, MainSite, Carousel, SitemapEntry
+from ..utils.cache_mixin import CacheMixin
 
 
-class PublicNotificationViewSet(viewsets.ModelViewSet):
+class PublicNotificationViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.PublicNotificationSerializer
     queryset = PublicNotification.objects.filter(is_active=True).only(
         "title",
@@ -16,11 +17,19 @@ class PublicNotificationViewSet(viewsets.ModelViewSet):
     )
 
     def get_permissions(self):
-        if self.action in ("list", "retrieve"):
-            self.permission_classes = (permissions.IsAuthenticated,)
-        else:
+        if self.action in ("create", "partial_update", "update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        public_notify_cache = self.get_cache("public_notification")
+
+        if public_notify_cache:
+            return response.Response(public_notify_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("public_notification", data.data)
+            return data
 
 
 class AdminImageViewSet(viewsets.ModelViewSet):
@@ -37,8 +46,17 @@ class AdminImageViewSet(viewsets.ModelViewSet):
     )
 
 
-class MainSiteViewSet(viewsets.ModelViewSet):
+class MainSiteViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.MainSiteSerializer
+
+    def list(self, request, *args, **kwargs):
+        main_site_cache = self.get_cache("main_site")
+        if main_site_cache:
+            return response.Response(main_site_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("main_site", data.data)
+            return data
 
     def get_permissions(self):
         if self.action in ("create", "partial_update", "update", "destroy"):
@@ -67,7 +85,7 @@ class MainSiteViewSet(viewsets.ModelViewSet):
             )
 
 
-class CarouselViewSet(viewsets.ModelViewSet):
+class CarouselViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.CarouselSerializer
     queryset = Carousel.objects.select_related("image").only(
         "name",
@@ -79,9 +97,18 @@ class CarouselViewSet(viewsets.ModelViewSet):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
 
+    def list(self, request, *args, **kwargs):
+        carousel_cache = self.get_cache("carousel")
+
+        if carousel_cache:
+            return response.Response(carousel_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("carousel", data.data)
+            return data
 
 
-class SiteMapViewSet(viewsets.ModelViewSet):
+class SiteMapViewSet(CacheMixin, viewsets.ModelViewSet):
     serializer_class = serializers.SiteMapSerializer
     queryset = SitemapEntry.objects.defer("is_deleted", "deleted_at")
 
@@ -89,3 +116,13 @@ class SiteMapViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "partial_update", "update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        sitemap_cache = self.get_cache("sitemap")
+
+        if sitemap_cache:
+            return response.Response(sitemap_cache)
+        else:
+            data = super().list(request, *args, **kwargs)
+            self.set_cache("sitemap", data.data)
+            return data

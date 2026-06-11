@@ -30,28 +30,28 @@ ticket_room_router.register("ticket", views.TicketViewSet, basename="ticket")
 urlpatterns = [
     path("get_ip_client/", views.GetIpClient.as_view(), name='get_ip_client'),
     path("create_user/", views.UserCreateView.as_view(), name='create_user'),
-    path("request-otp/", views.AsyncRequestOtpView.as_view(), name="request-otp"),
+    path("request-otp/", views.RequestOtpView.as_view(), name="request-otp"),
     path(
-        "verify-otp/", views.AsyncRequestPhoneVerifyOtpView.as_view(), name="verify_otp"
+        "verify-otp/", views.RequestPhoneVerifyOtpView.as_view(), name="verify_otp"
     ),
     path(
         "request-forget-password/",
-        views.AsyncRequestForgetPasswordView.as_view(),
+        views.RequestForgetPasswordView.as_view(),
         name="request-forget-password",
     ),
     path(
         "confirm-forget-password/",
-        views.AsyncForgetPasswordConfirmView.as_view(),
+        views.ForgetPasswordConfirmView.as_view(),
         name="forget-password-confirm",
     ),
     path(
         "admin_user_list/",
-        views.AsyncAdminUserListview.as_view(),
+        views.AdminUserListview.as_view(),
         name="admin_user_list",
     ),
     path(
         "login_by_phone_password/",
-        views.AsyncLoginByPhonePasswordView.as_view(),
+        views.LoginByPhonePasswordView.as_view(),
         name="login_phone_password",
     ),
     path("", include(state_router.urls)),

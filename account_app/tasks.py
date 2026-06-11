@@ -1,85 +1,54 @@
 import logging
-import os
-import subprocess
-from uuid import uuid4
+
 from celery import shared_task
-from django.conf import settings
-from django.utils import timezone
-# from django.core.management import call_command
+from celery.utils.log import get_task_logger
 from account_app.models import User, PrivateNotification
-# from core.utils.sms import send_otp_sms
-from core.utils.backup_arvancloud import Bucket
+from core.utils.sms import send_otp_for_request_forget_password, send_otp_sms
 
 
-# @shared_task(max_retries=3, queue="otp_sms")
-# def send_otp_code_by_celery(phone: str, code: str):
-#     asyncio.run(send_otp_sms(phone, code))
+# celery logger
+logger = get_task_logger(__name__)
 
-
-@shared_task(max_retries=3, queue="notifications")
-def send_notification_after_create_ticket(room_id):
-    users = User.objects.filter(
-        is_active=True,
-        is_staff=True
-    ).only(
-        "mobile_phone",
-    )
-    notification = [
-        PrivateNotification(
-            user_id=i.id,
-            title="ticket",
-            notif_type="ticket",
-            body="یک تیکت ثبت شده هست",
-            notifi_redirect_url=f'room_id:{room_id}'
-        )
-        for i in users
-    ]
-
-    if notification:
-        PrivateNotification.objects.bulk_create(notification)
-
-
-@shared_task(queue="backup_db")
-def create_backup():
-    from dotenv import load_dotenv
-    load_dotenv()
-
-    now = timezone.now().strftime("%Y/%m/%d/%H")
-    file_name = f"backup/{now}/{uuid4().hex}.sql"
-    file_path = f"/tmp/{file_name}"
-
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-    db_name = settings.DATABASES['default']['NAME']
-    db_user = settings.DATABASES['default']['USER']
-    db_password = settings.DATABASES['default']['PASSWORD']
-    db_host = settings.DATABASES['default']['HOST']
-    db_port = settings.DATABASES['default']['PORT']
-
-    dump_command = [
-        "pg_dump",
-        "-h", db_host,
-        "-p", str(db_port),
-        "-U", db_user,
-        "-F", "c",
-        "-f", file_path,
-        db_name,
-    ]
-
-    env = os.environ.copy()
-    env["PGPASSWORD"] = db_password
-
-    result = subprocess.run(dump_command, env=env, capture_output=True, text=True)
-
-    if result.returncode != 0:
-        print("STDERR:", result.stderr)
-        raise Exception(f"Backup failed: {result.stderr}")
-
+# send otp code for login user
+@shared_task(bind=True, max_retries=2, queue="otp_sms")
+def send_otp_code_by_celery(self, phone: str, code: str):
     try:
-        bucket = Bucket()
-        bucket.create_object_for_backup_as_multi_part(file_path=file_path, file_name=file_name)
-        logging.info(f"Backup {file_name} uploaded successfully!")
+        send_otp_sms(phone, code)
     except Exception as e:
-        logging.error(e)
-    finally:
-        os.remove(file_path)
+        logging.error(f"failed to send otp to {phone}, Error: {e}")
+        raise self.retry(exc=e, countdown=10)
+
+# send otp for forget password
+@shared_task(bind=True, max_retries=2, queue='otp_sms')
+def send_otp_forget_password(self, phone: str, code: str):
+    try:
+        send_otp_for_request_forget_password(phone, code)
+    except Exception as e:
+        logger.error(f"failed to send otp forget_password to {phone}, error: {e}")
+        raise self.retry(exc=e, countdown=10)
+
+# send notification after create ticket
+@shared_task(bind=True, max_retries=2, queue="notifications")
+def send_notification_after_create_ticket(self, room_id):
+    try:
+        users = User.objects.filter(
+            is_active=True,
+            is_staff=True
+        ).only(
+            "mobile_phone",
+        )
+        notification = [
+            PrivateNotification(
+                user_id=i.id,
+                title="ticket",
+                notif_type="ticket",
+                body="یک تیکت ثبت شده هست",
+                notifi_redirect_url=f'room_id:{room_id}'
+            )
+            for i in users
+        ]
+        if notification:
+            PrivateNotification.objects.bulk_create(notification)
+    except Exception as e:
+        logger.error(f'failed send notification, error: {e}')
+        self.retry(exc=e)

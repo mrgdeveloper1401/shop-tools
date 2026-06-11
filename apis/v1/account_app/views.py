@@ -1,26 +1,25 @@
-from django.contrib.auth import aauthenticate
+from account_app.tasks import send_otp_code_by_celery, send_otp_forget_password
+from django.contrib.auth import authenticate
 from django.db.models import Prefetch
-from django.shortcuts import aget_object_or_404
 from rest_framework import views, viewsets, mixins, response, status, exceptions, permissions, generics
-from adrf.views import APIView as AsyncApiView
-from adrf.generics import ListAPIView as AsyncListAPIView
 
 from account_app.models import User, OtpService, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, \
     Ticket
+from apis.v1.account_app.exceptions import UserNotFound
+from apis.v1.utils.cache_mixin import CacheMixin
 from apis.v1.utils.ip_client import get_client_ip
-from core.utils.jwt import async_get_token_for_user
+from core.utils.jwt import get_tokens_for_user
 from core.utils.pagination import AdminTwentyPageNumberPagination, FlexiblePagination, TwentyPageNumberPagination
 from core.utils.custom_filters import AdminUserInformationFilter, AdminUserAddressFilter, UserMobilePhoneFilter, \
     PrivateNotificationFilter, TicketFilter
-from core.utils.permissions import NotAuthenticated, AsyncNotAuthenticated, AsyncIsAdminUser
-from core.utils.sms import send_otp_sms, send_otp_for_request_forget_password
+from core.utils.permissions import NotAuthenticated
 from . import serializers
 from ..utils.cache_mixin import CacheMixin
 
 
 class GetIpClient(views.APIView):
     def get(self, request):
-        x_forwarded_for = request.META.get("get_client_ip", None)
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", None)
         remote_addr = request.META.get("REMOTE_ADDR", None)
         data = {
             "x_forwarded_for": x_forwarded_for,
@@ -41,19 +40,19 @@ class UserCreateView(views.APIView):
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class AsyncRequestOtpView(AsyncApiView):
-    serializer_class = serializers.AsyncRequestPhoneSerializer
-    permission_classes = (AsyncNotAuthenticated,)
+class RequestOtpView(views.APIView):
+    serializer_class = serializers.RequestPhoneSerializer
+    permission_classes = (NotAuthenticated,)
 
-    async def post(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # check user dose exists
         # get phone
         phone = serializer.validated_data["mobile_phone"]
-        if not await User.objects.filter(mobile_phone=phone).aexists():
-            raise exceptions.NotFound("کاربری با این شماره موبایل پیدا نشد")
+        if not User.objects.filter(mobile_phone=phone).exists():
+            raise UserNotFound()
 
         # get user ip address
         ip_addr = get_client_ip(request)
@@ -64,13 +63,14 @@ class AsyncRequestOtpView(AsyncApiView):
         redis_key = f'{ip_addr}-{phone}-{otp}'
 
         # set key
-        await OtpService.store_otp(
+        OtpService.sync_store_otp(
             key=redis_key,
             otp=otp,
         )
 
-        # send otp code by celery
-        await send_otp_sms(phone, otp)
+        # send otp code
+        # asyncio.run(send_otp_sms(phone, otp))
+        send_otp_code_by_celery.delay(phone, otp)
 
         # return response
         return response.Response(
@@ -81,39 +81,37 @@ class AsyncRequestOtpView(AsyncApiView):
         )
 
 
-class AsyncRequestPhoneVerifyOtpView(AsyncApiView):
-    serializer_class = serializers.AsyncRequestPhoneVerifySerializer
-    permission_classes = (AsyncNotAuthenticated,)
+class RequestPhoneVerifyOtpView(views.APIView):
+    serializer_class = serializers.RequestPhoneVerifySerializer
+    permission_classes = (NotAuthenticated,)
 
-    async def post(self, request):
-        # import ipdb
-        # ipdb.set_trace()
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # get ip address and phone
         ip_addr = get_client_ip(request)
         phone = serializer.validated_data["phone"]
-        code = serializer.validated_data.get("code")
+        code = serializer.validated_data["code"]
 
         # pattern redis-key
         redis_key = f'{ip_addr}-{phone}-{code}'
 
         # validate otp
-        get_otp = await OtpService.verify_otp(redis_key, code)
+        get_otp = OtpService.sync_verify_otp(redis_key, code)
 
         # check otp
         if not get_otp:
             raise exceptions.NotFound()
 
         # check user
-        user = await aget_object_or_404(User, mobile_phone=phone, is_active=True)
+        user = generics.get_object_or_404(User.objects.only("id"), mobile_phone=phone, is_active=True)
 
         # generate token
-        token = await async_get_token_for_user(user)
+        token = get_tokens_for_user(user)
 
         # delete otp in redis
-        await OtpService.delete_otp(redis_key)
+        OtpService.sync_delete_otp(redis_key)
 
         # return token
         return response.Response(
@@ -154,7 +152,13 @@ class UserInformationViewSet(viewsets.ModelViewSet):
         return query
 
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin
+):
     """
     permission (create and delete) --> user must be admin \n
     pagination --> 20 item , only user admin have pagination
@@ -220,7 +224,7 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
         )
 
 
-class UserAddressViewSet(viewsets.ModelViewSet):
+class UserAddressViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     pagination --> 20 item , only user admin have pagination \n
     filter query --> postal cdde, only admin user can use filter query
@@ -230,11 +234,25 @@ class UserAddressViewSet(viewsets.ModelViewSet):
     pagination_class = AdminTwentyPageNumberPagination
     filterset_class = AdminUserAddressFilter
 
+    def list(self, request, *args, **kwargs):
+        # cache user address where not staff
+        if not request.user.is_staff:
+            user_id = request.user.id
+            user_address_cache = self.get_cache(f"user_address_cache_{user_id}")
+            if user_address_cache:
+                return response.Response(user_address_cache)
+            else:
+                data = super().list(request, *args, **kwargs)
+                self.set_cache(f"user_address_cache_{user_id}", data.data)
+                return response.Response(data.data)
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         query = UserAddress.objects.select_related("city").only(
             "city__name",
+            "user_id",
             "state_id",
-            "is_default",
+            # "is_default",
             "title",
             "address_line",
             "postal_code",
@@ -248,15 +266,15 @@ class UserAddressViewSet(viewsets.ModelViewSet):
         return query
 
 
-class AsyncAdminUserListview(AsyncListAPIView):
+class AdminUserListview(generics.ListAPIView):
     """
     show list use phone \n
     you can show list user \n
     permission --> admin user \n
     filter query --> mobile_phone
     """
-    serializer_class = serializers.AsyncAdminUserListSerializer
-    permission_classes = (AsyncIsAdminUser,)
+    serializer_class = serializers.AdminUserListSerializer
+    permission_classes = (permissions.IsAdminUser,)
     filterset_class = UserMobilePhoneFilter
 
     def get_queryset(self):
@@ -270,7 +288,7 @@ class StateViewSet(
     mixins.RetrieveModelMixin
 ):
     serializer_class = serializers.StateSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    # permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return State.objects.only(
@@ -304,7 +322,7 @@ class CityViewSet(
     mixins.ListModelMixin,
 ):
     serializer_class = serializers.CitySerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    # permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return City.objects.filter(
@@ -337,24 +355,25 @@ class CityViewSet(
             return response.Response(serializer.data)
 
 
-class AsyncLoginByPhonePasswordView(AsyncApiView):
-    serializer_class = serializers.AsyncLoginByPhonePasswordSerializer
-    permission_classes = (AsyncNotAuthenticated,)
 
-    async def post(self, request):
+class LoginByPhonePasswordView(views.APIView):
+    serializer_class = serializers.LoginByPhonePasswordSerializer
+    permission_classes = (NotAuthenticated,)
+
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         phone = serializer.validated_data['phone']
         password = serializer.validated_data['password']
 
-        user = await aauthenticate(
+        user = authenticate(
             mobile_phone=phone,
             password=password
         )
         if user and user.is_active:
             # generate token
-            token = await async_get_token_for_user(user)
+            token = get_tokens_for_user(user)
             return response.Response(
                 data={
                     "token": token,
@@ -362,7 +381,7 @@ class AsyncLoginByPhonePasswordView(AsyncApiView):
                 }
             )
         else:
-            raise exceptions.NotFound()
+            raise UserNotFound()
 
 
 class AdminListProfileView(generics.ListAPIView):
@@ -382,11 +401,11 @@ class AdminListProfileView(generics.ListAPIView):
     )
 
 
-class AsyncRequestForgetPasswordView(AsyncApiView):
-    permission_classes = (AsyncNotAuthenticated,)
+class RequestForgetPasswordView(views.APIView):
+    permission_classes = (NotAuthenticated,)
     serializer_class = serializers.ForgetPasswordSerializer
 
-    async def post(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -401,14 +420,13 @@ class AsyncRequestForgetPasswordView(AsyncApiView):
         otp = OtpService.generate_otp()
 
         # key for redis
-        forget_password_key = f'forget-{user.mobile_phone}-{user_ip}-{otp}'
+        forget_password_key = f'forget-{phone}-{user_ip}-{otp}'
 
         # save key and otp in redis
-        await OtpService.store_otp(key=forget_password_key, otp=otp)
+        OtpService.sync_store_otp(key=forget_password_key, otp=otp)
 
         # send otp code into phone
-        # send_otp_code_by_celery.delay(user_phone, otp)
-        await send_otp_for_request_forget_password(phone, otp)
+        send_otp_forget_password.delay(phone, otp)
 
         # return response
         return response.Response(
@@ -419,13 +437,11 @@ class AsyncRequestForgetPasswordView(AsyncApiView):
         )
 
 
-class AsyncForgetPasswordConfirmView(AsyncApiView):
-    permission_classes = (AsyncNotAuthenticated,)
-    serializer_class = serializers.AsyncForgetPasswordChangeSerializer
+class ForgetPasswordConfirmView(views.APIView):
+    permission_classes = (NotAuthenticated,)
+    serializer_class = serializers.ForgetPasswordChangeSerializer
 
-    async def post(self, request):
-        # import ipdb
-        # ipdb.set_trace()
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -441,7 +457,7 @@ class AsyncForgetPasswordConfirmView(AsyncApiView):
         forget_password_key = f'forget-{user_phone}-{user_ip}-{get_otp}'
 
         # validate redis_key
-        otp_verify = await OtpService.verify_otp(forget_password_key, get_otp)
+        otp_verify = OtpService.sync_verify_otp(forget_password_key, get_otp)
         if not otp_verify:
             raise exceptions.NotFound()
 
@@ -450,23 +466,18 @@ class AsyncForgetPasswordConfirmView(AsyncApiView):
         user = await aget_object_or_404(User.objects.only(*fields), mobile_phone=user_phone, is_active=True)
 
         # check password
-        await user.acheck_password(password)
+        user.check_password(password)
 
         # set new password
         user.set_password(password)
 
         # save new password
-        await user.asave()
-
-        # generate_token
-        # token = await async_get_token_for_user(user)
+        user.save()
 
         # return success data
         return response.Response(
             {
                 "message": "password change successfully",
-                # "token": token,
-                # "is_staff": user.is_staff,
             }
         )
 

@@ -7,7 +7,6 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
-from django.conf import settings
 
 from core.utils.normalize_number import normalize_digits
 from core.utils.validators import PhoneNumberValidator
@@ -20,21 +19,20 @@ class User(AbstractBaseUser, PermissionsMixin, UpdateMixin, SoftDeleteMixin, Cre
         _("mobile phone"),
         max_length=22,
         unique=True,
-        null=True,
-        blank=True,
         validators=(PhoneNumberValidator,)
     )
     username = models.CharField(
         _("username"),
         max_length=150,
         blank=True,
-        null=True
+        null=True,
+        db_index=True,
     )
     email = models.EmailField(
         _("email address"), 
         blank=True, 
         null=True, 
-        # unique=True
+        db_index=True,
     )
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
@@ -146,10 +144,10 @@ class UserAddress(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
         null=True,
         help_text=_("طول جغرافیایی")
     )
-    is_default = models.BooleanField(
-        default=False,
-        help_text=_("آیا آدرس پیش‌فرض کاربر است؟")
-    )
+    # is_default = models.BooleanField(
+    #     default=False,
+    #     help_text=_("آیا آدرس پیش‌فرض کاربر است؟")
+    # )
 
     class Meta:
         ordering = ("id",)
@@ -176,10 +174,6 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin
 class OtpService:
     set_time = 120
 
-    def __init__(self):
-        if settings.DEBUG:
-            self.set_time = 300
-
     @staticmethod
     def generate_otp(length=6):
         """Generate a numeric OTP and store it in Redis"""
@@ -192,6 +186,11 @@ class OtpService:
         await cache.aset(key, otp, timeout=OtpService.set_time)
 
     @staticmethod
+    def sync_store_otp(key, otp):
+        """Store OTP in Redis with expiry time (production --> 2 / development --> 5)"""
+        cache.set(key, otp, timeout=OtpService.set_time)
+
+    @staticmethod
     async def verify_otp(key, submitted_otp):
         """Verify the submitted OTP against stored OTP"""
         stored_otp = await cache.aget(key)
@@ -200,9 +199,22 @@ class OtpService:
         return stored_otp == submitted_otp
 
     @staticmethod
+    def sync_verify_otp(key, submitted_otp):
+        """Verify the submitted OTP against stored OTP"""
+        stored_otp = cache.get(key)
+        if stored_otp is None:
+            return False
+        return stored_otp == submitted_otp
+
+    @staticmethod
     async def delete_otp(key):
         """Delete OTP from Redis"""
         await cache.adelete(key)
+
+    @staticmethod
+    def sync_delete_otp(key):
+        """Delete OTP from Redis"""
+        cache.delete(key)
 
 
 class TicketRoom(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):

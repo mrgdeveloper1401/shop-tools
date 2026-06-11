@@ -381,14 +381,13 @@ pyrightconfig.json
 ./base_image/gs_tools:1.0.0.tar.gz
 general_log_django
 staticfiles
-general_log_django
 gstools_data
 nginx/gstoolos
 console_3.sql
 category_data.csv
 csv_data
-console_3.sql
 code.py
 api.gs-tools.ir/
 readme.md
 test_code.py
+env_folder
