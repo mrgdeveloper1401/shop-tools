@@ -6,16 +6,14 @@ from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.utils.dateparse import parse_date
 from openpyxl.styles import Font
-from rest_framework import viewsets, permissions, generics, mixins, exceptions, response, decorators
+from rest_framework import viewsets, permissions, generics, mixins, exceptions, response, decorators, views
 from django.utils import timezone
-from adrf.views import APIView as AsyncApiView
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_200_OK
 
 from core.utils.custom_filters import OrderFilter, ResultOrderFilter, AnalyticsFilter
 from core.utils.gate_way import verify_payment
-from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
+from core.utils.pagination import TwentyPageNumberPagination
 from order_app.models import Order, OrderItem, ShippingCompany, ShippingMethod, PaymentGateWay, VerifyPaymentGateWay
-# from order_app.tasks import send_notification_to_user_after_complete_order
 from account_app.models import PrivateNotification
 from core.utils.permissions import AsyncIsAuthenticated
 from core.utils.sms import send_verify_payment, cancel_verify_payment
@@ -274,7 +272,7 @@ class ResultOrderViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
         ).order_by("-id")
 
 
-class VerifyPaymentGatewayView(AsyncApiView):
+class VerifyPaymentGatewayView(views.APIView):
     """
     example --> ?success=1&status=2&trackId=4281457157&orderId=121
     """
@@ -399,7 +397,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
             tracking_code = order.tracking_code
 
             # create notification for user
-            await PrivateNotification.objects.acreate(
+            await PrivateNotification.objects.acreate( # TODOD  create by celery
                 user_id = request.user.id,
                 title = "ثبت سفارش موفق",
                 body = "کاربر محترم سفارش شما با موفقیت پرداخت و ثبت شده است",
@@ -407,7 +405,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
             )
 
             # send_notification_to_user_after_complete_order.delay(request.user.mobile_phone)
-            await send_verify_payment(request.user.mobile_phone, tracking_code)
+            await send_verify_payment(request.user.mobile_phone, tracking_code) # TODOD  create by celery
             return response.Response(verify_req)
             # send_sms_after_complete_order.delay(request.user.mobile_phone, get_order_traccking_code)
 
@@ -470,7 +468,7 @@ class VerifyPaymentGatewayView(AsyncApiView):
                 id=int(order_id),
                 profile__user_id=request.user.id
             )
-            await cancel_verify_payment(request.user.mobile_phone, order.tracking_code)
+            await cancel_verify_payment(request.user.mobile_phone, order.tracking_code) # TODOD  create by celery
             return response.Response(
                 {
                     "message": "cancel by user"

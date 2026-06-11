@@ -1,7 +1,6 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, exceptions
 from rest_framework.generics import get_object_or_404
-from adrf.serializers import Serializer, ModelSerializer
 from account_app.models import User, Profile, PrivateNotification, UserAddress, State, City, TicketRoom, Ticket
 from account_app.validators import MobileRegexValidator
 from apis.v1.account_app.exceptions import EmailAlreadyExistsError, UsernameAlreadyExistsError
@@ -10,7 +9,7 @@ from core.utils.validators import PhoneNumberValidator
 from core_app.models import Image
 
 
-class AsyncRequestPhoneSerializer(Serializer):
+class AsyncRequestPhoneSerializer(serializers.Serializer):
     mobile_phone = serializers.CharField(
         validators=(MobileRegexValidator(),)
     )
@@ -28,7 +27,13 @@ class RequestPhoneVerifySerializer(serializers.Serializer):
     )
 
 
-class AsyncRequestPhoneVerifySerializer(Serializer):
+class RequestPhoneSerializer(serializers.Serializer):
+    mobile_phone = serializers.CharField(
+        validators=(MobileRegexValidator(),)
+    )
+
+
+class RequestPhoneVerifySerializer(serializers.Serializer):
     code = serializers.CharField()
     phone = serializers.CharField(
         validators=(MobileRegexValidator(),)
@@ -218,7 +223,7 @@ class UserAddressSerializer(serializers.ModelSerializer):
         return fields
 
 
-class AsyncAdminUserListSerializer(ModelSerializer):
+class AdminUserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
@@ -246,7 +251,7 @@ class CitySerializer(serializers.ModelSerializer):
         )
 
 
-class AsyncLoginByPhonePasswordSerializer(Serializer):
+class LoginByPhonePasswordSerializer(serializers.Serializer):
     phone = serializers.CharField(validators=(MobileRegexValidator(),))
     password = serializers.CharField()
 
@@ -264,11 +269,11 @@ class AdminProfileListSerializer(serializers.ModelSerializer):
         )
 
 
-class ForgetPasswordSerializer(Serializer):
+class ForgetPasswordSerializer(serializers.Serializer):
     mobile_phone = serializers.CharField(validators=(MobileRegexValidator(),))
 
 
-class AsyncForgetPasswordChangeSerializer(Serializer):
+class ForgetPasswordChangeSerializer(serializers.Serializer):
     otp = serializers.CharField()
     password = serializers.CharField()
     confirm_password = serializers.CharField()

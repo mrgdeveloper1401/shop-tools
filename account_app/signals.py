@@ -2,7 +2,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch.dispatcher import receiver
 
 from apis.v1.utils.cache_mixin import CacheMixin
-from .models import User, Profile, Ticket, State, City, UserAddress
+from .models import State, User, Profile, Ticket, City, UserAddress
 from .tasks import send_notification_after_create_ticket
 
 
@@ -37,4 +37,5 @@ def clear_city_cache(sender, instance, **kwargs):
 # delete cache user address
 @receiver([post_save, post_delete], sender=UserAddress)
 def clear_user_address_cache(sender, instance, **kwargs):
-    cache_instance.delete_cache("user_address_cache")
+    user_id = instance.user_id
+    cache_instance.delete_cache(f"user_address_cache_{user_id}")

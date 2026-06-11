@@ -243,14 +243,11 @@ class UserListProductSerializer(serializers.ModelSerializer):
             "id",
             "product_name",
             "product_product_image",
-            "base_price",
             "variants",
             "product_slug",
             "description_slug",
             "category_id",
             "updated_at",
-            "in_person_purchase"
-            # "product_discounts",
         )
 
 
@@ -270,10 +267,8 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
-            "base_price",
             "product_name",
             "description",
-            # "social_links",
             "product_brand",
             "tags",
             "product_product_image",
@@ -281,9 +276,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "variants",
             "product_slug",
             "description_slug",
-            "sku",
             "updated_at",
-            "in_person_purchase"
         )
 
 
@@ -343,33 +336,11 @@ class AdminProductImageSerializer(serializers.ModelSerializer):
         data['image'] = AdminSimpleProductImageSerializer(instance.image, read_only=True).data
         return data
 
-    # def create(self, validated_data):
-    #     image = validated_data.pop("image", None)
-    #     alt_image = validated_data.pop("alt_image", None)
-    #
-    #     if image or alt_image:
-    #         img = Image.objects.create(
-    #             image=image,
-    #             alt_text=alt_image
-    #         )
-    #         product_image = ProductImages.objects.create(
-    #             image_id=img.id,
-    #             **validated_data
-    #         )
-    #         return product_image
-    #     else:
-    #         raise exceptions.ValidationError(
-    #             {
-    #                 "message": _("you must set image and alt_text image")
-    #             }
-    #         )
-
 
 class AdminProductVariantSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.only("id")
     )
-    # attributes = NestedVariantAttributeSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProductVariant
@@ -429,21 +400,6 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
         return data
 
 
-class AdminAttributeValueSerializer(serializers.ModelSerializer):
-    attribute = serializers.PrimaryKeyRelatedField(
-        queryset=Attribute.objects.only('id'),
-    )
-
-    class Meta:
-        model = AttributeValue
-        exclude = (
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at",
-        )
-
-
 class AdminProducttAttributeSerializer(serializers.ModelSerializer):
     variant = serializers.PrimaryKeyRelatedField(
         queryset=ProductVariant.objects.only("id")
@@ -482,12 +438,23 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
             "description_slug",
             "created_at",
             "updated_at",
-            "base_price",
-            "sku",
             "product_brand_name",
-            "in_person_purchase",
             # "product_discounts"
         )
+
+
+class UserProductVariantSerializer(serializers.ModelSerializer):
+    category_id = serializers.IntegerField(source="product.category_id", allow_null=True)
+    product_name = serializers.CharField(source="product.product_name")
+    product_product_image = serializers.ListSerializer(
+        allow_null=True,
+        source="product.product_product_image",
+        child=serializers.DictField()
+    )
+
+    class Meta:
+        model = ProductVariant
+        fields = '__all__'
 
 
 class AdminProductListHomePageSerializer(ProductListHomePageSerializer):
@@ -578,6 +545,7 @@ class AdminAttributeSerializer(serializers.ModelSerializer):
             "id",
             "attribute_name"
         )
+
 
 class ListCategoryNameSerializer(serializers.ModelSerializer):
     class Meta:

@@ -4,10 +4,7 @@ import os
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-os.environ.setdefault(
-    'DJANGO_SETTINGS_MODULE',
-    'core.envs.development' if DEBUG else 'core.envs.production'
-)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', "core.settings")
 
 app = Celery('core.utils')
 

@@ -11,33 +11,17 @@ class PaymentBaseError(exceptions.APIException):
     default_detail = _("A request error occurred.")
 
 
-class HttpConnectionError(exceptions.APIException):
-    pass
-
-
-class TimeOutError(exceptions.APIException):
-    pass
-
-
-class HTTPStatusError(exceptions.APIException):
-    pass
-
-
-class InvalidDataError(exceptions.APIException):
-    pass
-
-
 def http_error(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except httpx.ConnectError as ce: # connect error
-            raise HttpConnectionError(detail=str(ce))
-        except httpx.TimeoutException as te: # timeout error
-            raise TimeOutError(detail=str(te))
-        except httpx.HTTPStatusError as he: # status code
-            raise HTTPStatusError(detail=str(he))
-        except Exception as e: # other exception
-            raise InvalidDataError(detail=str(e))
+        except httpx.ConnectError as ce:
+            raise Exception(f"Connection Error: {ce}")
+        except httpx.TimeoutException as te:
+            raise Exception(f"Timeout Error: {te}")
+        except httpx.HTTPStatusError as he:
+            raise Exception(f"HTTP Status Error: {he}")
+        except Exception as e:
+            raise Exception(f"General Error: {e}")
     return wrapper

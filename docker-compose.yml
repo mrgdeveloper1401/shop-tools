@@ -8,88 +8,102 @@ services:
       - 5432
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${COMPOSE_POSTGRES_PASSWORD}
+     POSTGRES_PASSWORD: ${COMPOSE_POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
 
-#  pgadmin:
-#    container_name: shop_pgadmin
-#    image: dpage/pgadmin4
-#    restart: always
-#    ports:
-#      - "8081:80"
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-#      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-#    volumes:
-#      - pgadmin_data:/var/lib/pgadmin
+  redis:
+    container_name: gs_redis
+    image: redis:8-alpine
+    restart: always
+    command: >
+      redis-server
+      --loglevel warning
+      --appendonly no
+      --save ""
+      --maxmemory 1024mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+    expose:
+      - 6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
 
   app:
     container_name: django
     build:
       context: .
+      dockerfile: "dockerfile/prod/django/Dockerfile"
     ports:
       - "8000:8000"
     expose:
       - 8000
     env_file: ".env"
-    entrypoint: ["/home/app/scripts/start.sh"]
     restart: always
     volumes:
-      - static_files:/home/app/core/staticfiles
-
-  redis:
-    container_name: gs_redis
-    image: docker.arvancloud.ir/redis:7.4-alpine
-    restart: always
-    expose:
-      - 6379
+      - static_files:/home/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   nginx:
     container_name: gs_nginx
     restart: always
     volumes:
       - static_files:/vol/
-    command: ["nginx", "-g", "daemon off;"]
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/ssl:/etc/ssl:ro
+    entrypoint: ["nginx", "-g", "daemon off;"]
     build:
-      context: nginx
+      context: "dockerfile/prod/nginx/"
     ports:
       - "80:80"
       - "443:443"
-#    depends_on:
-#      - app
-#      - pgadmin
+    depends_on:
+      app:
+        condition: service_started
 
   celery:
     container_name: gs_celery
     restart: always
     build:
       context: .
-    env_file: ".env"
-    environment:
-      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
-      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      dockerfile: "./dockerfile/prod/django/Dockerfile"
+    env_file: "env_folder/.env"
     entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
-
-#  flower:
-#    container_name: gs_flower
-#    expose:
-#      - 5555
-#    ports:
-#      - "5555:5555"
-#    restart: always
-#    build:
-#      context: .
-#    env_file: ".env"
-#    entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
+    dns:
+      - 94.182.153.78
+      - 2.188.21.130
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
 
   celery_beat:
     container_name: dj_celery_beat
     restart: always
     build:
       context: .
-    env_file: ".env"
+      dockerfile: "./dockerfile/prod/django/Dockerfile"
+    env_file: "env_folder/.env"
     entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
 
 volumes:
   gs_postgres_data:
   static_files:
-#  pgadmin_data:

@@ -68,21 +68,15 @@ MIDDLEWARE = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "gs_tools_2025_12_19db",
+        "NAME": "gs_tools",
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",
-        "PORT": 5434,
-        "CONN_MAX_AGE": 60,
-        # "OPTIONS": {
-        #     "pool": {
-        #         "min_size": 2,
-        #         "max_size": 15,
-        #         "timeout": 2,
-        #     }
-        # }
+        "PORT": 5433,
+        "CONN_MAX_AGE": 60
     }
 }
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -182,8 +176,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/minute',  # 100 درخواست در دقیقه برای کاربران ناشناس
-        'user': '200/minute',  # 200 درخواست در دقیقه برای کاربران عادی
+        'anon': '100/minute',
+        'user': '200/minute',
     }
 }
 
@@ -301,7 +295,7 @@ CELERY_TASK_QUEUES = (
     Queue("ba_salam"),
     Queue("payment"),
     Queue("update_order"),
-    # Queue("backup_db")
+    Queue("backup_db")
 )
 
 # config base storage
@@ -330,25 +324,12 @@ INTERNAL_IPS = [
 
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
-# development lo
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        },
-    }
-}
-
-# config django-silk
-USE_DJANGO_SILK = config('USE_DJANGO_SILK', default=False, cast=bool)
-if USE_DJANGO_SILK:
-    MIDDLEWARE.append("silk.middleware.SilkyMiddleware")
-    INSTALLED_APPS.append("silk")
+AWS_S3_REGION_NAME = 'eu-west-1'
+AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
+AWS_ACCESS_KEY_ID = config('ARVAN_AWS_ACCESS_KEY_ID', cast=str)
+AWS_SECRET_ACCESS_KEY = config('ARVAN_AWS_SECRET_ACCESS_KEY', cast=str)
+AWS_STORAGE_BUCKET_NAME = config('ARVAN_AWS_STORAGE_BUCKET_NAME', cast=str)
+AWS_S3_ENDPOINT_URL = config('ARVAN_AWS_S3_ENDPOINT_URL', cast=str)
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_MAX_MEMORY_SIZE = 1024 * 1024 * 2

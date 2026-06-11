@@ -12,7 +12,7 @@ from core.utils.custom_filters import (
     ProductHomePageFilter,
     ProductTagFilter
 )
-from core.utils.pagination import TwentyPageNumberPagination, FlexiblePagination
+from core.utils.pagination import TwentyPageNumberPagination
 from core.utils.permissions import IsOwnerOrReadOnly
 from discount_app.models import ProductDiscount
 from . import serializers
@@ -32,13 +32,26 @@ from .filters import UserProductVariantsFilter
 from ..utils.cache_mixin import CacheMixin
 
 
-class ProductCategoryViewSet(viewsets.ModelViewSet):
+class ProductCategoryViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     pagination --> 20 item, only user admin have pagination \n
     filter query --> (category_name, is_active) --> only user admin have filter
     """
     filterset_class = AdminProductCategoryFilter
     pagination_class = TwentyPageNumberPagination
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "product_list_category_cache"
+        page = request.GET.get("page", None)
+        if page:
+            cache_key += page
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
     def get_queryset(self):
         base_query = Category.objects.select_related("category_image")
@@ -139,7 +152,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_variant__product_id",
                     "product_variant__stock_number",
                     "product_variant__name",
-                    "product_variant__price",
                 ).valid_discount()
             )
         )
@@ -160,9 +172,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_name",
                 "description_slug",
                 "sku",
-                "base_price",
                 "updated_at",
-                "in_person_purchase"
             ).prefetch_related(
                     Prefetch(
                 "product_product_image", queryset=ProductImages.objects.select_related("image").only(
@@ -207,11 +217,9 @@ class ProductViewSet(viewsets.ModelViewSet):
                 return query.only(
                     "updated_at",
                     "product_name",
-                    "base_price",
                     "description_slug",
                     "product_slug",
                     "category_id",
-                    "in_person_purchase"
                 )
             else:
                 return query.prefetch_related(
@@ -239,11 +247,10 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "description_slug",
                     "sku",
                     "updated_at",
-                    "in_person_purchase"
                 )
 
 
-class ProductBrandViewSet(viewsets.ModelViewSet):
+class ProductBrandViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     pagination --> 20 item for normal user and admin user \n
     filter query --> (category_name, is_active)
@@ -277,6 +284,19 @@ class ProductBrandViewSet(viewsets.ModelViewSet):
             ).only(
                 "brand_name", "brand_image__image"
             )
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "list_product_brand_view"
+        page = request.GET.get("page", None)
+        if page:
+            cache_key += page
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class AdminCreateProductImage(generics.CreateAPIView):
@@ -342,46 +362,12 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
              "old_price",
              "short_desc",
              "subtitle",
-            #  "in_person_purchase"
          )
 
 
-class AttributeViewSet(viewsets.ModelViewSet):
+class AttributeViewSet(CacheMixin, viewsets.ModelViewSet):
     filterset_class = AttributeFilter
-
-    def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
-            self.permission_classes = (permissions.IsAdminUser,)
-        return super().get_permissions()
-
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            return serializers.AdminAttributeSerializer
-        pass
-
-    def get_queryset(self):
-        base_query = Attribute.objects.defer(
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at"
-        )#.prefetch_related(
-        #     Prefetch(
-        #         "attribute_values", queryset=ProductAttributeValue.objects.only(
-        #             "attribute_value",
-        #         )
-        #     )
-        # )
-
-        # filter staff user
-        if self.request.user.is_staff:
-            return base_query
-
-
-class AttributeValueViewSet(viewsets.ModelViewSet):
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            return serializers.AdminAttributeValueSerializer
+    serializer_class = serializers.AdminAttributeSerializer
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -389,15 +375,20 @@ class AttributeValueViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        base_query = AttributeValue.objects.defer(
-            "is_deleted",
-            "deleted_at",
-            "created_at",
-            "updated_at"
-        )
-        # filter staff user
         if self.request.user.is_staff:
-            return base_query
+            return Attribute.objects.defer("is_deleted", "deleted_at", "created_at", "updated_at")
+        else:
+            return Attribute.objects.filter(is_active=True).only("attribute_name")
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "product_attribute_cache"
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
@@ -437,11 +428,10 @@ class ProductListHomePageView(generics.ListAPIView):
         "description_slug",
         "created_at",
         "updated_at",
-        "base_price",
+        "price",
         "sku",
         "product_brand__brand_name",
         "total_sale",
-        "in_person_purchase"
     ).select_related(
         "product_brand"
     ).prefetch_related(
@@ -512,14 +502,14 @@ class ProductListHomePageView(generics.ListAPIView):
         return queryset
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(CacheMixin, viewsets.ModelViewSet):
     """
     filter query --> tag_name and is_active \n
     pagination --> 20 item \n
     permissions --> method post and put and patch and deleted only user admin
     """
     filterset_class = ProductTagFilter
-    pagination_class = FlexiblePagination
+    pagination_class = TwentyPageNumberPagination
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
@@ -542,6 +532,19 @@ class TagViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update", "destroy"):
             self.permission_classes = (permissions.IsAdminUser,)
         return super().get_permissions()
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "product_tags_cache_view"
+        page = request.GET.get("page",None)
+        if page:
+            cache_key += page
+        get_cache = self.get_cache(cache_key)
+        if get_cache:
+            return response.Response(get_cache)
+        else:
+            qs = super().list(request, *args, **kwargs)
+            self.set_cache(cache_key, qs.data)
+            return qs
 
 
 class ProductCommentViewSet(viewsets.ModelViewSet):
@@ -603,12 +606,12 @@ class CategoryNameView(CacheMixin, generics.ListAPIView):
             return qs
 
 
-class AdminTagNameView(CacheMixin, generics.ListAPIView):
+class ListTagNameView(CacheMixin, generics.ListAPIView):
     queryset = Tag.objects.filter(is_active=True).only("tag_name")
     serializer_class = serializers.AdminTagNameSerializer
 
     def list(self, request, *args, **kwargs):
-        cache_key = "list_admin_tag_name"
+        cache_key = "list_index_tag_name"
         get_cache = self.get_cache(cache_key)
         if get_cache:
             return response.Response(get_cache)

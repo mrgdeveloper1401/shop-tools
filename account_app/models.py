@@ -7,7 +7,6 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
-from django.conf import settings
 
 from core.utils.normalize_number import normalize_digits
 from core.utils.validators import PhoneNumberValidator

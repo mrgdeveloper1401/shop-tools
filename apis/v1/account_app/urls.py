@@ -36,22 +36,22 @@ urlpatterns = [
     ),
     path(
         "request-forget-password/",
-        views.AsyncRequestForgetPasswordView.as_view(),
+        views.RequestForgetPasswordView.as_view(),
         name="request-forget-password",
     ),
     path(
         "confirm-forget-password/",
-        views.AsyncForgetPasswordConfirmView.as_view(),
+        views.ForgetPasswordConfirmView.as_view(),
         name="forget-password-confirm",
     ),
     path(
         "admin_user_list/",
-        views.AsyncAdminUserListview.as_view(),
+        views.AdminUserListview.as_view(),
         name="admin_user_list",
     ),
     path(
         "login_by_phone_password/",
-        views.AsyncLoginByPhonePasswordView.as_view(),
+        views.LoginByPhonePasswordView.as_view(),
         name="login_phone_password",
     ),
     path("", include(state_router.urls)),
