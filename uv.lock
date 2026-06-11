@@ -1948,7 +1948,7 @@ requires-dist = [
     { name = "drf-spectacular", specifier = ">=0.28.0" },
     { name = "drf-spectacular-sidecar", specifier = ">=2025.10.1" },
     { name = "flower", specifier = ">=2.0.1" },
-    { name = "gunicorn", specifier = ">=23.0.0" },
+    { name = "gunicorn", specifier = ">=25.0.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "ipython", specifier = ">=9.6.0" },
     { name = "locust", specifier = ">=2.42.1" },
