@@ -14,6 +14,6 @@ COPY . .
 
 RUN apt update &&  \
     apt upgrade -y && \
-    apt install curl vim procps && \
+    apt install curl vim procps -y && \
     npm install -D typescript && \
     npm i
