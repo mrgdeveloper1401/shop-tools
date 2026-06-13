@@ -4,9 +4,9 @@ WORKDIR /home/app
 
 COPY . .
 
-RUN npm run build
+#RUN npm run build
 
 EXPOSE 3000
 
 #ENTRYPOINT ["npm", "run", "start:node"]
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
