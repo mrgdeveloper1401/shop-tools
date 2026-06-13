@@ -1,0 +1,52 @@
+.RegisterMain {
+  @apply 1sm:container bg-white rounded-[20px] px-4 pt-8 pb-8 min-h-screen;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}
+
+.nameSection {
+  @apply pb-[10px] flex justify-between border-b-[0.5px];
+
+  & span {
+    @apply text-[20px] font-DanaMedium text-title;
+  }
+
+  & > div {
+    @apply flex items-center text-[30px] text-title bg-zinc-200 rounded-[10px] p-2 justify-center;
+  }
+}
+
+.td {
+  @apply flex justify-center;
+
+  & p {
+    @apply bg-[#dfebfb] rounded-[10px] px-4 py-2 w-fit text-[14px];
+  }
+
+  & > svg {
+    @apply text-[20px];
+  }
+
+  & > a {
+    @apply bg-[#dfebfb] rounded-[10px] px-4 py-2 w-fit text-[14px];
+  }
+}
+
+.datePicker {
+  direction: rtl;
+
+  & > div {
+    @apply w-full cursor-pointer;
+  }
+
+  & input {
+    @apply cursor-pointer text-[14px] font-DanaFaNumMed text-[#151d2b];
+  }
+
+  & input::placeholder {
+    @apply text-[#4a4655] text-[14px] font-DanaMedium text-center;
+  }
+
+  & input:focus {
+    box-shadow: 0 0 0 rgb(255, 255, 255);
+  }
+}

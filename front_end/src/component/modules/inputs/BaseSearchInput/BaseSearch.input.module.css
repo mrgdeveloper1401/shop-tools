@@ -1,0 +1,113 @@
+.root {
+  position: relative;
+  border-radius: 104px;
+  z-index: 1;
+  background: #f6f6f6;
+  padding: 3px 10px;
+  transition: border 100ms ease;
+  @apply w-full;
+}
+
+.input {
+  background: #f6f6f6;
+  color: #071c30;
+  font-size: 12px;
+  border: none !important;
+  outline: none !important;
+  @apply font-DanaMedium;
+
+  &:focus {
+    outline: 3px solid #20c997;
+  }
+
+  &[data-error='true'] {
+    color: #fa5252;
+  }
+
+  &::placeholder {
+    color: #33699f;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    @apply font-DanaMedium;
+  }
+}
+
+/* 
+.label {
+  position: absolute;
+  padding-inline: 4px;
+  background-color: var(--base-text-field-bg-color);
+  z-index: 1;
+  pointer-events: none;
+  top: calc(50px / 2 + 0.875rem);
+  transform: translateY(-50%);
+  left: 0.875rem;
+  color: #868e96;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  transition:
+    color 100ms ease,
+    transform 100ms ease,
+    font-size 100ms ease;
+
+  &[data-floating='true'] {
+    transform: translateY(-40px);
+    color: #20c997;
+  }
+
+  &[data-filled='true'] {
+    color: #212529;
+  }
+
+  &[data-error='true'] {
+    color: #fa5252;
+  }
+} */
+
+.error {
+  padding: 4px 0.875rem 0 0.875rem;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  color: #fa5252;
+}
+
+.section {
+  &[data-position='right'] {
+    transition: width 100ms ease;
+    --input-right-section-size: auto;
+    --section-pointer-events: all;
+
+    padding: 4px;
+
+    &[aria-hidden='true'] {
+      --input-right-section-size: 0;
+    }
+
+    &[aria-hidden='false'] {
+      & > button {
+        width: 100%;
+        height: 100%;
+        border-radius: 1rem;
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 24px;
+        padding: 0.5rem 1rem;
+
+        &[data-loading='true'] {
+          --button-color: #1864ab;
+        }
+      }
+    }
+  }
+
+  &[data-position='left'] {
+    margin-inline-start: 16px;
+    margin-inline-end: 12px;
+  }
+}

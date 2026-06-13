@@ -1,0 +1,32 @@
+.body {
+  height: calc(100vh - 75.98px);
+}
+
+.headercontent {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: start;
+
+  & h2 {
+    color: rgb(28, 12, 43);
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 44px;
+    margin: auto;
+  }
+
+  & button {
+    margin: 0;
+
+    & svg {
+      stroke: rgb(28, 12, 43);
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+.root {
+  direction: ltr;
+}

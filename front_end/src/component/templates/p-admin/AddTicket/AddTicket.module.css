@@ -1,0 +1,138 @@
+.nameSection {
+  @apply pb-[10px] flex justify-between border-b-[0.5px];
+
+  & > span {
+    @apply text-[20px] font-DanaDemiBold text-cblack;
+  }
+
+  & > svg {
+    @apply text-[24px] text-title cursor-pointer;
+  }
+}
+
+.ticket_chat_container {
+  @apply w-full mx-auto rounded-lg p-4 relative;
+
+  .ticket_chat_box {
+    @apply overflow-y-auto p-2;
+    height: 60vh;
+    margin-bottom: 90px;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 6px rgb(255, 255, 255);
+      height: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgb(242, 99, 178);
+      border-radius: 20px;
+    }
+
+    .ticket_chat_message {
+      @apply flex mt-4;
+    }
+  }
+}
+
+.form_container {
+  @apply bg-white absolute bottom-2 left-0 w-full rounded-[24px];
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
+
+  .form {
+    @apply flex justify-between items-center gap-4 p-4 rounded-[22px];
+    border: 2px solid #b2afaf;
+
+    .input {
+      @apply w-full;
+    }
+  }
+}
+
+.fileDownload {
+  @apply mt-4;
+}
+
+.buttonContainer {
+  @apply flex items-center gap-6;
+
+  & .sendText {
+    @apply text-[26px] text-title;
+  }
+
+  .fileInputWrapper {
+    @apply flex justify-around items-center;
+
+    .fileInput {
+      @apply opacity-0 hidden;
+    }
+
+    .fileInputLabel {
+      & > svg {
+        @apply text-title text-[26px] cursor-pointer;
+      }
+    }
+  }
+}
+
+.textarea {
+  @apply w-10;
+}
+
+.message {
+  @apply p-4 lg:max-w-lg max-w-full rounded-lg;
+
+  .nameInfo {
+    @apply flex items-center gap-2 text-title font-DanaMedium mb-4;
+
+    & > span {
+      @apply text-title font-DanaMedium;
+    }
+
+    & > svg {
+      @apply text-[10px] text-yellow-500 mt-0.5;
+    }
+  }
+
+  .dateInfo {
+    border-top: 1px solid #e5e7eb;
+    @apply flex items-center justify-between pt-2 mt-2 text-[14px] text-gray-500 font-DanaFaNumMed;
+  }
+}
+
+.message_support_container {
+  @apply mr-auto lg:w-1/2 w-full;
+
+  .message_support {
+    @apply bg-gray-200 text-title;
+
+    & > p {
+      line-height: 1.8;
+      white-space: 2px;
+    }
+  }
+}
+
+.message_user_container {
+  @apply ml-auto lg:w-1/2 w-full;
+
+  .message_user {
+    @apply bg-gray-100 text-title;
+
+    & > p {
+      line-height: 1.8;
+      white-space: 2px;
+    }
+  }
+}
+
+.back_btn {
+  @apply flex items-center;
+
+  & > svg {
+    @apply text-title text-[26px];
+  }
+}

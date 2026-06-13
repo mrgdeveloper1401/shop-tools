@@ -1,0 +1,33 @@
+.section {
+  @apply mt-24;
+}
+
+.BestProductConatiner {
+  @apply 1sm:container mx-auto;
+
+  .header {
+    @apply flex sm:pr-0 pr-2  sm:items-center items-start sm:gap-0 gap-2 sm:flex-row flex-col  w-full;
+    & > h2 {
+      @apply sm:text-[20px] text-[16px] font-DanaMedium text-main min-w-fit relative sm:border-none border-b-2  border-[#e5e5e5];
+      &::after {
+        @apply sm:hidden block sm:content-[''] content-[''] sm:w-full w-[50px] h-[2px] bg-main;
+      }
+
+      flex: 1;
+      & > span {
+        @apply sm:text-[20px] text-[16px] font-DanaDemiBold;
+      }
+    }
+    .divider {
+      @apply sm:block hidden;
+      border: 1px solid #e5e5e5;
+      width: 100%;
+      margin: 0 16px;
+      flex: 5;
+    }
+  }
+}
+
+.content {
+  @apply grid lg:grid-cols-6 sm:grid-cols-4 2sm:grid-cols-2 grid-cols-1 gap-1 sm:px-0 px-1 sm:mt-0 mt-8;
+}

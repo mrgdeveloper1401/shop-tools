@@ -1,0 +1,92 @@
+.RegisterMain {
+  @apply sm:container bg-white rounded-[20px] px-4 pt-8 pb-4 h-full;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}
+
+.form {
+  @apply grid md:grid-cols-1 gap-4 mt-8 place-items-center;
+}
+
+.nameSection {
+  @apply pb-[10px] flex justify-between border-b-[0.5px];
+
+  & span {
+    @apply text-[20px] font-DanaMedium text-title;
+  }
+
+  & div {
+    @apply flex items-center text-[30px] text-title bg-zinc-200 rounded-[10px] p-2 justify-center;
+  }
+}
+
+.input {
+  @apply md:w-[70%] w-full;
+}
+
+.fileInputWrapper {
+  border: 1px dashed #9aa3b2;
+  @apply flex justify-center items-center p-4 w-full gap-5 rounded-[8px];
+
+  .fileInput {
+    @apply opacity-0 hidden;
+  }
+
+  .fileInputLabel {
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    @apply h-[50px] flex items-center justify-center gap-2 px-5 py-2 rounded-xl border cursor-pointer text-[16px] text-[#1C6F7D] bg-[#F0F5FA] hover:bg-[#eceef0] transition-all duration-300;
+  }
+}
+
+.td {
+  @apply flex justify-center;
+
+  & p {
+    @apply bg-[#dfebfb] rounded-[10px] px-4 py-2 w-fit text-[14px];
+  }
+
+  & > svg {
+    @apply text-[20px];
+  }
+}
+
+.deleteBtn {
+  & > svg {
+    @apply text-[20px] text-[#d72b2b];
+  }
+}
+
+.imagePreview {
+  @apply object-cover rounded-md w-full;
+}
+
+.fileInfo {
+  @apply flex justify-between items-center w-full bg-slate-100 py-2 px-4 rounded-lg text-slate-500 font-DanaMedium;
+
+  & > button > svg {
+    @apply text-red-400 text-[25px];
+  }
+
+  & > .fileInfoContent {
+    @apply flex justify-between items-center bg-slate-200 p-4 rounded-lg text-title;
+
+    & > svg {
+      @apply text-title text-[26px];
+    }
+
+    & > div {
+      @apply flex justify-between items-center;
+
+      & > span {
+        @apply text-[16px] font-DanaDemiBold text-des mr-2;
+      }
+    }
+  }
+}
+
+.image {
+  @apply object-cover;
+
+  & > img {
+    @apply object-cover w-[200px] rounded-md;
+  }
+}

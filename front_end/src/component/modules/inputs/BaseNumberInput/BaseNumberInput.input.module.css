@@ -1,0 +1,38 @@
+.root {
+  @apply relative w-full;
+}
+
+.input {
+  @apply h-[40px] px-4 py-2 text-sm border-none font-DanaMedium rounded-[10px] text-[#151d2b] bg-slate-200;
+
+  &[data-error] {
+    outline: 1px solid rgb(240, 78, 78);
+    color: rgb(236, 85, 85);
+  }
+}
+
+.label {
+  @apply absolute px-1 z-[1] pointer-events-none top-[20px] -translate-y-[50%] right-2 text-[#4a4655] text-[14px] font-DanaMedium not-italic font-normal leading-6;
+  transition:
+    color 100ms ease,
+    transform 100ms ease;
+
+  &[data-floating] {
+    @apply -translate-y-[42px] text-[#151d2b];
+  }
+
+  &[data-error] {
+    color: rgb(245, 21, 21);
+  }
+}
+
+.error {
+  @apply px-4 pt-1 text-xs font-normal not-italic leading-4 text-red-500;
+}
+
+.section {
+  &[data-position='right'] {
+    --input-right-section-size: 48px;
+    --psi-icon-size: 24px;
+  }
+}

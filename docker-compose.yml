@@ -104,6 +104,23 @@ services:
       redis:
         condition: service_healthy
 
+  next_js:
+    container_name: front_gs_tools
+    build:
+      context: ./front_end
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_API_URL: https://api.gs-tools.ir
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    depends_on:
+      nginx:
+        condition: service_started
+
 volumes:
   gs_postgres_data:
   static_files:

@@ -1,0 +1,30 @@
+.form_container {
+  @apply flex flex-col justify-between;
+  height: calc(100vh - 80px);
+}
+
+.form {
+  @apply grid md:grid-cols-1 gap-6 pt-5 px-8 z-50;
+}
+
+.fileInputWrapper {
+  @apply flex flex-col-reverse gap-2 justify-around items-center p-4 rounded-[8px] w-full;
+  border: 1px dashed #9aa3b2;
+
+  .fileInput {
+    @apply opacity-0 hidden;
+  }
+
+  .fileInputLabel {
+    @apply sm:w-[143px] h-[50px] flex items-center justify-center px-5 py-2 rounded-xl border cursor-pointer text-[16px] text-[#1C6F7D] bg-[#F0F5FA] hover:bg-[#d2e3f2] transition-all duration-300;
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+  }
+}
+
+.buttonContainer {
+  @apply flex gap-2 justify-end items-center mt-4;
+
+  & > button {
+    @apply min-w-[159px];
+  }
+}

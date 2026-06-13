@@ -1,0 +1,28 @@
+.section {
+  @apply w-full sm:p-3;
+
+  .containerLanding {
+    @apply sm:container mx-auto;
+  }
+}
+
+.bottom {
+  @apply flex justify-between items-center mt-6;
+}
+
+.slide {
+  @apply overflow-hidden rounded-[25px] flex items-center justify-center flex-col gap-2 p-1;
+
+  & > div {
+    @apply flex items-center justify-center rounded-full;
+    cursor: pointer;
+  }
+
+  & > p {
+    @apply font-DanaDemiBold text-[14px] text-center text-main;
+  }
+
+  .imageSlider {
+    @apply w-[110px] h-[110px] rounded-full;
+  }
+}

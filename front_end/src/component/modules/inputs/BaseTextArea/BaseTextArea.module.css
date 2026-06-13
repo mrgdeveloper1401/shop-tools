@@ -1,0 +1,70 @@
+.root {
+  position: relative;
+  border-radius: 12px;
+  width: 100%;
+  font-size: 16px;
+}
+
+.input {
+  outline: 1px solid #ca4242;
+  transition: outline 100ms ease;
+  resize: vertical;
+  @apply font-Dana text-title w-full min-h-[50px] h-[50px] rounded-[8px] border-none text-[16px] px-4 py-2;
+}
+
+.input:focus-within {
+  outline: 1px solid #ca4242;
+  font-size: 16px;
+}
+
+.input[data-filled] {
+  @apply text-title text-[20px];
+  font-size: 16px;
+}
+
+.input[data-error] {
+  outline: 1px solid #fa5252;
+  color: #fa5252;
+}
+
+.label {
+  position: absolute;
+  padding-inline: 4px;
+  z-index: 1;
+  pointer-events: none;
+  top: calc(50px / 2);
+  transform: translateY(-50%);
+  right: 16px;
+  @apply font-DanaMedium text-main;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  transition:
+    color 100ms ease,
+    transform 100ms ease;
+  background-color: transparent;
+}
+
+.label[data-floating] {
+  transform: translateY(-40px);
+  background-color: #ffffff;
+}
+
+.label[data-error] {
+  color: #fa5252;
+}
+
+.error {
+  padding: 4px 16px 0 16px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  color: #fa5252;
+}
+
+.section[data-position='right'] {
+  --input-right-section-size: 48px;
+  --psi-icon-size: 24px;
+}

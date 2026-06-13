@@ -1,1 +1,0 @@
-FROM next_gs_tools:1.0.0

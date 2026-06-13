@@ -1,0 +1,48 @@
+.RegisterMain {
+  @apply 1sm:container bg-white rounded-[20px] px-4 pt-8 pb-8;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}
+
+.form {
+  @apply grid md:grid-cols-2 md:gap-6 gap-3 mt-8;
+}
+
+.nameSection {
+  @apply pb-[10px] flex justify-between border-b-[0.5px];
+
+  & span {
+    @apply text-[20px] font-DanaMedium text-title;
+  }
+
+  & div {
+    @apply flex items-center text-[30px] text-title bg-zinc-200 rounded-[10px] p-2 justify-center;
+  }
+}
+
+.td {
+  @apply flex justify-center;
+
+  & p {
+    @apply bg-[#dfebfb] rounded-[10px] px-4 py-2 w-fit text-[14px];
+  }
+
+  & > svg {
+    @apply text-[20px];
+  }
+
+  & > a {
+    @apply bg-[#dfebfb] rounded-[10px] px-4 py-2 w-fit text-[14px];
+  }
+}
+
+.textArea {
+  & textarea {
+    @apply min-w-[300px];
+  }
+}
+
+.deleteBtn {
+  & > svg {
+    @apply text-[20px] text-[#d72b2b];
+  }
+}

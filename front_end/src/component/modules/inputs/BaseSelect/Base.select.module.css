@@ -1,0 +1,14 @@
+.root {
+  .label {
+    color: var(--mantine-color-gray-9);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 23px;
+    padding: var(--mantine-spacing-sm) 0px;
+  }
+
+  .input {
+    border-radius: var(--mantine-radius-xs);
+  }
+}

@@ -1,0 +1,70 @@
+.form_container {
+  @apply flex flex-col justify-between py-5;
+}
+
+.form {
+  @apply grid md:grid-cols-3 gap-6 pt-5 px-8 z-50;
+  direction: rtl;
+}
+
+.buttonContainer {
+  @apply flex gap-2 justify-end items-center mt-4;
+
+  & > button {
+    @apply min-w-[159px];
+  }
+}
+
+.input {
+  direction: rtl;
+}
+
+.editor_container {
+  direction: rtl;
+}
+
+.inputImage {
+  @apply w-full h-full object-cover mb-4;
+
+  & > img {
+    @apply w-full rounded-[7px];
+  }
+}
+
+.fileInputWrapper {
+  border: 1px dashed #9aa3b2;
+  @apply flex justify-around items-center p-4 rounded-[8px];
+
+  .fileInput {
+    @apply opacity-0 hidden;
+  }
+
+  .fileInputLabel {
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    @apply sm:w-[143px] h-[50px] flex items-center justify-center px-5 py-2 rounded-xl border cursor-pointer text-[16px] text-[#1C6F7D] bg-[#F0F5FA] hover:bg-[#d2e3f2] transition-all duration-300;
+  }
+}
+
+.fileInfo {
+  @apply flex justify-between items-center w-full bg-slate-100 py-2 px-4 rounded-lg text-slate-500 font-DanaMedium;
+
+  & > button > svg {
+    @apply text-red-400 text-[25px];
+  }
+
+  & > .fileInfoContent {
+    @apply flex justify-between items-center bg-slate-200 p-4 rounded-lg text-title;
+
+    & > svg {
+      @apply text-title text-[26px];
+    }
+
+    & > div {
+      @apply flex justify-between items-center;
+
+      & > span {
+        @apply text-[16px] font-DanaDemiBold text-des mr-2;
+      }
+    }
+  }
+}

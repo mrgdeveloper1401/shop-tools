@@ -1,0 +1,27 @@
+.header {
+  @apply flex items-center justify-between w-full bg-white;
+  border-bottom: 1px solid rgb(241, 237, 237);
+
+  & > button:hover {
+    background-color: rgb(212, 204, 204);
+  }
+}
+
+.root {
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+.content {
+  @apply flex justify-center items-center flex-col rounded-[16px];
+}
+
+.title {
+  @apply text-[20px] text-title font-DanaDemiBold;
+  line-height: 36px;
+}
+
+.body {
+  @apply bg-white overflow-y-auto w-full;
+}

@@ -1,0 +1,41 @@
+.section {
+  @apply w-full  md:py-2 py-2 md:pb-1 pb-6 px-1;
+
+  .containerLanding {
+    @apply flex justify-center items-center xl:mt-6 w-full xl:px-[90px] lg:px-[55px];
+  }
+}
+
+.slide {
+  @apply overflow-hidden sm:rounded-[25px] rounded-[10px] flex items-center justify-center relative;
+
+  .imageSlider {
+    @apply w-full sm:h-auto  h-[155px] object-cover sm:rounded-[25px] rounded-[10px];
+  }
+}
+
+.control {
+  @apply text-gray-800 bg-[#ebf5f5] sm:p-2 p-0 hover:bg-[#e9f0f0];
+
+  & > svg {
+    fill: white;
+  }
+}
+
+/* ---------- */
+/* .yalda_image {
+  position: relative;
+
+  > img {
+    @apply md:h-[73vh] h-[35vh];
+    object-fit: cover;
+    width: 100%;
+  }
+
+  > div {
+    position: absolute;
+    top: 60%;
+    right: 50%;
+    transform: translate(50%, -50%);
+  }
+} */

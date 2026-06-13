@@ -1,0 +1,49 @@
+.breadcrumb {
+  @apply 1sm:block hidden bg-gray-100 mb-8 1sm:container rounded-2xl;
+}
+
+.breadcrumb__content {
+  @apply flex bg-gray-100 pt-3 pb-3 px-6 rounded-2xl text-slate-500 mt-5;
+}
+
+.breadcrumb__home_content_icon {
+  @apply flex items-center justify-center bg-gray-100 rounded-2xl;
+}
+
+.breadcrumb__home_icon svg {
+  @apply text-[20px] text-cblack;
+}
+
+.icon_bread {
+  @apply mt-[1px] mx-[5px];
+}
+
+.breadcrumb__list {
+  @apply flex items-center mr-6 relative;
+}
+.breadcrumb__link {
+  margin-top: 10px;
+}
+.breadcrumb__item {
+  @apply list-none flex items-center mr-[27px];
+}
+
+.breadcrumb__itemLink {
+  @apply text-title hover:text-cblack;
+}
+
+.breadCrumb_li1,
+.breadCrumb_li2,
+.breadCrumb_li3 {
+  @apply mr-2.5 text-slate-500 text-[14px] cursor-pointer;
+}
+
+.breadCrumb_li2::before,
+.breadCrumb_li3::before {
+  @apply content-[''] w-[4px] h-[40px]  bg-[#FFFFFF] absolute -top-[24px] rotate-[37deg] rounded-bl-[15px];
+}
+
+.breadCrumb_li2::after,
+.breadCrumb_li3::after {
+  @apply content-[''] w-[4px] h-[43px]  bg-[#FFFFFF] absolute top-[7px] rotate-[-32deg] rounded-tl-[15px];
+}

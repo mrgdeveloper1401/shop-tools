@@ -1,0 +1,135 @@
+.root {
+  font-weight: 200;
+  border-radius: 10px;
+  line-height: 24px;
+  padding: 8px 28px;
+  transition:
+    background-color 100ms ease,
+    outline 100ms ease,
+    box-shadow 100ms ease;
+
+  &[data-variant='filled'] {
+    background-color: #ef4056;
+
+    &:hover {
+      outline: 1px solid #801313;
+    }
+
+    &:active {
+      box-shadow:
+        0px 1px 2px 0px rgba(16, 24, 40, 0.05),
+        0px 0px 0px 4px #bbd4d8;
+    }
+
+    &:disabled,
+    &[data-disabled] {
+      background-color: #d06868;
+      color: white;
+    }
+
+    &:where([data-error='true']) {
+      &:hover {
+        outline: none;
+      }
+
+      &:active {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  &[data-variant='secondary'] {
+    outline: 1px solid rgb(18, 15, 25);
+    background-color: #3b0808;
+
+    &:hover {
+      background-color: #2e2347;
+    }
+
+    &:active {
+      box-shadow: 0px 0px 0px 4px #bbd4d8;
+    }
+
+    &:disabled,
+    &[data-disabled] {
+      outline: 1px solid blue;
+      background-color: blue;
+      color: blue;
+    }
+
+    &:where([data-error='true']) {
+      --mantine-color-primary-filled: red;
+      --mantine-color-primary-filled-hover: red;
+
+      &:hover {
+        outline: none;
+      }
+
+      &:active {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  &[data-variant='outline'] {
+    background-color: #fff;
+    color: #11434b;
+    border: 1px solid #8eb7be;
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    font-size: 18px;
+    font-weight: 500;
+
+    &:active {
+      box-shadow: 0px 0px 0px 4px #bbd4d8;
+    }
+
+    &:disabled,
+    &[data-disabled] {
+      outline: 1px solid blue;
+      background-color: blue;
+      color: blue;
+    }
+
+    &:where([data-error='true']) {
+      --mantine-color-primary-filled: red;
+      --mantine-color-primary-filled-hover: red;
+
+      &:hover {
+        outline: none;
+      }
+
+      &:active {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  &[data-size='xs'] {
+    padding: 4px 6px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+
+  &[data-size='sm'] {
+    /* padding: 12px 8px; */
+    font-size: 14px;
+  }
+
+  &[data-size='md'] {
+    /* padding: 10px 22px; */
+    font-size: 16px;
+  }
+
+  &[data-size='lg'] {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+
+  &[data-size='xl'] {
+    padding: 8px 28px;
+    font-size: 16px;
+  }
+}
