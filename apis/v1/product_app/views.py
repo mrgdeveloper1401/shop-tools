@@ -97,7 +97,6 @@ class CreateAdminProductView(generics.CreateAPIView):
             # "social_links",
             "product_name",
             "description_slug",
-            "sku"
         ).prefetch_related(
             Prefetch(
                 "tags", queryset=Tag.objects.only("tag_name")
@@ -171,7 +170,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "description",
                 "product_name",
                 "description_slug",
-                "sku",
                 "updated_at",
             ).prefetch_related(
                     Prefetch(
@@ -188,7 +186,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "tags", queryset=Tag.objects.only("tag_name")
                 ),
                 Prefetch(
-                    "attributes", queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(
+                    "variants__attributes", queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(
                         "attribute__attribute_name",
                         "product_id",
                         "value"
@@ -238,14 +236,12 @@ class ProductViewSet(viewsets.ModelViewSet):
                 ).select_related(
                     "product_brand"
                 ).only(
-                    "base_price",
                     "product_name",
                     "description",
                     "product_brand__brand_name",
                     "tags",
                     "product_slug",
                     "description_slug",
-                    "sku",
                     "updated_at",
                 )
 
@@ -429,7 +425,6 @@ class ProductListHomePageView(generics.ListAPIView):
         "created_at",
         "updated_at",
         "price",
-        "sku",
         "product_brand__brand_name",
         "total_sale",
     ).select_related(
