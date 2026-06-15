@@ -202,7 +202,7 @@ else:
 CACHES = {
     "default": {
          "BACKEND": "django_redis.cache.RedisCache",
-         "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/5", cast=str),
+         "LOCATION": config("REDIS_SECOND_URL", default="redis://127.0.0.1:6381/5", cast=str), # inr prod use db 4
          "TIMEOUT": config("REDIS_SECOND_TIMEOUT", default=86400, cast=int),
          "OPTIONS": {
              "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -228,8 +228,8 @@ DJANGO_REDIS_IGNORE_EXCEPTIONS = config("DJANGO_REDIS_IGNORE_EXCEPTIONS", defaul
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = config("DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS", default=True, cast=bool)
 
 # config celery
-CELERY_BROKER_URL = config("PRODUCTION_CELERY_BROKER_URL", cast=str, default='redis://localhost:6381/6')
-CELERY_RESULT_BACKEND = config("PRODUCTION_CELERY_RESULT_BACKEND", cast=str, default='redis://localhost:6381/7')
+CELERY_BROKER_URL = config("PRODUCTION_CELERY_BROKER_URL", cast=str, default='redis://localhost:6381/6') # inr prod use db 2
+CELERY_RESULT_BACKEND = config("PRODUCTION_CELERY_RESULT_BACKEND", cast=str, default='redis://localhost:6381/7') # inr prod use db 3
 CELERY_ACCEPT_CONTENT = config("CELERY_ACCEPT_CONTENT", default="json", cast=Csv())
 CELERY_TASK_SERIALIZER = config("CELERY_TASK_SERIALIZER", cast=str, default='json')
 CELERY_RESULT_SERIALIZER = config("CELERY_RESULT_SERIALIZER", cast=str, default='json')
@@ -249,6 +249,7 @@ USE_CORS = config("USE_CORS", cast=bool, default=False)
 if USE_CORS:
     MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
     CORS_ALLOWED_ORIGINS = config("PRODUCTION_CORS_ALLOWED_ORIGINS", cast=Csv())
+    CORS_ALLOW_CREDENTIALS = config("CORS_ALLOW_CREDENTIALS", cast=bool, default=True)
     INSTALLED_APPS.append("corsheaders")
 
 USE_SSL = config("USE_SSL", cast=bool, default=False)

@@ -9,12 +9,19 @@ class ProductVariantFilter(FilterSet):
     has_discount = BooleanFilter(method='filter_has_discount', label="has_discount")
     category_id = NumberFilter(method='filter_category_id', label="category_id")
     brand_id = NumberFilter(method='filter_brand_id', label="brand_id")
+    null_sku = BooleanFilter(method='filter_null_sku', label="null_sku")
 
     class Meta:
         model = ProductVariant
         fields = {
             "name": ("icontains",),
         }
+
+    def filter_null_sku(self, queryset, name, value):
+        if value:
+            return queryset.filter(sku__isnull=True)
+        else:
+            return queryset.filter(sku__isnull=False)
 
     def filter_has_discount(self, queryset, name, value):
         if value is None:
