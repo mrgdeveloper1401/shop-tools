@@ -140,6 +140,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
+        product_variant_attribute_fields = ("attribute__attribute_name", "product_variant_id", "value__attribute_value")
+        # base query
         base_query = Product.objects.filter(category_id=self.kwargs["category_pk"]).prefetch_related(
             Prefetch(
                 "variants__product_variant_discounts", queryset=ProductDiscount.objects.select_related(
@@ -156,12 +158,14 @@ class ProductViewSet(viewsets.ModelViewSet):
         )
 
         if self.request.user.is_staff:
+            product_image_fields = ("image__image", "image__image_id_ba_salam", "alt_text_image", "order", "product_id", "updated_at")
+
             base_query = base_query.select_related(
                 "product_brand",
                 "category"
             ).only(
-                "total_sale",
-                "product_id_ba_salam",
+                # "total_sale",
+                # "product_id_ba_salam",
                 "tags__tag_name",
                 "product_brand__brand_name",
                 "category__category_name",
@@ -173,24 +177,15 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "updated_at",
             ).prefetch_related(
                     Prefetch(
-                "product_product_image", queryset=ProductImages.objects.select_related("image").only(
-                        "image__image",
-                        "image__image_id_ba_salam",
-                        "alt_text_image",
-                        "order",
-                        "product_id",
-                        "updated_at"
-                        )
-                ),
+                        "product_product_image",
+                        queryset=ProductImages.objects.select_related("image").only(*product_image_fields)
+                    ),
                 Prefetch(
                 "tags", queryset=Tag.objects.only("tag_name")
                 ),
                 Prefetch(
-                    "variants__attributes", queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(
-                        "attribute__attribute_name",
-                        "product_id",
-                        "value"
-                    )
+                    "variants__product_variant_attributes",
+                    queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(*product_variant_attribute_fields)
                 )
             )
             return base_query
@@ -225,13 +220,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                         "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
                     ),
                     Prefetch(
-                        "attributes", queryset=ProductVariantAttributeValues.objects.select_related(
-                            "attribute"
-                        ).only(
-                            "attribute__attribute_name",
-                            "value",
-                            "product_id"
-                        )
+                        "variants__product_variant_attributes",
+                        queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(*product_variant_attribute_fields)
                     )
                 ).select_related(
                     "product_brand"

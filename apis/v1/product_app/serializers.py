@@ -261,7 +261,11 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     tags = NestedProductTagsSerializer(many=True)
     product_brand = SimpleProductBrandSerializer()
     product_product_image = NestedProductImageSerializer(many=True)
-    attributes = NestedProductVariantAttributeValuesSerializer(many=True, read_only=True)
+    attributes = NestedProductVariantAttributeValuesSerializer(
+        many=True,
+        read_only=True,
+        source="product_variant_attributes"
+    )
     variants = NestedProductVariantPriceAttributeSerializer(many=True)
 
     class Meta:
@@ -458,10 +462,7 @@ class UserProductVariantSerializer(serializers.ModelSerializer):
 
 
 class AdminProductListHomePageSerializer(ProductListHomePageSerializer):
-    total_sale = serializers.IntegerField()
-
-    class Meta(ProductListHomePageSerializer.Meta):
-        fields = ProductListHomePageSerializer.Meta.fields + ('total_sale',)
+    pass
 
 
 class AdminTagSerializer(serializers.ModelSerializer):

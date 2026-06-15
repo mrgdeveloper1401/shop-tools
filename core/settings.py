@@ -228,8 +228,8 @@ DJANGO_REDIS_IGNORE_EXCEPTIONS = config("DJANGO_REDIS_IGNORE_EXCEPTIONS", defaul
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = config("DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS", default=True, cast=bool)
 
 # config celery
-CELERY_BROKER_URL = config("PRODUCTION_CELERY_BROKER_URL", cast=str, default='redis://localhost:6381/4')
-CELERY_RESULT_BACKEND = config("PRODUCTION_CELERY_RESULT_BACKEND", cast=str, default='redis://localhost:6381/3')
+CELERY_BROKER_URL = config("PRODUCTION_CELERY_BROKER_URL", cast=str, default='redis://localhost:6381/6')
+CELERY_RESULT_BACKEND = config("PRODUCTION_CELERY_RESULT_BACKEND", cast=str, default='redis://localhost:6381/7')
 CELERY_ACCEPT_CONTENT = config("CELERY_ACCEPT_CONTENT", default="json", cast=Csv())
 CELERY_TASK_SERIALIZER = config("CELERY_TASK_SERIALIZER", cast=str, default='json')
 CELERY_RESULT_SERIALIZER = config("CELERY_RESULT_SERIALIZER", cast=str, default='json')
