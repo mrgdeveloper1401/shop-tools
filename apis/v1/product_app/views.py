@@ -345,9 +345,11 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
              "stock_number",
              "is_active",
              "name",
-             "old_price",
              "short_desc",
              "subtitle",
+             "sku",
+             "in_person_purchase",
+             "product_id_ba_salam"
          )
 
 
@@ -387,16 +389,14 @@ class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ProductVariantAttributeValues.objects.filter(
-            product_id=self.kwargs['product_pk']
+            product_variant__product_id=self.kwargs['product_pk']
         ).select_related(
                 "attribute"
             ).only(
                 "attribute__attribute_name",
                 "value",
-                "product_id"
+                "product_variant_id"
         )
-
-
 
 
 class ProductListHomePageView(generics.ListAPIView):

@@ -382,8 +382,8 @@ class SimpleAttribute(serializers.ModelSerializer):
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
     # attribute_values = NestedProductVariantAttributeValueserializer(many=True, read_only=True)
-    product = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.only("id")
+    product_variant = serializers.PrimaryKeyRelatedField(
+        queryset=ProductVariant.objects.only("id")
     )
     attribute = serializers.PrimaryKeyRelatedField(
         queryset=Attribute.objects.only("id")
