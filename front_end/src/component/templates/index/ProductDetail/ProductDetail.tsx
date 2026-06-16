@@ -178,7 +178,7 @@ const ProductDetail = ({
             </div>
           </div>
 
-          <div className={s.specifications}>
+          {/* <div className={s.specifications}>
             <h2>مشخصات محصول:</h2>
             {data.attributes.length > 0 &&
               data.attributes.map((item: any, index: number) => (
@@ -187,7 +187,7 @@ const ProductDetail = ({
                   <p>{item.value}</p>
                 </div>
               ))}
-          </div>
+          </div> */}
 
           <div className={s.addToBag}>
             <CounterProduct data={data} variantSelected={variantSelcted} />

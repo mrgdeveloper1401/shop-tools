@@ -4,8 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useCreateProductForm } from '@/hooks/formik/admin-dashboard/useCreateProductFormik';
 import { useDebouncedValue } from '@mantine/hooks';
-import Swal from 'sweetalert2';
 import { Switch } from '@mantine/core';
+import Swal from 'sweetalert2';
 
 import BaseTextArea from '@/component/modules/inputs/BaseTextArea/BaseTextArea';
 import BaseTable from '../../../modules/tables/BaseTable/Base.table';

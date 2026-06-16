@@ -339,7 +339,7 @@ const getHomeProductsApi = async (
       ...(has_discount && { has_discount: has_discount }),
     }).toString();
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/product_home_page/?${queryParams}`,
+      `https://api.gs-tools.ir/v2/product/product_list?${queryParams}`,
       {
         next: { revalidate: 180 },
       },
