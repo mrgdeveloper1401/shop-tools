@@ -8,5 +8,5 @@ COPY . .
 
 EXPOSE 3000
 
-#ENTRYPOINT ["npm", "run", "start:node"]
-CMD ["npm", "run", "start"]
+ENTRYPOINT ["npm", "run", "start:node"]
+#CMD ["npm", "run", "start"]
