@@ -157,6 +157,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             )
         )
 
+        # for admin user
         if self.request.user.is_staff:
             product_image_fields = ("image__image", "image__image_id_ba_salam", "alt_text_image", "order", "product_id", "updated_at")
 
@@ -190,6 +191,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             )
             return base_query
 
+        # for normal user
         else:
             query = base_query.filter(is_active=True).prefetch_related(
                     Prefetch(
@@ -221,7 +223,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     ),
                     Prefetch(
                         "variants__product_variant_attributes",
-                        queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(*product_variant_attribute_fields)
+                        queryset=ProductVariantAttributeValues.objects.select_related("attribute", "value").only(*product_variant_attribute_fields)
                     )
                 ).select_related(
                     "product_brand"
