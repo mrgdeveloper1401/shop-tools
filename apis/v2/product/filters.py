@@ -15,6 +15,7 @@ class ProductVariantFilter(FilterSet):
         model = ProductVariant
         fields = {
             "name": ("icontains",),
+            "id": ("exact",)
         }
 
     def filter_null_sku(self, queryset, name, value):

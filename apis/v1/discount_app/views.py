@@ -55,7 +55,7 @@ class ValidCouponCodeView(views.APIView):
                 return response.Response(
                     {
                         "data": "ok",
-                        "amount": coupon[0].amount
+                        "amount": coupon.first().amount
                     }
                 )
             else:

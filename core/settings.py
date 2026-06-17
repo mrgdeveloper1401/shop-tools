@@ -13,7 +13,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv(), default='*')
 
-SECRET_KEY = config("SECRET_KEY", cast=str, default="salam_donya")
+SECRET_KEY = config("SECRET_KEY", cast=str, default="hello_world_django_gs_tools")
 
 INSTALLED_APPS = [
     # built in django
@@ -61,6 +61,8 @@ DATABASES = {
         # "CONN_MAX_AGE": config("CON_MAX_AGE", cast=int, default=60),
         'OPTIONS': {
             'pool': {
+                # for tow core --> (4, 20) connection
+                # for tow core and 5 worker --> 5 * 20 = 100 connection
                 'min_size': config("POOL_MIN_SIZE", cast=int, default=4),       # Minimum number of connections in the pool
                 'max_size': config("POOL_MAX_SIZE", cast=int, default=os.cpu_count() * 2 * 5),       # Maximum number of connections in the pool
                 'timeout': config("POOL_TIMEOUT", cast=int, default=30),  # Connection lifetime in seconds (optional)
@@ -214,6 +216,7 @@ CACHES = {
              #     "level": config("COMPRESSOR_SECOND_LEVEL_ARGS", default=6, cast=int)
              # },
              "CONNECTION_POOL_KWARGS": {
+                 # fot tow core --> 20 connection --> 2 * 2 * 5 = 20
                  "max_connections": config("REDIS_SECOND_POOL_MAX_CONNECTION", default=os.cpu_count() * 2 * 5, cast=int),
                  "retry_on_timeout": config("REDIS_SECOND_POOL_RETRY_TIMEOUT", default=True, cast=bool),
                  "health_check_interval": config("REDIS_SECOND_HEALTH_CHECK_INTERVAL", default=True, cast=bool),

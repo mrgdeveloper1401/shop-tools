@@ -21,14 +21,16 @@ def send_otp_sms(phone: str, otp: str):
         "token": otp,
         "template": KV_PATTERN_NAME,
     }
-    with httpx.Client() as client:
-        response = client.get(
+    try:
+        response = httpx.get(
             url=VERIFY_BASE_URL,
             params=params,
             timeout=10.0
         )
         response.raise_for_status()
         return response
+    except Exception as e:
+        raise HttpxCustomApiException(e)
 
 @http_error
 def send_otp_for_request_forget_password(phone, code):
@@ -37,45 +39,45 @@ def send_otp_for_request_forget_password(phone, code):
         "token": code,
         "template": KV_REQUEST_FORGE_PASSWORD
     }
-    with httpx.Client() as client:
-        response = client.get(
+    try:
+        response = httpx.get(
             url=VERIFY_BASE_URL,
             params=params,
             timeout=10.0
         )
         response.raise_for_status()
         return response
+    except Exception as e:
+        raise HttpxCustomApiException(e)
 
-async def send_verify_payment(phone: str, tracking_code: str):
+def send_verify_payment(phone: str, tracking_code: str):
     params = {
         "receptor": phone,
         "token": tracking_code,
         "template": KV_PAYMENT_PATTERN_NAME
     }
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(
-                url=VERIFY_BASE_URL,
-                params=params,
-                timeout=10.0
+    try:
+        response = httpx.get(
+            url=VERIFY_BASE_URL,
+            params=params,
+            timeout=10.0
             )
-            return response.raise_for_status()
-        except Exception as e:
-            raise HttpxCustomApiException(e)
+        return response.raise_for_status()
+    except Exception as e:
+        raise HttpxCustomApiException(e)
 
-async def cancel_verify_payment(phone: str, tracking_code: str):
+def cancel_verify_payment(phone: str, tracking_code: str):
     params = {
         "receptor": phone,
         "token": tracking_code,
         "template": KV_CANCEL_PAYMENT_PATTERN_NAME
     }
-    async with httpx.AsyncClient() as client:
-        try:
-            resonse = await client.get(
-                url=VERIFY_BASE_URL,
-                params=params,
-                timeout=10.0
-            )
-            return resonse.raise_for_status()
-        except Exception as e:
-            raise HttpxCustomApiException(e)
+    try:
+        response = httpx.get(
+            url=VERIFY_BASE_URL,
+            params=params,
+            timeout=10.0
+        )
+        return response.raise_for_status()
+    except Exception as e:
+        raise HttpxCustomApiException(e)

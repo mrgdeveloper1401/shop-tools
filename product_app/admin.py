@@ -84,7 +84,7 @@ class ProductBasePriceIsNull(admin.SimpleListFilter):
 
 @admin.register(Category)
 class CategoryAdmin(TreeAdmin, CoreAdminMixin):
-    # form = movenodeform_factory(Category)
+    form = movenodeform_factory(Category)
     list_display = ("id", "category_name", "category_slug", "category_image_id", "is_active", "created_at", "updated_at")
     list_display_links = ("id", "category_name")
     search_fields = ("category_name", "id")

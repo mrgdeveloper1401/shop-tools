@@ -2,9 +2,9 @@
 import multiprocessing
 
 bind = "0.0.0.0:8000"
-workers = multiprocessing.cpu_count() * 2 + 1
+workers = multiprocessing.cpu_count() * 2 + 1 # for 2 core --> 5 worker
 worker_class = "gthread"
-threads = 4
+threads = 4 # for two core --> 5 * 4 = 20 (thread)
 
 # Logging
 loglevel = "error"

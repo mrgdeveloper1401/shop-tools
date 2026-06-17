@@ -188,7 +188,7 @@ class ProductVariant(CreateMixin, UpdateMixin, SoftDeleteMixin):
     stock_number = models.PositiveIntegerField(default=10)
     is_active = models.BooleanField(default=True, db_default=True)
     short_desc = models.CharField(max_length=400, blank=True, null=True)
-    sku = models.CharField(max_length=50, null=True)
+    sku = models.CharField(max_length=50, null=True, blank=True)
     product_id_ba_salam = models.BigIntegerField(
         null=True,
         blank=True,
@@ -241,5 +241,5 @@ class FavoriteProduct(CreateMixin, UpdateMixin, SoftDeleteMixin):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('id',)
         db_table = "favorite_product"

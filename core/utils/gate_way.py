@@ -1,6 +1,7 @@
 import httpx
 from decouple import config
 
+from core.utils.custom_exception import HttpxCustomApiException
 from core.utils.exceptions import http_error
 
 
@@ -30,9 +31,9 @@ def request_gate_way(amount, description, order_id, mobile):
     return response.json()
 
 @http_error
-async def verify_payment(track_id):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
+def verify_payment(track_id):
+    try:
+        response = httpx.post(
             url=config("ZIBAL_VERIFY_URL", cast=str),
             json={
                 "trackId": track_id,
@@ -40,4 +41,6 @@ async def verify_payment(track_id):
             },
             headers=http_header(),
         )
-    return response.json()
+        return response.json()
+    except Exception as e:
+        raise HttpxCustomApiException(e)

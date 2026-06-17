@@ -147,7 +147,8 @@ class UserInformationViewSet(viewsets.ModelViewSet):
             'username',
             "email",
             "is_active",
-            "is_staff"
+            "is_staff",
+            "password"
         )
         if not self.request.user.is_staff:
             query = query.filter(id=self.request.user.id)
@@ -165,6 +166,7 @@ class UserProfileViewSet(
     permission (create and delete) --> user must be admin \n
     pagination --> 20 item , only user admin have pagination
     """
+    # TODO, edit list method
     serializer_class = serializers.UserProfileSerializer
     pagination_class = AdminTwentyPageNumberPagination
 
@@ -204,6 +206,7 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
+        # filter normal user user
         if not self.request.user.is_staff:
             return PrivateNotification.objects.filter(
                 user_id=self.request.user.id,
@@ -214,16 +217,18 @@ class UserPrivateNotificationViewSet(viewsets.ModelViewSet):
                 "created_at",
                 "notif_type",
             )
-        return PrivateNotification.objects.select_related("user").only(
-            "user__mobile_phone",
-            "title",
-            "body",
-            "created_at",
-            "notif_type",
-            "is_read",
-            "is_active",
-            "notifi_redirect_url"
-        )
+        else:
+            # show for admin user
+            return PrivateNotification.objects.select_related("user").only(
+                "user__mobile_phone",
+                "title",
+                "body",
+                "created_at",
+                "notif_type",
+                "is_read",
+                "is_active",
+                "notifi_redirect_url"
+            )
 
 
 class UserAddressViewSet(CacheMixin, viewsets.ModelViewSet):
@@ -275,6 +280,7 @@ class AdminUserListview(generics.ListAPIView):
     permission --> admin user \n
     filter query --> mobile_phone
     """
+    # TODO, use limit offset, search phone and id
     serializer_class = serializers.AdminUserListSerializer
     permission_classes = (permissions.IsAdminUser,)
     filterset_class = UserMobilePhoneFilter

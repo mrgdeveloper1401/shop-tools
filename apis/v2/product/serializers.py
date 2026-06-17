@@ -51,7 +51,7 @@ class NestedProductVariantDiscount(serializers.ModelSerializer):
 
 
 class ProductListHomePageSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="product.id")
+    # id = serializers.IntegerField(source="product.id")
     category_id = serializers.IntegerField(source="product.category_id", allow_null=True)
     product_product_image = NestedProductImageSerializer(source="product", allow_null=True)
     product_name = serializers.CharField(source="product.product_name", allow_null=True)

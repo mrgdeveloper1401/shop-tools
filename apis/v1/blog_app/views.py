@@ -121,7 +121,11 @@ class PostBlogViewSet(viewsets.ModelViewSet):
 
 
 class IntroductionPostBlogView(CacheMixin, generics.ListAPIView):
+    """
+    معروف ترین مقاله ها
+    """
     serializer_class = serializers.ListPostBlogSerializer
+
     queryset = PostBlog.objects.filter(
         is_active=True,
         is_introduction_article=True
@@ -228,6 +232,9 @@ class BlogTagWithOutPaginationView(CacheMixin, generics.ListAPIView):
 
 
 class LatestTenPostBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
+    """
+     ده پست اخیر
+    """
     serializer_class = serializers.ListPostBlogSerializer
 
     def list(self, request, *args, **kwargs):
@@ -272,6 +279,7 @@ class LatestTenPostBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListM
             "author"
         ).order_by("-id")[:10]
         return query
+
 
 class SeoBlogViewSet(CacheMixin, viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = serializers.SeoBlogSerializer

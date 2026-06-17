@@ -323,7 +323,8 @@ class ProductImageViewSet(viewsets.ModelViewSet):
             "image__image",
             "image__image_id_ba_salam",
             "image__wp_image_url",
-            "product_id"
+            "product_id",
+            "alt_text_image"
         )
 
 
@@ -390,14 +391,16 @@ class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
+        # TODO, better query
         return ProductVariantAttributeValues.objects.filter(
             product_variant__product_id=self.kwargs['product_pk']
         ).select_related(
-                "attribute"
-            ).only(
-                "attribute__attribute_name",
-                "value",
-                "product_variant_id"
+            "attribute",
+            "value"
+        ).only(
+            "attribute__attribute_name",
+            "value__attribute_value",
+            "product_variant_id"
         )
 
 
