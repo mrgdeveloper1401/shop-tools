@@ -151,7 +151,7 @@ class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
     description = CKEditor5Field('Text', config_name='extends')
     description_slug = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True, db_default=True)
-    sku = models.CharField(max_length=50)
+    sku = models.CharField(max_length=50, blank=True, null=True)
     # base_price = models.DecimalField(
     #     max_digits=12,
     #     decimal_places=3,
