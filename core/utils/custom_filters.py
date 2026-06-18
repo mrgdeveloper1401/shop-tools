@@ -158,6 +158,7 @@ class ProductHomePageFilter(FilterSet):
     min_price = NumberFilter(method="min_price_filter")
     price = RangeFilter(field_name='variants__price', label='Price range')
     has_discount = BooleanFilter(method='filter_has_discount', label="Has discount")
+    null_sku = BooleanFilter(method='is_null_sku', label="Is null sku")
 
     class Meta:
         model = Product
@@ -167,6 +168,9 @@ class ProductHomePageFilter(FilterSet):
             "tags__tag_name": ['contains'],
             "product_brand": ['exact'],
         }
+
+    def is_null_sku(self, queryset, name, value):
+        return queryset.filter(sku__isnull=value)
 
     def more_price_filter(self, queryset, name, value):
         return queryset.filter(

@@ -137,7 +137,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_deleted",
             "deleted_at",
             "created_at",
-            "sku"
         )
         read_only_fields = ("total_sale",)
 

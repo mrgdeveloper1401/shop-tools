@@ -175,6 +175,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_name",
                 "description_slug",
                 "updated_at",
+                "sku"
             ).prefetch_related(
                 Prefetch(
                     "product_product_image",
@@ -215,6 +216,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "description_slug",
                     "product_slug",
                     "category_id",
+                    "sku"
                 )
             else:
                 return query.prefetch_related(
