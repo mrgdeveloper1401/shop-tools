@@ -414,6 +414,7 @@ class ProductListHomePageView(generics.ListAPIView):
     pagination --> 20 item \n
     filter query --> product_name, tag, min_price, max_price, category_name, price_range
     """
+    # TODO,
     ordering_fields = ("id", "total_sale")
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     queryset = Product.objects.filter(is_active=True).only(
@@ -427,6 +428,7 @@ class ProductListHomePageView(generics.ListAPIView):
         # "price",
         "product_brand__brand_name",
         "total_sale",
+        "sku"
     ).select_related(
         "product_brand"
     ).prefetch_related(
@@ -464,45 +466,46 @@ class ProductListHomePageView(generics.ListAPIView):
             ).valid_discount()
         ),
         Prefetch(
-            "variants__product_variant_attributes", queryset=ProductVariantAttributeValues.objects.only(
+            "product_attributes", queryset=ProductVariantAttributeValues.objects.only(
                 "value",
                 "attribute__attribute_name",
-                "product_variant_id",
-                "product_variant__product_id",
+                "product_id",
             ).select_related("attribute")
         )
     )
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductHomePageFilter
+    serializer_class = serializers.AdminProductListHomePageSerializer
+    permission_classes = (permissions.IsAdminUser,)
 
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            return serializers.AdminProductListHomePageSerializer
-        else:
-            return serializers.ProductListHomePageSerializer
+    # def get_serializer_class(self):
+    #     if self.request.user.is_staff:
+    #         return serializers.AdminProductListHomePageSerializer
+    #     else:
+    #         return serializers.ProductListHomePageSerializer
 
-    def get_queryset(self):
-        queryset = super().get_queryset().order_by("-id")
+    # def get_queryset(self):
+        # queryset = super().get_queryset().order_by("-id")
 
         # Subquery برای گرفتن قیمت اولین variant فعال هر محصول
-        first_variant_price = ProductVariant.objects.filter(
-            product_id=OuterRef('pk'),
-            is_active=True
-        ).order_by('id').values('price')[:1]  # مرتب کردن بر اساس ID (می‌توانید به price تغییر دهید)
+        # first_variant_price = ProductVariant.objects.filter(
+        #     product_id=OuterRef('pk'),
+        #     is_active=True
+        # ).order_by('id').values('price')[:1]  # مرتب کردن بر اساس ID (می‌توانید به price تغییر دهید)
 
         # اضافه کردن annotation به کوئری اصلی
-        queryset = queryset.annotate(
-            first_variant_price=Subquery(first_variant_price)
-        )
+        # queryset = queryset.annotate(
+        #     first_variant_price=Subquery(first_variant_price)
+        # )
 
         # اگر پارامتر ordering وجود داشت، از آن استفاده می‌کنیم
-        ordering = self.request.query_params.get('ordering', '')
-        if ordering == 'first_variant_price':
-            queryset = queryset.order_by('first_variant_price')
-        elif ordering == '-first_variant_price':
-            queryset = queryset.order_by('-first_variant_price')
-
-        return queryset
+        # ordering = self.request.query_params.get('ordering', '')
+        # if ordering == 'first_variant_price':
+        #     queryset = queryset.order_by('first_variant_price')
+        # elif ordering == '-first_variant_price':
+        #     queryset = queryset.order_by('-first_variant_price')
+        #
+        # return queryset
 
 
 class TagViewSet(CacheMixin, viewsets.ModelViewSet):

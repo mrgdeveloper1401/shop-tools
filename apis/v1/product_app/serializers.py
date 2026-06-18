@@ -137,6 +137,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_deleted",
             "deleted_at",
             "created_at",
+            "sku"
         )
         read_only_fields = ("total_sale",)
 
@@ -469,7 +470,10 @@ class UserProductVariantSerializer(serializers.ModelSerializer):
 
 
 class AdminProductListHomePageSerializer(ProductListHomePageSerializer):
-    pass
+    attributes = NestedVariantAttributeSerializer(many=True, read_only=True, source="product_attributes")
+
+    class Meta(ProductListHomePageSerializer.Meta):
+        fields = ProductListHomePageSerializer.Meta.fields + ("attributes", "sku")
 
 
 class AdminTagSerializer(serializers.ModelSerializer):
