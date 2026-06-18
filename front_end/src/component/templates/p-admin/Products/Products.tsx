@@ -22,6 +22,7 @@ import {
   getAllBrandsApi,
   getAllCategoryApi,
   getAllTagsApi,
+  getProductsAdminApi,
   getProductsApi,
   IBrands,
   ICategory,
@@ -77,10 +78,12 @@ const ProductsSection = () => {
 
   const callGetProductsApi = async () => {
     try {
-      const result = await getProductsApi(
+      const result = await getProductsAdminApi(
         Number(urlParams),
         undefined,
         urlSearch,
+        undefined,
+        "-id"
       );
       setAllProductsData(result);
 

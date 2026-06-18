@@ -5,6 +5,7 @@ import Navbar from '@/component/templates/index/Navbar/Navbar';
 import NavbarCategory from '@/component/templates/index/NavbarCategory/NavbarCategory';
 import BannerHeader from '@/component/templates/index/BannerHeader/BannerHeader';
 import DetailInfo from '@/component/modules/DetailInfo/DetailInfo';
+import { notFound } from 'next/navigation';
 
 const data = [
   { name: 'خانه', href: '/' },
@@ -48,18 +49,19 @@ export default function SidebarLayout({
 }: {
   children: ReactNode;
 }): JSX.Element {
-  return (
-    <>
-      <header>
-        <BannerHeader />
-        <Navbar data={data} />
-        <NavbarCategory />
-      </header>
-      <main>
-        {children}
-        <DetailInfo />
-      </main>
-      <Footer />
-    </>
-  );
+  return notFound()
+  // return (
+  //   <>
+  //     <header>
+  //       <BannerHeader />
+  //       <Navbar data={data} />
+  //       <NavbarCategory />
+  //     </header>
+  //     <main className="bg-[#FCFCFC]">
+  //       {children}
+  //       <DetailInfo />
+  //     </main>
+  //     <Footer />
+  //   </>
+  // ); 
 }

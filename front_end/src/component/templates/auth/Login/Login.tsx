@@ -54,7 +54,7 @@ const Login = () => {
         <div className={s.login_left_main}>
           <Link href="/" className={s.image}>
             <Image
-              src="/images/home/logo.webp"
+              src="/images/home/logo.png"
               alt="logo"
               width={150}
               height={100}

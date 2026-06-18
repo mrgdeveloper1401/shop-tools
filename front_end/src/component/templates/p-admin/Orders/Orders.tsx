@@ -25,7 +25,7 @@ const Orders = () => {
   const [allOrders, setAllOrders] =
     useState<PaginationWithDataType<IResultOrder>>();
   const [filterPaymentStatus, setFilterPaymentStatus] =
-    useState<string>('pending');
+    useState<string>('paid');
 
   const callGetOrderApi = async () => {
     try {

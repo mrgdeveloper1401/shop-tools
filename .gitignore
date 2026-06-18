@@ -392,3 +392,5 @@ readme.md
 test_code.py
 env_folder
 backup
+front_end/.next
+front_end/node_modules

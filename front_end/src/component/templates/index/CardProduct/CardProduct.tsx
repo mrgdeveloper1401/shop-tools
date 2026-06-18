@@ -97,8 +97,8 @@ const CardProduct: FC<CardProductProps> = ({ data }) => {
     // به‌روزرسانی سبد
     const updatedCart = isExist
       ? current.map((item: any) =>
-          item.variant_id === selectedVariant.variant_id ? itemData : item,
-        )
+        item.variant_id === selectedVariant.variant_id ? itemData : item,
+      )
       : [...current, itemData];
 
     localStorage.setItem('bagShop', JSON.stringify(updatedCart));
@@ -129,7 +129,7 @@ const CardProduct: FC<CardProductProps> = ({ data }) => {
               src={
                 data.product_product_image.length > 0
                   ? data.product_product_image.find((item) => item.order === 1)
-                      ?.image?.get_image_url || ''
+                    ?.image?.get_image_url || ''
                   : ''
               }
               alt={data.product_name}

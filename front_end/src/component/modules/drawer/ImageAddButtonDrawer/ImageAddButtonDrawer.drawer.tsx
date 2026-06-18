@@ -22,6 +22,7 @@ import { ImagesColumnsData } from './ImageAddButtonDrawer.table';
 import { showSwal } from '../../../../utils/swalHelper';
 
 import styles from './ImageAddButtonDrawer.module.css';
+import { Button } from '@mantine/core';
 
 interface ImageAddButtonDrawerProps {
   productId: number;
@@ -189,9 +190,15 @@ const ImageAddButtonDrawer: FC<ImageAddButtonDrawerProps> = ({
           </div>
         </Suspense>
       </BaseDrawer>
-      <PrimaryButton onClick={open} size="xs" className={styles.td}>
+
+      <Button
+        variant="filled" color="red" radius="xl"
+        onClick={open}
+
+      >
         افزودن عکس
-      </PrimaryButton>
+
+      </Button>
     </>
   );
 };

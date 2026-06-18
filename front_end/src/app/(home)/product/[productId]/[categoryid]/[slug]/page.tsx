@@ -55,7 +55,7 @@ export async function generateMetadata({
       url: `https://gs-tools.ir/${productId}/${categoryid}/${slug}`,
       siteName: 'جی اس تولز',
       type: 'website',
-      images: product.product_product_image.map((img) => ({
+      images: product.product_product_image && product.product_product_image.map((img) => ({
         url: img.image.get_image_url,
         width: 1200,
         height: 630,
@@ -86,6 +86,7 @@ const ProductPage = async ({
   const { productId, categoryid, slug } = resolvedParams;
 
   const product = await getOneProductApi(Number(productId), Number(categoryid));
+  console.log(product)
   if (!product) return <p>محصول پیدا نشد</p>;
 
   const productStructuredData = {

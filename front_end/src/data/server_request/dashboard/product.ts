@@ -307,16 +307,57 @@ const getProductsApi = async (
   }
 };
 
+const getProductsAdminApi = async (
+  pageIndex: any,
+  filter?: any,
+  search_product?: string,
+  search_tags?: string,
+  ordering?: string,
+  has_discount?: boolean,
+  brandId?: number,
+): Promise<PaginationWithDataType<IProducts>> => {
+  const queryParams = new URLSearchParams({
+    page: pageIndex.toLocaleString(),
+    ...(filter && { filter: filter }),
+    ...(search_product && { product_name__contains: search_product }),
+    ...(search_tags && { tags__tag_name__contains: search_tags }),
+    ...(ordering && { ordering: ordering }),
+    ...(has_discount && { has_discount: has_discount }),
+    ...(brandId && { brand_id: brandId }),
+  }).toString();
+
+  try {
+    const res = await axios.get(
+      `https://api.gs-tools.ir/v1/product/product_home_page/?${queryParams}`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()?.token.access}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    // console.log(error);
+    return {
+      count: 0,
+      next: 0,
+      previous: 0,
+      results: [],
+    };
+  }
+};
+
 const getProductShopApi = async (
   categoryId: number,
   urlPageIndex: number,
 ): Promise<PaginationWithDataType<IProducts>> => {
   const queryParams = new URLSearchParams({
     page: urlPageIndex.toString(),
-    category_id: categoryId.toString()
+    category_id: categoryId.toString(),
   }).toString();
   const res = await axios.get(
-      `https://api.gs-tools.ir/v2/product/product_list?${queryParams}`,
+    `https://api.gs-tools.ir/v2/product/product_list?${queryParams}`,
   );
   return res.data;
 };
@@ -341,7 +382,7 @@ const getHomeProductsApi = async (
     const res = await fetch(
       `https://api.gs-tools.ir/v2/product/product_list?${queryParams}`,
       {
-        next: { revalidate: 180 },
+        next: { revalidate: 60 },
       },
     );
     return await res.json();
@@ -936,12 +977,9 @@ const getHomeProductApi = async (): Promise<
   PaginationWithDataType<IProductHome>
 > => {
   try {
-    const res = await fetch(
-      `https://api.gs-tools.ir/v2/product/product_list`,
-      {
-        next: { revalidate: 180 },
-      },
-    );
+    const res = await fetch(`https://api.gs-tools.ir/v2/product/product_list`, {
+      next: { revalidate: 180 },
+    });
     return await res.json();
   } catch (error) {
     return {
@@ -1000,4 +1038,5 @@ export {
   getHomeCategoryApi,
   getHomeBrandsApi,
   getProductFromCategoryApi,
+  getProductsAdminApi,
 };

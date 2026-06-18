@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import { Loader } from '@mantine/core';
 
 import BagShopButtonDrawer from '@/component/modules/drawer/BagShopButtonDrawer/BagShopButtonDrawer.drawer';
-import ShopIcon from '@/component/modules/icons/Shop.icon';
 import UserIcon from '@/component/modules/icons/User.icon';
 import TomanIcon from '@/component/modules/icons/Toman.icon';
 import SearchInputIcon from '@/component/modules/icons/SearchInput.icon';
@@ -75,12 +74,17 @@ const Navbar = ({ data }: { data: any }) => {
     }
   };
 
+
   useEffect(() => {
-    if (search.length > 0) {
-      callGetProductsApi();
-    } else {
-      setAllProductsData(undefined);
-    }
+    const timer = setTimeout(() => {
+      if (search.trim().length > 0) {
+        callGetProductsApi();
+      } else {
+        setAllProductsData(undefined);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
   }, [search]);
 
   useEffect(() => {
@@ -101,11 +105,7 @@ const Navbar = ({ data }: { data: any }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  console.log({
-    search,
-    isOpen,
-    allProductsData
-  });
+
   return (
     <div
       className={`${s.container} w-full ${isVisible ? 'fixed shadow-md' : ''} top-0 right-0 z-40 bg-white transition-all duration-300 ease-in`}
@@ -116,7 +116,7 @@ const Navbar = ({ data }: { data: any }) => {
       <div className={s.right}>
         <Link href="/">
           <Image
-            src="/images/home/logo.webp"
+            src="/images/home/logo.png"
             alt="ابزار آلات جی اس تولز | فروشگاه  ابزار آلات صنعتی، دستی و برقی"
             width={200}
             height={200}

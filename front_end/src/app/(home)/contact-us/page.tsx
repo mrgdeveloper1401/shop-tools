@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     locale: 'fa_IR',
     images: [
       {
-        url: 'https://gs-tools.ir/images/home/logo.webp',
+        url: 'https://gs-tools.ir/images/home/logo.png',
         width: 1200,
         height: 630,
         alt: 'تماس با جی‌اس تولز',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: 'تماس با جی‌اس تولز | GS Tools',
     description:
       'برای ارتباط با تیم جی‌اس تولز از طریق شماره تماس، واتساپ یا شبکه‌های اجتماعی اقدام کنید.',
-    images: ['https://gs-tools.ir/images/home/logo.webp'],
+    images: ['https://gs-tools.ir/images/home/logo.png'],
   },
   alternates: {
     canonical: 'https://gs-tools.ir/contact-us',
@@ -68,7 +68,7 @@ const structuredData = {
     '@type': 'Organization',
     name: 'جی‌اس تولز',
     url: 'https://gs-tools.ir',
-    logo: 'https://gs-tools.ir/images/home/logo.webp',
+    logo: 'https://gs-tools.ir/images/home/logo.png',
     contactPoint: [
       {
         '@type': 'ContactPoint',

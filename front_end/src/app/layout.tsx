@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://gs-tools.ir/images/home/logo.webp',
+        url: 'https://gs-tools.ir/images/home/logo.png',
         width: 1200,
         height: 630,
         alt: 'لوگوی جی‌اس تولز',
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     title: 'جی‌اس تولز | فروشگاه ابزارآلات صنعتی',
     description:
       'ابزارآلات برقی، دستی، صنعتی و ابزار دقیق را در جی‌اس تولز با کیفیت بالا خرید کنید.',
-    images: ['https://gs-tools.ir/images/home/logo.webp'],
+    images: ['https://gs-tools.ir/images/home/logo.png'],
   },
   alternates: {
     canonical: 'https://gs-tools.ir',
@@ -74,7 +74,7 @@ const structuredData = {
   name: 'جی‌اس تولز',
   alternateName: ['gs tools', 'فروشگاه ابزارآلات جی‌اس تولز', 'خرید ابزار'],
   url: 'https://gs-tools.ir',
-  logo: 'https://gs-tools.ir/images/home/logo.webp',
+  logo: 'https://gs-tools.ir/images/home/logo.png',
   // sameAs: [
   // 'https://www.instagram.com/gs_tools2024',
   // 'https://t.me/Garmasa',

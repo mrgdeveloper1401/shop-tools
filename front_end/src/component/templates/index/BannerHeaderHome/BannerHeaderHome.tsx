@@ -79,7 +79,7 @@ const BannerHeaderHome = () => {
       <div className={s.right}>
         <Link href="/">
           <Image
-            src="/images/home/logo.webp"
+            src="/images/home/logo.png"
             alt="لوگو سایت"
             width={200}
             height={200}
@@ -153,7 +153,7 @@ const BannerHeaderHome = () => {
                                   ?.amount && <span>تومان</span>}
                             </h2>
                             {variantSelcted &&
-                            variantSelcted.product_variant_discounts.length >
+                              variantSelcted.product_variant_discounts.length >
                               0 ? (
                               <>
                                 <div className={s.price_discount}>
@@ -166,7 +166,7 @@ const BannerHeaderHome = () => {
                                             .product_variant_discounts[0]
                                             .amount,
                                         )) /
-                                        100
+                                      100
                                     ).toLocaleString()}
                                   </h2>
                                   <TomanIcon className="text-[10px] mb-1" />
@@ -183,7 +183,7 @@ const BannerHeaderHome = () => {
                         return (
                           <span>
                             {item.variants.length > 0 &&
-                            item.variants[0].price ? (
+                              item.variants[0].price ? (
                               <span className="flex items-center gap-1">
                                 {priceFormat(item.variants[0].price)}
                                 <TomanIcon className="text-[10px] mb-1" />

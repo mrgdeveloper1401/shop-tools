@@ -3,7 +3,7 @@
 }
 
 .container {
-  @apply flex items-center justify-between md:px-10 px-5 md:py-4 py-2;
+  @apply flex items-center justify-between md:px-28 px-5 md:py-4 py-2;
 }
 
 .right {
@@ -11,7 +11,7 @@
 
   & > a {
     & > img {
-      @apply lg:w-[37%] md:w-[80%] w-[120px] lg:ml-0 ml-2;
+      @apply  md:w-[70%] w-[120px] lg:ml-0 ml-2;
     }
   }
 }
@@ -75,9 +75,15 @@
 .searchInput {
   @apply w-[100%] z-0 lg:flex hidden items-center bg-slate-200 rounded-xl p-2;
 
+  & >input::placeholder{
+    color: rgba(0, 0, 0, 0.527);
+    font-weight: 800
+  }
   & > input {
     @apply bg-slate-200 outline-none border-none w-full px-2 h-[40px];
-  }
+      color: black;
+
+    }
 
   & > a {
     @apply bg-slate-200 outline-none border-none px-2 cursor-pointer;

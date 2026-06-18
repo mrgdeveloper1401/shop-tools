@@ -51,7 +51,7 @@ const ForgetPassword = () => {
         <div className={s.ForgetPassword_left_main}>
           <div className={s.image}>
             <Image
-              src="/images/home/logo.webp"
+              src="/images/home/logo.png"
               alt="logo"
               width={150}
               height={100}

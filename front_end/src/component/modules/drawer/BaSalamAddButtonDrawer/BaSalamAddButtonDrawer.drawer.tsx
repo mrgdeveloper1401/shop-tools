@@ -19,6 +19,7 @@ import {
 } from '@/data/server_request/dashboard/BaSalam';
 import { getOneProductApi } from '@/data/server_request/dashboard/product';
 import styles from './BaSalamAddButtonDrawer.module.css';
+import { Button } from '@mantine/core';
 
 const dataCategory = [
   {
@@ -517,9 +518,15 @@ const BaSalamAddButtonDrawer: FC<BaSalamAddButtonDrawerProps> = ({
           </div>
         </form>
       </BaseDrawer>
-      <PrimaryButton onClick={open} size="xs" className={styles.td}>
+      <Button
+        variant="filled" color="red" radius="xl"
+        onClick={open}
+
+      >
         افزودن به باسلام
-      </PrimaryButton>
+
+      </Button>
+
     </>
   );
 };

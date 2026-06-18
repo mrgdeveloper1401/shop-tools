@@ -24,6 +24,7 @@ import { SpecificationColumnsData } from './SpecificationButtonDrawer.table';
 import styles from './SpecificationButtonDrawer.module.css';
 import BaseSelectSearchInput from '../../inputs/BaseSelectSearchInput/BaseSelectSearch.input';
 import ChevronDownIcon from '../../icons/ChevronDown.icon';
+import { Button } from '@mantine/core';
 
 interface SpecificationButtonDrawerProps {
   productId: number;
@@ -158,9 +159,11 @@ const SpecificationButtonDrawer: FC<SpecificationButtonDrawerProps> = ({
           </div>
         </Suspense>
       </BaseDrawer>
-      <PrimaryButton onClick={open} size="xs" className={styles.td}>
+
+      <Button variant="filled" onClick={open} color="red" radius="xl">
         افزودن مشخصات
-      </PrimaryButton>
+
+      </Button>
     </>
   );
 };

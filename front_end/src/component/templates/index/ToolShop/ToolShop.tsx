@@ -19,6 +19,7 @@ import BaseSelectInput from '@/component/modules/inputs/BaseSelectInput/BaseSele
 import ChevronDownIcon from '@/component/modules/icons/ChevronDown.icon';
 
 const filters = [
+  { name: 'همه', filter: 'all' },
   { name: 'ارزان ترین', filter: 'price' },
   { name: 'گران ترین', filter: '-price' },
   { name: 'تخفیف دار', filter: 'has_discount' },
@@ -153,15 +154,17 @@ const ToolShop = () => {
       <div className={s.content}>
         <LoadingOverlay visible={isLoading} h="300vh" />
         <Tabs
-          defaultValue="min_price"
-          w="100%"
           variant="pills"
+          defaultValue="all"
+          w="100%"
           color="red"
           radius="md"
         >
           <div className="flex md:flex-row flex-col justify-between px-2 gap-2">
             <Tabs.List>
+
               {filters.map((item, index) => (
+
                 <Tabs.Tab
                   key={index + 1}
                   value={item.filter}
@@ -182,7 +185,10 @@ const ToolShop = () => {
                     setfilter(item.filter);
                   }}
                 >
-                  <span className="font-Dana text-[14px]">{item.name}</span>
+                  <span>
+                    {item.name}
+
+                  </span>
                 </Tabs.Tab>
               ))}
             </Tabs.List>
@@ -211,29 +217,32 @@ const ToolShop = () => {
           </div>
 
           <Divider size="xs" mt="5px" mb="lg" />
-          <Tabs.Panel value={filter || 'min_price'} pt="xs">
-            {isFilterLoading ? (
-              <div className="flex justify-center items-center ">
-                <Loader color="red" size="md" />
-              </div>
-            ) : (
-              <>
-                {allProductsData?.results.length !== 0 ? (
-                  <div className={s.cardBox}>
-                    {allProductsData?.results.map(
-                      (item) =>
-                        item.product_product_image.length > 0 && (
-                          <CardProduct data={item as any} key={item.id} />
-                        ),
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center text-gray-500 bg-slate-50 p-5">
-                    محصولی یافت نشد
-                  </div>
-                )}
-              </>
-            )}
+          <Tabs.Panel value={filter || 'all'} pt="xs">
+            <div className='flex flex-col'>
+              {isFilterLoading ? (
+                <div className="flex justify-center items-center ">
+                  <Loader color="red" size="md" />
+                </div>
+              ) : (
+                <>
+                  {allProductsData?.results.length !== 0 ? (
+                    <div className={s.cardBox}>
+                      {allProductsData?.results.map(
+                        (item) =>
+                          item.product_product_image.length > 0 && (
+                            <CardProduct data={item as any} key={item.id} />
+                          ),
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-500 bg-slate-50 p-5">
+                      محصولی یافت نشد
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
           </Tabs.Panel>
 
           <BasePagination

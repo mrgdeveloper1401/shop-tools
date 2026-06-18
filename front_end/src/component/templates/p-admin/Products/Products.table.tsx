@@ -120,7 +120,7 @@ export const ProductsColumnsData = (
   },
   {
     key: 'variant',
-    header: 'variant',
+    header: 'قیمت',
     hasFilter: null,
 
     render: (props: any) => (

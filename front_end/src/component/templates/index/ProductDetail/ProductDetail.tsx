@@ -130,7 +130,7 @@ const ProductDetail = ({
                   )}
               </span>
               {variantSelcted &&
-              variantSelcted.product_variant_discounts.length > 0 ? (
+                variantSelcted.product_variant_discounts.length > 0 ? (
                 <>
                   <div className={s.price_discount}>
                     <span>
@@ -142,7 +142,7 @@ const ProductDetail = ({
                               variantSelcted.product_variant_discounts[0]
                                 .amount,
                             )) /
-                            100
+                          100
                         ).toLocaleString()}
                     </span>
                     <TomanIcon className={s.toman_icon} />
@@ -165,20 +165,18 @@ const ProductDetail = ({
                 }
                 data={data?.variants.map((item) => ({
                   value: String(item.variant_id),
-                  label: `${item.name} - ${priceFormat(item.price)} تومان  ${
-                    item.product_variant_discounts.length > 0 ? '|' : ''
-                  } ${
-                    item.product_variant_discounts.length > 0
+                  label: `${item.name} - ${priceFormat(item.price)} تومان  ${item.product_variant_discounts.length > 0 ? '|' : ''
+                    } ${item.product_variant_discounts.length > 0
                       ? item.product_variant_discounts[0].amount
                       : ''
-                  }  ${item.product_variant_discounts.length > 0 ? 'تخفیف' : ''}  `,
+                    }  ${item.product_variant_discounts.length > 0 ? 'تخفیف' : ''}  `,
                 }))}
                 onChange={(val) => variantSelctedHandler(val)}
               />
             </div>
           </div>
 
-          {/* <div className={s.specifications}>
+          <div className={s.specifications}>
             <h2>مشخصات محصول:</h2>
             {data.attributes.length > 0 &&
               data.attributes.map((item: any, index: number) => (
@@ -187,22 +185,22 @@ const ProductDetail = ({
                   <p>{item.value}</p>
                 </div>
               ))}
-          </div> */}
+          </div>
 
           <div className={s.addToBag}>
             <CounterProduct data={data} variantSelected={variantSelcted} />
             <div className={s.price_fixed}>
               {variantSelcted &&
-              variantSelcted?.product_variant_discounts.length > 0
+                variantSelcted?.product_variant_discounts.length > 0
                 ? formatPrice(
-                    parseFloat(variantSelcted.price) -
-                      (parseFloat(variantSelcted.price) *
-                        parseFloat(
-                          variantSelcted.product_variant_discounts[0].amount,
-                        )) /
-                        100,
-                    0,
-                  )
+                  parseFloat(variantSelcted.price) -
+                  (parseFloat(variantSelcted.price) *
+                    parseFloat(
+                      variantSelcted.product_variant_discounts[0].amount,
+                    )) /
+                  100,
+                  0,
+                )
                 : variantSelcted
                   ? formatPrice(variantSelcted && variantSelcted?.price, 0)
                   : '-'}

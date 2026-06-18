@@ -39,7 +39,7 @@ export function SidebarLinksGroup({
             <ThemeIcon variant="light" size={30}>
               {Icon}
             </ThemeIcon>
-            <Box ml="md">{label}</Box>
+            <span className={styles.label_sidebar}>{label}</span>
           </Box>
           {hasLinks && (
             <ChevronLeftIcon
@@ -51,8 +51,9 @@ export function SidebarLinksGroup({
             />
           )}
         </Group>
-      </UnstyledButton>
-      {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
+      </UnstyledButton >
+      {hasLinks ? <Collapse in={opened}> {items}</Collapse > : null
+      }
     </>
   );
 }

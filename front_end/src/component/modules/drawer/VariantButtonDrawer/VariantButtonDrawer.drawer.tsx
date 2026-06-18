@@ -19,6 +19,7 @@ import {
 } from '@/data/server_request/dashboard/product';
 import { VariantColumnsData } from './VariantButtonDrawer.table';
 import styles from './VariantButtonDrawer.module.css';
+import { Button } from '@mantine/core';
 
 interface VariantButtonDrawerProps {
   productId: number;
@@ -155,9 +156,16 @@ const VariantButtonDrawer: FC<VariantButtonDrawerProps> = ({
           </div>
         </Suspense>
       </BaseDrawer>
-      <PrimaryButton onClick={open} size="xs" className={styles.td}>
-        افزدون ورینت
-      </PrimaryButton>
+
+      <Button
+        variant="filled" color="red" radius="xl"
+        onClick={open}
+
+      >
+        افزدون قیمت
+
+      </Button>
+
     </>
   );
 };

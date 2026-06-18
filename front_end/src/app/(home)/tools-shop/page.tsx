@@ -65,7 +65,7 @@ const structuredData = {
   description:
     'فروشگاه آنلاین ابزارآلات صنعتی، برقی، دستی و کارگاهی با ضمانت اصالت کالا و ارسال سریع به سراسر ایران.',
   url: 'https://gs-tools.ir/tools-shop',
-  logo: 'https://gs-tools.ir/images/home/logo.webp',
+  logo: 'https://gs-tools.ir/images/home/logo.png',
   image: 'https://gs-tools.ir/image/svgs/Logos/logo.png',
   brand: {
     '@type': 'Brand',

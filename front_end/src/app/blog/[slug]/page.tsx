@@ -97,7 +97,7 @@ const BlogArticlePage = async ({
       name: 'آکادمی کدیما',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://gs-tools.ir/images/home/logo.webp',
+        url: 'https://gs-tools.ir/images/home/logo.png',
       },
     },
     datePublished: articleData.created_at,

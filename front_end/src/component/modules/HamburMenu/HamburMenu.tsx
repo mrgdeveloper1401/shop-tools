@@ -54,12 +54,17 @@ const HamburMenu = ({ data }: any) => {
   };
 
   useEffect(() => {
-    if (search) {
-      callGetProductsApi();
-    } else {
-      setAllProductsData(undefined);
-    }
+    const timer = setTimeout(() => {
+      if (search.trim().length > 0) {
+        callGetProductsApi();
+      } else {
+        setAllProductsData(undefined);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
   }, [search]);
+
 
   const logoutHandler = () => {
     Swal.fire({
@@ -164,7 +169,7 @@ const HamburMenu = ({ data }: any) => {
                   <div>
                     {(() => {
                       const variantSelcted = item.variants.find(
-                        (i) => i.product_variant_discounts.length > 0,
+                        (i) => i.product_variant_discounts !== null && i.product_variant_discounts.length > 0,
                       );
                       if (variantSelcted) {
                         return (
@@ -182,7 +187,7 @@ const HamburMenu = ({ data }: any) => {
                                   ?.amount && <span>تومان</span>}
                             </h2>
                             {variantSelcted &&
-                            variantSelcted.product_variant_discounts.length >
+                              variantSelcted.product_variant_discounts.length >
                               0 ? (
                               <>
                                 <div className={s.price_discount}>
@@ -195,7 +200,7 @@ const HamburMenu = ({ data }: any) => {
                                             .product_variant_discounts[0]
                                             .amount,
                                         )) /
-                                        100
+                                      100
                                     ).toLocaleString()}
                                   </h2>
                                   <TomanIcon className="text-[10px] mb-1" />
@@ -212,7 +217,7 @@ const HamburMenu = ({ data }: any) => {
                         return (
                           <span>
                             {item.variants.length > 0 &&
-                            item.variants[0].price ? (
+                              item.variants[0].price ? (
                               <span className="flex items-center gap-1">
                                 {priceFormat(item.variants[0].price)}
                                 <TomanIcon className="text-[10px] mb-1" />

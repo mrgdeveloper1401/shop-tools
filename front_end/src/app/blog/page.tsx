@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://gs-tools.ir/images/home/logo.webp',
+        url: 'https://gs-tools.ir/images/home/logo.png',
         width: 1200,
         height: 630,
         alt: 'وبلاگ جی‌اس تولز - آموزش و مقالات ابزارآلات',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     title: 'وبلاگ جی‌اس تولز | آموزش و مقالات ابزارآلات صنعتی',
     description:
       'مطالب آموزشی و مقالات تخصصی درباره ابزارآلات برقی، دستی و صنعتی در وبلاگ جی‌اس تولز.',
-    images: ['https://gs-tools.ir/images/home/logo.webp'],
+    images: ['https://gs-tools.ir/images/home/logo.png'],
   },
   alternates: {
     canonical: 'https://gs-tools.ir/blog',

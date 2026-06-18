@@ -1,6 +1,6 @@
 .navbar_container {
   /* @apply bg-[#ee4242] rounded-2xl py-3 xl:mx-24 mx-14 lg:block hidden; */
-  @apply bg-primary rounded-2xl py-3 xl:mx-24 mx-14 lg:block hidden;
+  @apply bg-primary px-20 py-3  lg:block hidden;
 }
 
 .header {

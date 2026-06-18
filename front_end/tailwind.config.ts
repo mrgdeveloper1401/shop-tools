@@ -28,7 +28,7 @@ const config: Config = {
         icon: '#77A4FB',
         whiteColor: '#FFFFFF',
         title: '#2A2D53',
-        primary: '#EE4242',
+        primary: '#EF4056',
         // primary: '#061C3E',
       },
       colors: {

@@ -71,7 +71,7 @@ const SignUp = () => {
         <div className={s.SignUp_left_main}>
           <div className={s.image}>
             <Image
-              src="/images/home/logo.webp"
+              src="/images/home/logo.png"
               alt="logo"
               width={150}
               height={100}
