@@ -419,7 +419,7 @@ class ProductListHomePageView(generics.ListAPIView):
         "description_slug",
         "created_at",
         "updated_at",
-        "price",
+        # "price",
         "product_brand__brand_name",
         "total_sale",
     ).select_related(
@@ -457,6 +457,14 @@ class ProductListHomePageView(generics.ListAPIView):
                 "discount_type",
                 "product_variant_id"
             ).valid_discount()
+        ),
+        Prefetch(
+            "variants__product_variant_attributes", queryset=ProductVariantAttributeValues.objects.only(
+                "value",
+                "attribute__attribute_name",
+                "product_variant_id",
+                "product_variant__product_id",
+            ).select_related("attribute")
         )
     )
     pagination_class = TwentyPageNumberPagination
