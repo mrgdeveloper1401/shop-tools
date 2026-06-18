@@ -102,6 +102,7 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data['product_product_image'] = data['product_product_image']['image']
         variant_id = data.pop("variant_id", None)
+        product_id = data.get("id")
         price =data.pop("price", None)
         product_variant_discounts = data.pop("product_variant_discounts", None)
         is_available = data.pop("is_available", None)
@@ -109,7 +110,7 @@ class ProductListHomePageSerializer(serializers.ModelSerializer):
         name = data.pop("name", None)
         data['variants'] = [
             {
-                "id": variant_id,
+                "id": product_id,
                 "price": price,
                 "variant_id": variant_id,
                 "product_variant_discounts": product_variant_discounts,
