@@ -24,7 +24,6 @@ from product_app.models import (
     Tag,
     ProductVariant,
     Attribute,
-    AttributeValue,
     ProductVariantAttributeValues,
     ProductComment
 )
@@ -140,7 +139,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        product_variant_attribute_fields = ("attribute__attribute_name", "product_variant_id", "value__attribute_value")
+        product_attributes_fields = ("attribute__attribute_name", "product_id", "value")
         # base query
         base_query = Product.objects.filter(category_id=self.kwargs["category_pk"]).prefetch_related(
             Prefetch(
@@ -150,7 +149,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "amount",
                     "discount_type",
                     "product_variant_id",
-                    "product_variant__product_id",
+                    "product_variant__product__id",
                     "product_variant__stock_number",
                     "product_variant__name",
                 ).valid_discount()
@@ -177,22 +176,22 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "description_slug",
                 "updated_at",
             ).prefetch_related(
-                    Prefetch(
-                        "product_product_image",
-                        queryset=ProductImages.objects.select_related("image").only(*product_image_fields)
-                    ),
+                Prefetch(
+                    "product_product_image",
+                    queryset=ProductImages.objects.select_related("image").only(*product_image_fields)
+                ),
                 Prefetch(
                 "tags", queryset=Tag.objects.only("tag_name")
                 ),
                 Prefetch(
-                    "variants__product_variant_attributes",
-                    queryset=ProductVariantAttributeValues.objects.select_related("attribute").only(*product_variant_attribute_fields)
+                    "product_attributes", queryset=ProductVariantAttributeValues.objects.filter(is_active=True).only(*product_attributes_fields)
                 )
             )
             return base_query
 
         # for normal user
         else:
+            # base query for normal user
             query = base_query.filter(is_active=True).prefetch_related(
                     Prefetch(
                         "product_product_image", queryset=ProductImages.objects.select_related("image").only(
@@ -208,6 +207,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     )
                 )
 
+            # product list query
             if self.action == "list":
                 return query.only(
                     "updated_at",
@@ -221,10 +221,6 @@ class ProductViewSet(viewsets.ModelViewSet):
                     Prefetch(
                         "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
                     ),
-                    Prefetch(
-                        "variants__product_variant_attributes",
-                        queryset=ProductVariantAttributeValues.objects.select_related("attribute", "value").only(*product_variant_attribute_fields)
-                    )
                 ).select_related(
                     "product_brand"
                 ).only(
@@ -235,6 +231,10 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_slug",
                     "description_slug",
                     "updated_at",
+                ).prefetch_related(
+                    Prefetch(
+                        "product_attributes", queryset=ProductVariantAttributeValues.objects.filter(is_active=True).only(*product_attributes_fields)
+                    )
                 )
 
 
@@ -392,16 +392,21 @@ class ProductAttributesValuesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # TODO, better query
-        return ProductVariantAttributeValues.objects.filter(
-            product_variant__product_id=self.kwargs['product_pk']
+        qs = ProductVariantAttributeValues.objects.filter(
+            product_id=self.kwargs['product_pk']
         ).select_related(
             "attribute",
-            "value"
         ).only(
             "attribute__attribute_name",
-            "value__attribute_value",
-            "product_variant_id"
+            "value",
+            "product_id",
+            "is_active"
         )
+
+        # filter for admin normal user
+        if not self.request.user.is_staff:
+            return qs.filter(is_active=True)
+        return qs
 
 
 class ProductListHomePageView(generics.ListAPIView):

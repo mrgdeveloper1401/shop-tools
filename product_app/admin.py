@@ -245,25 +245,22 @@ class ProductVariantAdmin(CoreAdminMixin):
 
 @admin.register(ProductVariantAttributeValues)
 class ProductVariantAttributeValuesAdmin(CoreAdminMixin):
-    list_display = ("id", "attribute_name", "value_name", "variant_name", "product_variant_id", "is_active", "created_at", "updated_at")
-    raw_id_fields = ("attribute", "product_variant", "value")
-    list_select_related = ("attribute", "product_variant", "value")
-    search_fields = ("id", "attribute__attribute_name", "value__attribute_value")
-    search_help_text = "برای جست و جو میتوانید از نام اتریبیوت یا مقدار ان استفاده کنید(attribute_name, value_name)"
-    list_display_links = ("id", "attribute_name", "value_name")
+    list_display = ("id", "attribute_name", "value", "variant_name", "product_id", "is_active", "created_at", "updated_at")
+    raw_id_fields = ("attribute", "product")
+    list_select_related = ("attribute", "product")
+    search_fields = ("id", "attribute__attribute_name") # TODO, better search
+    search_help_text = "برای جست و جو میتوانید از نام اتریبیوت یا مقدار ان استفاده کنید(attribute_name,id)"
+    list_display_links = ("id", "attribute_name", "value")
 
     def attribute_name(self, obj):
         return obj.attribute.attribute_name
 
     def variant_name(self, obj):
-        return obj.product_variant.name
-
-    def value_name(self, obj):
-        return obj.value.attribute_value
+        return obj.produc.product_name
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if "changelist" in request.resolver_match.url_name:
-            fields = ("product_variant__name", "attribute__attribute_name", "value__attribute_value", "is_active", "created_at", "updated_at")
+            fields = ("product__product_name", "attribute__attribute_name", "value", "is_active", "created_at", "updated_at")
             return qs.only(*fields)
         return qs

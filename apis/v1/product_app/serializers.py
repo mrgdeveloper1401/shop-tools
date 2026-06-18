@@ -13,7 +13,6 @@ from product_app.models import (
     Tag,
     ProductVariant,
     Attribute,
-    AttributeValue,
     ProductVariantAttributeValues,
     ProductComment
 )
@@ -139,6 +138,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "deleted_at",
             "created_at",
         )
+        read_only_fields = ("total_sale",)
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -150,7 +150,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class NestedVariantAttributeSerializer(serializers.ModelSerializer):
     attribute_name = serializers.CharField(source="attribute.attribute_name", read_only=True)
-    value_name = serializers.CharField(source="value.attribute_value", read_only=True)
+    value_name = serializers.CharField(source="value", read_only=True)
 
     class Meta:
         model = ProductVariantAttributeValues
@@ -161,13 +161,13 @@ class NestedVariantAttributeSerializer(serializers.ModelSerializer):
 
 
 class NestedProductVariantPriceAttributeSerializer(serializers.ModelSerializer):
-    attributes = NestedVariantAttributeSerializer(many=True, read_only=True, source="product_variant_attributes")
+    # attributes = NestedVariantAttributeSerializer(many=True, read_only=True, source="product_variant_attributes")
     variant_id = serializers.IntegerField(source="id")
     product_variant_discounts = NestedProductDiscountSerializer(many=True)
 
     class Meta:
         model = ProductVariant
-        fields = ("id", "price", "variant_id", "product_variant_discounts", "is_available", "stock_number", "name", "attributes")
+        fields = ("id", "price", "variant_id", "product_variant_discounts", "is_available", "stock_number", "name")
 
 
 class NestedProductVariantAttributeSerializer(serializers.ModelSerializer):
@@ -248,6 +248,7 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
     product_brand = SimpleProductBrandSerializer()
     product_product_image = NestedProductImageSerializer(many=True)
     variants = NestedProductVariantPriceAttributeSerializer(many=True)
+    attributes = NestedVariantAttributeSerializer(many=True, read_only=True, source="product_attributes", allow_null=True)
 
     class Meta:
         model = Product
@@ -261,35 +262,36 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "product_slug",
             "description_slug",
             "updated_at",
+            "attributes"
         )
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-
-        # ساخت لیستی از دیکشنری‌ها
-        attributes_list = []
-        seen = set()  # برای جلوگیری از تکراری‌ها
-
-        for variant in data.get('variants', []):
-            variant_attributes = variant.pop('attributes', [])
-            for attr in variant_attributes:
-                attr_name = attr.get('attribute_name')
-                attr_value = attr.get('value_name')
-
-                # ایجاد کلید یکتا برای تشخیص تکراری‌ها
-                unique_key = f"{attr_name}_{attr_value}"
-
-                if unique_key not in seen:
-                    seen.add(unique_key)
-                    attributes_list.append({
-                        'attribute_name': attr_name,
-                        'value': attr_value
-                    })
-
-        # اضافه کردن به دیتا
-        data['attributes'] = attributes_list
-
-        return data
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #
+    #     # ساخت لیستی از دیکشنری‌ها
+    #     attributes_list = []
+    #     seen = set()  # برای جلوگیری از تکراری‌ها
+    #
+    #     for variant in data.get('variants', []):
+    #         variant_attributes = variant.pop('attributes', [])
+    #         for attr in variant_attributes:
+    #             attr_name = attr.get('attribute_name')
+    #             attr_value = attr.get('value_name')
+    #
+    #             # ایجاد کلید یکتا برای تشخیص تکراری‌ها
+    #             unique_key = f"{attr_name}_{attr_value}"
+    #
+    #             if unique_key not in seen:
+    #                 seen.add(unique_key)
+    #                 attributes_list.append({
+    #                     'attribute_name': attr_name,
+    #                     'value': attr_value
+    #                 })
+    #
+    #     # اضافه کردن به دیتا
+    #     data['attributes'] = attributes_list
+    #
+    #     return data
 
 
 class AdminProductBrandSerializer(serializers.ModelSerializer):
@@ -390,8 +392,8 @@ class SimpleAttribute(serializers.ModelSerializer):
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
     # attribute_values = NestedProductVariantAttributeValueserializer(many=True, read_only=True)
-    product_variant = serializers.PrimaryKeyRelatedField(
-        queryset=ProductVariant.objects.only("id")
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.only("id")
     )
     attribute = serializers.PrimaryKeyRelatedField(
         queryset=Attribute.objects.only("id")
@@ -413,14 +415,11 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
 
 
 class AdminProducttAttributeSerializer(serializers.ModelSerializer):
-    variant = serializers.PrimaryKeyRelatedField(
-        queryset=ProductVariant.objects.only("id")
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.only("id")
     )
     attribute = serializers.PrimaryKeyRelatedField(
         queryset=Attribute.objects.only('id')
-    )
-    value = serializers.PrimaryKeyRelatedField(
-        queryset=AttributeValue.objects.only("id")
     )
 
     class Meta:

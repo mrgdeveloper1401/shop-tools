@@ -106,10 +106,10 @@ class ProductBrand(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
 
 
 class ProductVariantAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin, ActiveMixin):
-    product_variant = models.ForeignKey(
-        "ProductVariant",
+    product = models.ForeignKey(
+        "Product",
         on_delete=models.PROTECT,
-        related_name="product_variant_attributes",
+        related_name="product_attributes",
         # limit_choices_to={"is_active": True}
     )
     attribute = models.ForeignKey(
@@ -118,11 +118,11 @@ class ProductVariantAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin, A
         related_name="variant_attributes",
         # limit_choices_to={"is_active": True}
     )
-    value = models.ForeignKey(AttributeValue, on_delete=models.PROTECT, related_name="variant_values")
+    value = models.CharField(max_length=255)
 
     class Meta:
         ordering = ('id',)
-        db_table = "product_variant_attribute_values"
+        db_table = "product_attribute_values"
 
 
 class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
