@@ -126,7 +126,7 @@ class ProductVariantAttributeValues(CreateMixin, UpdateMixin, SoftDeleteMixin, A
 
 
 class Product(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    # total_sale = models.PositiveIntegerField(default=0, db_default=0)
+    total_sale = models.PositiveIntegerField(default=0, db_default=0)
     product_brand = models.ForeignKey(
         ProductBrand,
         on_delete=models.PROTECT,

@@ -155,7 +155,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_variant__name",
                 ).valid_discount()
             )
-        )
+        ).order_by("-id")
 
         # for admin user
         if self.request.user.is_staff:
@@ -165,7 +165,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_brand",
                 "category"
             ).only(
-                # "total_sale",
+                "total_sale",
                 # "product_id_ba_salam",
                 "tags__tag_name",
                 "product_brand__brand_name",
