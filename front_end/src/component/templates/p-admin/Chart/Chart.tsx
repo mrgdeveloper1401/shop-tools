@@ -152,13 +152,19 @@ const SaleBarChart = ({
             }}
           />
 
-          <Tooltip
-            formatter={(
-              value: number | undefined,
-              name: string | undefined,
-            ) => [value?.toLocaleString('fa-IR') ?? '0', name]}
-            labelFormatter={(label) => `تاریخ: ${label}`}
-          />
+            <Tooltip
+              formatter={(value, name) => {
+                const formattedValue =
+                  typeof value === 'number'
+                    ? value.toLocaleString('fa-IR')
+                    : Array.isArray(value)
+                      ? value.join(' - ')
+                      : String(value ?? '0');
+
+                return [formattedValue, String(name ?? '')];
+              }}
+            />
+
 
           <Legend />
 

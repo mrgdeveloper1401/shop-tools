@@ -233,6 +233,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                     "product_slug",
                     "description_slug",
                     "updated_at",
+                    "sku"
                 ).prefetch_related(
                     Prefetch(
                         "product_attributes", queryset=ProductVariantAttributeValues.objects.filter(is_active=True).only(*product_attributes_fields)

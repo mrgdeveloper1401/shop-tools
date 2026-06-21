@@ -193,6 +193,7 @@ class NestedProductVariantAttributeValuesSerializer(serializers.ModelSerializer)
 class RetrieveAdminProductSerializer(ProductSerializer):
     # variants = NestedProductVariantAttributeSerializer(many=True, read_only=True)
     attributes = NestedProductVariantAttributeValuesSerializer(many=True, read_only=True)
+    sku = serializers.CharField()
 
 
 class NestedImageSerializer(serializers.ModelSerializer):
@@ -262,7 +263,8 @@ class UserRetrieveProductSerializer(serializers.ModelSerializer):
             "product_slug",
             "description_slug",
             "updated_at",
-            "attributes"
+            "attributes",
+            "sku"
         )
 
     # def to_representation(self, instance):
