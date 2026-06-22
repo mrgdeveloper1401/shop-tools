@@ -43,7 +43,7 @@ services:
       dockerfile: "dockerfile/prod/django/Dockerfile"
     expose:
       - 8000
-    env_file: "env_folder/app.env"
+    env_file: ".env"
     restart: always
     volumes:
       - static_files:/home/app/staticfiles
@@ -104,7 +104,7 @@ services:
   next_js:
     container_name: front_gs_tools
     build:
-      context: .
+      context: ../GS-Tools
       dockerfile: dockerfile/prod/nextjs/Dockerfile
     environment:
       NODE_ENV: production
