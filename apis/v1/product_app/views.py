@@ -120,18 +120,19 @@ class ProductViewSet(viewsets.ModelViewSet):
     filterset_class = ProductFilter
     ordering_fields = ("total_sale",)
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    serializer_class = serializers.ProductSerializer
 
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            if self.action == "list":
-                return serializers.ProductSerializer
-            else:
-                return serializers.RetrieveAdminProductSerializer
-        else:
-            if self.action == "list":
-                return serializers.UserListProductSerializer
-            else:
-                return serializers.UserRetrieveProductSerializer
+    # def get_serializer_class(self):
+    #     if self.request.user.is_staff:
+    #         if self.action == "list":
+    #             return serializers.ProductSerializer
+    #         else:
+    #             return serializers.RetrieveAdminProductSerializer
+    #     else:
+    #         if self.action == "list":
+    #             return serializers.UserListProductSerializer
+    #         else:
+    #             return serializers.UserRetrieveProductSerializer
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -139,35 +140,31 @@ class ProductViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        product_attributes_fields = ("attribute__attribute_name", "product_id", "value")
-        # base query
-        base_query = Product.objects.filter(category_id=self.kwargs["category_pk"]).prefetch_related(
-            Prefetch(
-                "variants__product_variant_discounts", queryset=ProductDiscount.objects.select_related(
-                    "product_variant__product"
-                ).only(
-                    "amount",
-                    "discount_type",
-                    "product_variant_id",
-                    "product_variant__product__id",
-                    "product_variant__stock_number",
-                    "product_variant__name",
-                ).valid_discount()
-            )
-        ).order_by("-id")
+        product_image_fields = (
+            "image__image",
+            "image__image_id_ba_salam",
+            "alt_text_image",
+            "order",
+            "product_id",
+            "updated_at",
+        )
 
-        # for admin user
-        if self.request.user.is_staff:
-            product_image_fields = ("image__image", "image__image_id_ba_salam", "alt_text_image", "order", "product_id", "updated_at")
+        product_variant_fields = (
+            "id",
+            "product_id",
+            "price",
+            "stock_number",
+            "name",
+        )
 
-            base_query = base_query.select_related(
-                "product_brand",
-                "category"
-            ).only(
+        return (
+            Product.objects
+            .filter(category_id=self.kwargs["category_pk"])
+            .select_related("category", "product_brand")
+            .only(
+                "id",
                 "total_sale",
-                # "product_id_ba_salam",
-                "tags__tag_name",
-                "product_brand__brand_name",
+                "product_brand_id",
                 "category__category_name",
                 "is_active",
                 "product_slug",
@@ -175,70 +172,39 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "product_name",
                 "description_slug",
                 "updated_at",
-                "sku"
-            ).prefetch_related(
-                Prefetch(
-                    "product_product_image",
-                    queryset=ProductImages.objects.select_related("image").only(*product_image_fields)
-                ),
-                Prefetch(
-                "tags", queryset=Tag.objects.only("tag_name")
-                ),
-                Prefetch(
-                    "product_attributes", queryset=ProductVariantAttributeValues.objects.filter(is_active=True).only(*product_attributes_fields)
-                )
+                "sku",
+                "product_brand__brand_name"
             )
-            return base_query
-
-        # for normal user
-        else:
-            # base query for normal user
-            query = base_query.filter(is_active=True).prefetch_related(
-                    Prefetch(
-                        "product_product_image", queryset=ProductImages.objects.select_related("image").only(
-                            "image__image",
-                            "order",
-                            "product_id",
-                            "alt_text_image",
-                            "image__image_id_ba_salam",
-                            "updated_at"
-                        ).filter(
-                            is_active=True
+            .prefetch_related(
+                Prefetch(
+                    "variants",
+                    queryset=ProductVariant.objects.only(
+                        *product_variant_fields
+                    ).prefetch_related(
+                        Prefetch(
+                            "product_variant_discounts",
+                            queryset=ProductDiscount.objects.only(
+                                "id",
+                                "amount",
+                                "discount_type",
+                                "product_variant_id",
+                            ).valid_discount()
                         )
                     )
-                )
-
-            # product list query
-            if self.action == "list":
-                return query.only(
-                    "updated_at",
-                    "product_name",
-                    "description_slug",
-                    "product_slug",
-                    "category_id",
-                    "sku"
-                )
-            else:
-                return query.prefetch_related(
-                    Prefetch(
-                        "tags", queryset=Tag.objects.filter(is_active=True).only("tag_name")
-                    ),
-                ).select_related(
-                    "product_brand"
-                ).only(
-                    "product_name",
-                    "description",
-                    "product_brand__brand_name",
+                ),
+                Prefetch(
                     "tags",
-                    "product_slug",
-                    "description_slug",
-                    "updated_at",
-                    "sku"
-                ).prefetch_related(
-                    Prefetch(
-                        "product_attributes", queryset=ProductVariantAttributeValues.objects.filter(is_active=True).only(*product_attributes_fields)
+                    queryset=Tag.objects.only("id", "tag_name")
+                ),
+                Prefetch(
+                    "product_product_image",
+                    queryset=ProductImages.objects.select_related("image").only(
+                        *product_image_fields
                     )
-                )
+                ),
+            )
+            .order_by("-id")
+        )
 
 
 class ProductBrandViewSet(CacheMixin, viewsets.ModelViewSet):
