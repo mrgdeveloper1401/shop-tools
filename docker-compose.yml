@@ -1,0 +1,121 @@
+services:
+  db:
+    container_name: gs_db
+    volumes:
+      - gs_postgres_data:/var/lib/postgresql/data
+    image: docker.arvancloud.ir/postgres:16.9-alpine
+    expose:
+      - 5432
+    restart: always
+    env_file: "env_folder/db.env"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+
+  redis:
+    container_name: gs_redis
+    image: redis:8-alpine
+    restart: always
+    command: >
+      redis-server
+      --loglevel warning
+      --appendonly no
+      --save ""
+      --maxmemory 1024mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+    expose:
+      - 6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+
+  app:
+    container_name: django
+    build:
+      context: .
+      dockerfile: "dockerfile/prod/django/Dockerfile"
+    expose:
+      - 8000
+    env_file: "env_folder/app.env"
+    restart: always
+    volumes:
+      - static_files:/home/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    container_name: gs_nginx
+    restart: always
+    volumes:
+      - static_files:/vol/
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/ssl:/etc/ssl:ro
+    entrypoint: ["nginx", "-g", "daemon off;"]
+    build:
+      context: "dockerfile/prod/nginx/"
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      app:
+        condition: service_started
+
+  celery:
+    container_name: gs_celery
+    restart: always
+    build:
+      context: .
+      dockerfile: dockerfile/prod/django/Dockerfile
+    env_file: "env_folder/app.env"
+    entrypoint: "celery -A core.utils.dj_celery worker -l INFO"
+    dns:
+      - 94.182.153.78
+      - 2.188.21.130
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
+  celery_beat:
+    container_name: dj_celery_beat
+    restart: always
+    build:
+      context: .
+      dockerfile: dockerfile/prod/django/Dockerfile
+    env_file: "env_folder/app.env"
+    entrypoint: "celery -A core.utils.dj_celery beat -l INFO"
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
+  next_js:
+    container_name: front_gs_tools
+    build:
+      context: .
+      dockerfile: dockerfile/prod/nextjs/Dockerfile
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_API_URL: https://api.gs-tools.ir
+    expose:
+      - 3000
+    depends_on:
+      nginx:
+        condition: service_started
+
+volumes:
+  gs_postgres_data:
+  static_files:
