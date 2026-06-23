@@ -1,4 +1,4 @@
-FROM next_gs_tools:1.0.0
+FROM next_gs_tools:2.0.0
 
 WORKDIR /home/app
 
