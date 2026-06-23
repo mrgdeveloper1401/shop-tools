@@ -105,7 +105,7 @@ services:
     container_name: front_gs_tools
     build:
       context: ../GS-Tools
-      dockerfile: dockerfile/prod/nextjs/Dockerfile
+      dockerfile: Dockerfile
     environment:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: 1
