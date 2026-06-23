@@ -4,7 +4,7 @@ WORKDIR /home/app
 
 COPY ./GS-Tools .
 
-#RUN npm run build
+RUN npm run build
 
 EXPOSE 3000
 
