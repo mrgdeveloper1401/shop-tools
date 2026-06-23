@@ -441,7 +441,7 @@ class ProductListHomePageView(generics.ListAPIView):
                 "product_id",
             ).select_related("attribute")
         )
-    )
+    ).order_by("-id")
     pagination_class = TwentyPageNumberPagination
     filterset_class = ProductHomePageFilter
     serializer_class = serializers.AdminProductListHomePageSerializer
